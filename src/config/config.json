@@ -1,0 +1,16 @@
+{
+    "mongo" : {
+        "connection_string" : "mongodb://<DB_USER>:<DB_PASSWORD>@cluster0-shard-00-00-<MONGO_ID>.mongodb.net:27017,cluster0-shard-00-01-<MONGO_ID>.mongodb.net:27017,cluster0-shard-00-02-<MONGO_ID>.mongodb.net:27017/",
+        "dbs" : {
+            "main" : "main?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin&retryWrites=true",
+            "ecosystem" : "ecosystem?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin&retryWrites=true"
+        }
+    },
+    "eth" : {
+        "url" : "https://<ETH_NET_NAME>.infura.io/v3/<INFURA_KEY>",
+        "keys" : {
+            "home" : "<APP_MGMT_PRIVATE_KEY>"
+        }
+    }
+    
+}

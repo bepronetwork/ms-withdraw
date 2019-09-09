@@ -1,0 +1,162 @@
+{
+    "000" : {
+        "key"      : "UNKNOWN",
+        "message"   : "Internal Error, Please contact the Customer Service"
+    },
+    "001" : {
+        "key"      : "INSUFFICIENT_FUNDS",
+        "message"   : "Seems you don´t have enought funds to procced with this transaction."
+    },
+    "002" : {
+        "key"      : "INVALID_AMOUNT",
+        "message"   : "The amount is negative, please set a positive number"
+    },
+    "003" : {
+        "key"      : "INVALID_ODD",
+        "message"   : "The odd set isn´t valid for a transaction, please set an odd superior to 1.2 and inferior to 1000"
+    },
+    "004" : {
+        "key"      : "USER_NOT_EXISTENT",
+        "message"   : "User is not attributed"
+    },
+    "005" : {
+        "key"      : "WRONG_PASSWORD",
+        "message"   : "Password is incorrect"
+    },
+    "006" : {
+        "key"      : "INVALID_BET_QUANTITY",
+        "message"   : "Bet quantity is incorrect"
+    },
+    "007" : {
+        "key"       : "ALREADY_EXISTING_USER",
+        "message"   : "The User is already in the App"
+    },
+    "008" : {
+        "key"       : "ALREADY_EXISTING_EMAIL",
+        "message"   : "The Email is already in the App"
+    },
+    "009" : {
+        "key"      : "INSUFFICIENT_LIQUIDITY",
+        "message"   : "Seems like the Application does not have enought Liquidity for this Bet"
+    },
+    "010" : {
+        "key"      : "DEPOSIT_TRANSACTION_NOT_VALID",
+        "message"   : "Seems like this deposit transaction is not valid"
+    },
+    "011" : {
+        "key"      : "ALREADY_EXISTING_DEPOSIT_TRANSACTION",
+        "message"   : "Seems like this transaction was already inserted and used by other deposit"
+    },
+    "012" : {
+        "key"      : "APP_NOT_EXISTENT",
+        "message"   : "App is not attributed"
+    },
+    "013" : {
+        "key"      : "BAD_BET",
+        "message"   : "Bet Parameters are either null, negative or impossible to process"
+    },
+    "014" : {
+        "key"      : "WITHDRAW_MODE_IN_API",
+        "message"   : "Withdraw mode is already IN for the API"
+    },
+    "015" : {
+        "key"      : "WITHDRAW_MODE_IN_SMART_CONTRACT",
+        "message"   : "Withdraw mode is already IN for the Smart-Contract"
+    },
+    "016" : {
+        "key"      : "BAD_SIGNED_MESSAGE",
+        "message"   : "Messages was not signed by the address sent"
+    },
+    "017" : {
+        "key"      : "BAD_WITHDRAW_AMOUNT_SIGNED",
+        "message"   : "Amount send for withdraw is wrong"
+    },
+    "018" : {
+        "key" : "WITHDRAW_AMOUNT_IS_NOT_RIGHT",
+        "message" : "Amount for Withdraw is not right"
+    },
+    "019" : {
+        "key" : "WITHDRAW_ALREADY_ADDED",
+        "message" : "Transaction Hash was alredy added for Withdraw Purposes"
+    },
+    "020" : {
+        "key" : "USER_ADDRESS_IS_NOT_VALID",
+        "message" : "Address is Not Valid with this User"  
+    },
+    "021" : {
+        "key" : "WITHDRAW_NOT_ENOUGH_BALANCE",
+        "message" : "User does not have enough balance to withdraw the amount asked"  
+    },
+    "022" : {
+        "key" : "WITHDRAW_IN_PLACE",
+        "message" : "Withdraw is in place, please resume to continue Betting"  
+    },
+    "023" : {
+        "key" : "APP_ADDRESS_IS_NOT_VALID",
+        "message" : "Address is Not Valid with this App"
+    },
+    "024" : {
+        "key" : "TRANSACTION_NOT_VALID",
+        "message" : "Transaction is Not Valid"
+    },
+    "025" : {
+        "key" : "NEGATIVE_AMOUNT",
+        "message" : "Amount Can´t be Negative"
+    },
+    "026" : {
+        "key" : "WITHDRAW_ID_NOT_DEFINED",
+        "message" : "Please provide a Withdraw Id"
+    },
+    "027" : {
+        "key"      : "GAME_NOT_EXISTENT",
+        "message"   : "Game is not attributed"
+    },
+    "028" : {
+        "key"      : "BAD_NONCE",
+        "message"   : "Nonce is either null or too small"
+    },
+    "029"  : {
+        "key"      : "TABLE_LIMIT_SUPRASSED",
+        "message"   : "This Bet Passed the Table Limit for this Game"
+    },
+    "030"  : {
+        "key"      : "BAD_LIMIT_TABLE",
+        "message"   : "Bad Table Limit"
+    },
+    "031"  : {
+        "key"      : "EDIT_TABLE_NOT_VALID",
+        "message"   : "Edit Table Limit not Valid"
+    },
+    "032"  : {
+        "key"      : "EDIT_EDGE_NOT_VALID",
+        "message"   : "Edit Edge not Valid"
+    },
+    "033" : {
+        "key"      : "BAD_EDGE",
+        "message"   : "Bad Edge"
+    },
+    "034" : {
+        "key" : "USER_NOT_EXISTENT_IN_APP",
+        "message"   : "This User is not Registered in this App"
+    },
+    "035" : {
+        "key" : "USER_HAS_2FA_DEACTIVATED",
+        "message"   : "This User hasn´t 2FA Activated, please use the normal login"
+    },
+    "036" : {
+        "key" : "WRONG_2FA_TOKEN",
+        "message"   : "2FA Key is Wrong"
+    },
+    "037" : {
+        "key" : "USER_HAS_2FA",
+        "message"   : "User has 2FA set"
+    },
+    "038" : {
+        "key" : "APP_ALREADY_EXISTENT",
+        "message"   : "App Already Existent for this Admin"
+    },
+    "039" : {
+        "key" : "ERROR_TRANSACTION",
+        "message"   : "Transaction Error"
+    }
+}
