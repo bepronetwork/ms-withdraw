@@ -120,10 +120,11 @@ const progressActions = {
                 newPlayersBalance   : Numbers.toFloat(params.allUsersBalance),
                 decimals            : params.decimals
             });
-
+            console.log("Withdraw Done")
             return params;
 
         }catch(err){
+            console.log(err);
             /* Update App Wallet in the Platform */
             await WalletsRepository.prototype.updatePlayBalance(params.app.wallet, -params.playBalanceDelta);
             throwError('ERROR_TRANSACTION')
