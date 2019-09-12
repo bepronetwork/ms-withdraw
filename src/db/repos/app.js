@@ -277,7 +277,7 @@ class AppRepository extends MongoComponent{
     addWithdraw(id, withdraw){
         return new Promise( (resolve,reject) => {
             AppRepository.prototype.schema.model.findOneAndUpdate(
-                { _id: id, withdraws : {$nin : [withdraw._id] } }, 
+                { _id: id, withdraws : {$nin : [withdraw] } }, 
                 { $push: { "withdraws" : withdraw } },
                 (err, item) => {
                     if(err){reject(err)}
@@ -291,7 +291,7 @@ class AppRepository extends MongoComponent{
     removeWithdraw(id, withdraw){
         return new Promise( (resolve,reject) => {
             AppRepository.prototype.schema.model.findOneAndUpdate(
-                { _id: id, withdraws : {$in : [withdraw._id] } }, 
+                { _id: id }, 
                 { $pull: { "withdraws" : withdraw } },
                 (err, item) => {
                     if(err){reject(err)}
