@@ -52,8 +52,8 @@ class contract{
             data : byteCode,
             from  : account.address,
             to : this.address,
-            gasPrice : 20000000000,
-            gas : 4000000,
+            gasPrice : 60000000000,
+            gas : 1000000,
             value: value ? value : '0x0'
         }
 
