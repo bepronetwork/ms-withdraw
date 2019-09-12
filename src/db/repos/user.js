@@ -107,6 +107,19 @@ class UsersRepository extends MongoComponent{
             )
         });
     }
+
+    removeWithdraw(user_id, withdraw){
+        return new Promise( (resolve,reject) => {
+            UsersRepository.prototype.schema.model.findOneAndUpdate(
+                { _id: user_id, withdraws : {$in : [withdraw._id] } }, 
+                { $pull: { "withdraws" : withdraw } },
+                (err, item) => {
+                    if(err){reject(err)}
+                    resolve(true);
+                }
+            )
+        });
+    }
     
     addBet(user_id, bet){
         return new Promise( (resolve,reject) => {

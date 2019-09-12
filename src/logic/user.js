@@ -121,6 +121,7 @@ const progressActions = {
             
             /* Update User Wallet in the Platform */
             await WalletsRepository.prototype.updatePlayBalance(params.user.wallet, params.playBalanceDelta);
+            
             /* Add Deposit to user */
             await UsersRepository.prototype.addWithdraw(params.user._id, withdrawSaveObject._id);
 
@@ -133,6 +134,9 @@ const progressActions = {
 
             return params;
         }catch(err){
+                    
+            /* Add Deposit to user */
+            await UsersRepository.prototype.removeWithdraw(params.user._id, withdrawSaveObject._id);
             /* Update User Wallet in the Platform */
             await WalletsRepository.prototype.updatePlayBalance(params.user.wallet, -params.playBalanceDelta);
             // Transaction Error
