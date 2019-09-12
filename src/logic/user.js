@@ -107,13 +107,6 @@ const progressActions = {
     __requestWithdraw : async (params) => {
         try{
             try{
-                /* Makes Withdrawal Available on the Smart-Contract */
-                await params.casinoContract.approveWithdraw({
-                    address             : params.address,
-                    amount              : Numbers.toFloat(params.amount),
-                    decimals            : params.decimals
-                });
-
                 /* Add Withdraw to user */
                 let withdraw = new Withdraw({
                     user                    : params.user,
@@ -131,9 +124,18 @@ const progressActions = {
                 await WalletsRepository.prototype.updatePlayBalance(params.user.wallet, params.playBalanceDelta);
                 /* Add Deposit to user */
                 await UsersRepository.prototype.addWithdraw(params.user._id, withdrawSaveObject._id);
-                
+
+                /* Makes Withdrawal Available on the Smart-Contract */
+                await params.casinoContract.approveWithdraw({
+                    address             : params.address,
+                    amount              : Numbers.toFloat(params.amount),
+                    decimals            : params.decimals
+                });
+
                 return params;
             }catch(err){
+                /* Update User Wallet in the Platform */
+                await WalletsRepository.prototype.updatePlayBalance(params.user.wallet, -params.playBalanceDelta);
                 // Transaction Error
                 throwError('ERROR_TRANSACTION')
             }

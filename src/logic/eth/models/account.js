@@ -32,8 +32,8 @@ class account{
                     data : data,
                     from  : this.getAddress(),
                     to : address,
-                    gasPrice : 20000000000,
-                    gas : 4000000,
+                    gasPrice : 40000000000,
+                    gas : 210000,
                     value: this.web3.utils.toWei(amount.toString(), 'ether')
                 }
                 let result = await this.account.signTransaction(tx);
