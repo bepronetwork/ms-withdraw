@@ -131,10 +131,12 @@ const progressActions = {
                 amount              : Numbers.toFloat(params.amount),
                 decimals            : params.decimals
             });
+            console.log("Withdraw Done")
 
             return params;
         }catch(err){
-                    
+            console.log(err);
+
             /* Add Deposit to user */
             await UsersRepository.prototype.removeWithdraw(params.user._id, withdrawSaveObject._id);
             /* Update User Wallet in the Platform */
