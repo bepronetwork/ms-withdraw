@@ -287,6 +287,21 @@ class AppRepository extends MongoComponent{
         });
     }
 
+
+    removeWithdraw(id, withdraw){
+        return new Promise( (resolve,reject) => {
+            AppRepository.prototype.schema.model.findOneAndUpdate(
+                { _id: id, withdraws : {$in : [withdraw._id] } }, 
+                { $pull: { "withdraws" : withdraw } },
+                (err, item) => {
+                    if(err){reject(err)}
+                    resolve(true);
+                }
+            )
+        });
+    }
+
+
     findApp = (App_name) => {
         return new Promise( (resolve, reject) => {
             AppRepository.prototype.schema.model.findOne({'name' : App_name})
