@@ -92,7 +92,27 @@ const processActions = {
   
 const progressActions = {
     __requestWithdraw : async (params) => {
+
+        /* Add Withdraw to user */
+        var withdraw = new Withdraw({
+            app                     : params.app,
+            creation_timestamp      : new Date(),                    
+            address                 : params.withdrawAddress,                         // Deposit Address 
+            currency                : params.currencyTicker,
+            amount                  : params.amount,
+            nonce                   : params.nonce,
+        })
+
+        /* Save Deposit Data */
+        var withdrawSaveObject = await withdraw.createWithdraw();
+
         try{
+            /* Update App Wallet in the Platform */
+            await WalletsRepository.prototype.updatePlayBalance(params.app.wallet, params.playBalanceDelta);
+
+            /* Add Withdraw to App */
+            await AppRepository.prototype.addWithdraw(params.app._id, withdrawSaveObject._id);
+
             /* Update All Users Balance in Smart-Contract */
             await params.casinoContract.approveOwnerWithdrawal({
                 address             : params.withdrawAddress,
@@ -101,29 +121,11 @@ const progressActions = {
                 decimals            : params.decimals
             });
 
-              /* Add Withdraw to user */
-            let withdraw = new Withdraw({
-                app                     : params.app,
-                creation_timestamp      : new Date(),                    
-                address                 : params.withdrawAddress,                         // Deposit Address 
-                currency                : params.currencyTicker,
-                amount                  : params.amount,
-                nonce                   : params.nonce,
-            })
-
-            /* Save Deposit Data */
-            let withdrawSaveObject = await withdraw.createWithdraw();
-
-            /* Update App Wallet in the Platform */
-            await WalletsRepository.prototype.updatePlayBalance(params.app.wallet, params.playBalanceDelta);
-
-            /* Add Withdraw to App */
-            await AppRepository.prototype.addWithdraw(params.app._id, withdrawSaveObject._id);
-
             return params;
 
         }catch(err){
-            console.log(err);
+            /* Update App Wallet in the Platform */
+            await WalletsRepository.prototype.updatePlayBalance(params.app.wallet, -params.playBalanceDelta);
             throwError('ERROR_TRANSACTION')
         }
     }

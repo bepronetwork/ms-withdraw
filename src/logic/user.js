@@ -105,40 +105,38 @@ const processActions = {
   
 const progressActions = {
     __requestWithdraw : async (params) => {
+         /* Add Withdraw to user */
+         var withdraw = new Withdraw({
+            user                    : params.user,
+            creation_timestamp      : new Date(),                    
+            address                 : params.withdrawAddress,                         // Deposit Address 
+            currency                : params.currencyTicker,
+            amount                  : params.amount,
+            nonce                   : params.nonce,
+        })
+    
+        /* Save Deposit Data */
+        var withdrawSaveObject = await withdraw.createWithdraw();
         try{
-            try{
-                /* Makes Withdrawal Available on the Smart-Contract */
-                await params.casinoContract.approveWithdraw({
-                    address             : params.address,
-                    amount              : Numbers.toFloat(params.amount),
-                    decimals            : params.decimals
-                });
-
-                /* Add Withdraw to user */
-                let withdraw = new Withdraw({
-                    user                    : params.user,
-                    creation_timestamp      : new Date(),                    
-                    address                 : params.withdrawAddress,                         // Deposit Address 
-                    currency                : params.currencyTicker,
-                    amount                  : params.amount,
-                    nonce                   : params.nonce,
-                })
             
-                /* Save Deposit Data */
-                let withdrawSaveObject = await withdraw.createWithdraw();
+            /* Update User Wallet in the Platform */
+            await WalletsRepository.prototype.updatePlayBalance(params.user.wallet, params.playBalanceDelta);
+            /* Add Deposit to user */
+            await UsersRepository.prototype.addWithdraw(params.user._id, withdrawSaveObject._id);
 
-                /* Update User Wallet in the Platform */
-                await WalletsRepository.prototype.updatePlayBalance(params.user.wallet, params.playBalanceDelta);
-                /* Add Deposit to user */
-                await UsersRepository.prototype.addWithdraw(params.user._id, withdrawSaveObject._id);
-                
-                return params;
-            }catch(err){
-                // Transaction Error
-                throwError('ERROR_TRANSACTION')
-            }
+            /* Makes Withdrawal Available on the Smart-Contract */
+            await params.casinoContract.approveWithdraw({
+                address             : params.address,
+                amount              : Numbers.toFloat(params.amount),
+                decimals            : params.decimals
+            });
+
+            return params;
         }catch(err){
-            throw err;
+            /* Update User Wallet in the Platform */
+            await WalletsRepository.prototype.updatePlayBalance(params.user.wallet, -params.playBalanceDelta);
+            // Transaction Error
+            throwError('ERROR_TRANSACTION')
         }
     }
 }
