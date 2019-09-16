@@ -12,7 +12,6 @@ context('Withdraw under min allowed', async () => {
     
     before( async () =>  {
         app = global.test.app;
-        contract = global.test.contract;
         user = global.test.user;
         user_eth_account = global.test.user_eth_account;    
     });
