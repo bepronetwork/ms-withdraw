@@ -81,7 +81,7 @@ class ErrorManager {
                     }
                     // Verify if Minimum Withdraw was passed
                     if(parseFloat(object.amount) < MIN_WITHDRAW){
-                        libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.MIN_WITHDRAW_PASSED));
+                        libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.MIN_WITHDRAW_NOT_PASSED));
                     }
                     // Verify if is Amount is Verified
                     /*if(!object.isAmountVerified)
