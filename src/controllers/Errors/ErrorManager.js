@@ -1,5 +1,6 @@
 import {ErrorHandler} from './codes';
 import _ from 'lodash';
+import { MIN_WITHDRAW } from '../../config';
 
 // Private Use
 let libraries;
@@ -29,8 +30,13 @@ class ErrorManager {
                     if(!object.user_in_app)
                         throw libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.USER_NOT_EXISTENT_IN_APP));
                     // Verify if User does not have enough balance
-                    if(!object.hasEnoughBalance)
+                    if(!object.hasEnoughBalance){
                         libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.WITHDRAW_NOT_ENOUGH_BALANCE));
+                    }                    
+                    // Verify if Minimum Withdraw was passed
+                    if(object.amount < MIN_WITHDRAW){
+                        libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.MIN_WITHDRAW_PASSED));
+                    }
                     // Verify if Address of User is the Same as the Withdraw one
                     /*if(!object.isValidAddress)
                         libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.USER_ADDRESS_IS_NOT_VALID));*/

@@ -53,7 +53,8 @@ ErrorHandler.prototype.KEYS =  {
     'WRONG_2FA_TOKEN'                       : "036",
     'USER_HAS_2FA'                          : "037",
     'APP_ALREADY_EXISTENT'                  : "038",
-    'ERROR_TRANSACTION'                     : "039"
+    'ERROR_TRANSACTION'                     : "039",
+    'MIN_WITHDRAW_PASSED'                   : "040"
 }; 
 
 

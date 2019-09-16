@@ -25,6 +25,8 @@ export const PUBLIC_KEY = process.env.PUBLIC_KEY;
 
 export const PRIVATE_KEY = process.env.PRIVATE_KEY;
 
+export const MIN_WITHDRAW = parseFloat(process.env.MIN_WITHDRAW);
+
 /* Variables */
 
 var ETH_NETWORK = config.eth;

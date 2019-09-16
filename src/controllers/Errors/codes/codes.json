@@ -158,5 +158,9 @@
     "039" : {
         "key" : "ERROR_TRANSACTION",
         "message"   : "Transaction Error"
+    },
+    "040" : {
+        "key" : "MIN_WITHDRAW_PASSED",
+        "message"   : "Mininum Withdrawal was Passed"
     }
 }
