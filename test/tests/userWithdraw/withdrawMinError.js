@@ -8,17 +8,13 @@ const expect = chai.expect;
 const WITHDRAW_AMOUNT = 1;
 
 context('Withdraw under min allowed', async () => {
-    var user, app, user_eth_account, contract;
+    var user, app, user_eth_account;
     
     before( async () =>  {
-        
         app = global.test.app;
         contract = global.test.contract;
         user = global.test.user;
-        user_eth_account = global.test.user_eth_account;
-
-        user = await loginUser({username : user.username, password : user.password, app_id : app.id});
-    
+        user_eth_account = global.test.user_eth_account;    
     });
 
 
