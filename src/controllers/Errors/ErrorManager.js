@@ -24,7 +24,7 @@ class ErrorManager {
                     if(typeof object == 'undefined' || Object.is(object, null))
                         libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.USER_NOT_EXISTENT));
                     // Verify if Withdraw Amount is Positive
-                    if(object.amount <= 0)
+                    if(parseFloat(object.amount) <= 0)
                         libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.NEGATIVE_AMOUNT))
                     // Verify User is in App
                     if(!object.user_in_app)
@@ -34,7 +34,7 @@ class ErrorManager {
                         libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.WITHDRAW_NOT_ENOUGH_BALANCE));
                     }                    
                     // Verify if Minimum Withdraw was passed
-                    if(object.amount < MIN_WITHDRAW){
+                    if(parseFloat(object.amount) < MIN_WITHDRAW){
                         libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.MIN_WITHDRAW_PASSED));
                     }
                     // Verify if Address of User is the Same as the Withdraw one
@@ -78,6 +78,10 @@ class ErrorManager {
                     // Verify if App is Mentioned
                     if(!object.app || _.isEmpty(object.app)){
                         libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.APP_NOT_EXISTENT)); break;   
+                    }
+                    // Verify if Minimum Withdraw was passed
+                    if(parseFloat(object.amount) < MIN_WITHDRAW){
+                        libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.MIN_WITHDRAW_PASSED));
                     }
                     // Verify if is Amount is Verified
                     /*if(!object.isAmountVerified)
