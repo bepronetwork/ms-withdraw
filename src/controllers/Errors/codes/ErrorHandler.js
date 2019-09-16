@@ -54,7 +54,7 @@ ErrorHandler.prototype.KEYS =  {
     'USER_HAS_2FA'                          : "037",
     'APP_ALREADY_EXISTENT'                  : "038",
     'ERROR_TRANSACTION'                     : "039",
-    'MIN_WITHDRAW_PASSED'                   : "040"
+    'MIN_WITHDRAW_NOT_PASSED'                   : "040"
 }; 
 
 
