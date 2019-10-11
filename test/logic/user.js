@@ -5,10 +5,10 @@ const _ = require('lodash');
 import { Security } from '../controllers/Security';
 import { ErrorManager } from '../controllers/Errors';
 import LogicComponent from './logicComponent';
-import { UsersRepository, AppRepository, WalletsRepository, DepositRepository, WithdrawRepository } from '../db/repos';
+import { UsersRepository, AppRepository, WalletsRepository, DepositRepository, WithdrawRepository, AffiliateLinkRepository, AffiliateRepository } from '../db/repos';
 import Numbers from './services/numbers';
 import { verifytransactionHashDepositUser, verifytransactionHashWithdrawUser } from './services/services';
-import { Deposit, Withdraw } from '../models';
+import { Deposit, Withdraw, AffiliateLink } from '../models';
 import CasinoContract from './eth/CasinoContract';
 import codes from './categories/codes';
 import { globals } from '../Globals';
@@ -39,9 +39,9 @@ const processActions = {
         var input_params = params;
         let normalized = {};
         let user = await __private.db.findUser(params.username);     
+        if(!user){throwError('USER_NOT_EXISTENT')}
         var app = user.app_id; 
         var user_in_app = (app._id == params.app);
-
 		if(user){
 			normalized = {
 				username : user.username,
@@ -55,10 +55,15 @@ const processActions = {
 	},
 	__register : async (params) => {
 
+        const { affiliateLink, affiliate } = params;
+
         var input_params = params;
 		//Set up Password Structure
         let user, hash_password;
-        
+
+        let app = await AppRepository.prototype.findAppById(params.app);
+        if(!app){throwError('APP_NOT_EXISTENT')}
+
         if(params.user_external_id){
             // User is Extern (Only Widget Clients)
             user = await AppRepository.prototype.findUserByExternalId(input_params.app, input_params.user_external_id);
@@ -81,16 +86,18 @@ const processActions = {
             isAddressAlreadyRegistered,
 			alreadyExists	: alreadyExists,
 			username 		: params.username,
-			full_name		: params.full_name,
+            full_name		: params.full_name,
             name 			: params.name,
             address         : params.address,
 			hash_password,
             wallet 			: params.wallet,
             register_timestamp : new Date(),
-			nationality		: params.nationality,
+            nationality		: params.nationality,
+            affiliate,
 			age				: params.age,
-			email			: params.email,
-			app_id			: params.app,
+            email			: params.email,
+            affiliateLink,
+			app_id			    : params.app,
 			external_user	: params.user_external_id ? true : false,
 			external_id		: params.user_external_id
 		}
@@ -261,12 +268,33 @@ const processActions = {
 
   
 const progressActions = {
-	__register : async (params) => {
-		let user = await self.save(params);
-        // Add to App
-        await AppRepository.prototype.addUser(params.app_id, user);
-        user = await UsersRepository.prototype.findUserById(user._id);
-		return user
+    __register : async (params) => {
+        try{
+            const { affiliate } = params;
+            let user = await self.save(params);
+            /* Register of Affiliate Link */
+            let affiliateLinkObject = await (new AffiliateLink({
+                userAffiliated : user._id,
+                app_id : params.app_id,
+                affiliateLink : params.affiliateLink
+            })).register();
+            /* Add affiliateLink _id */ 
+            await UsersRepository.prototype.setAffiliateLink(user._id, affiliateLinkObject._id);
+            /* Add Affiliate to Affiliate Link */ 
+            await AffiliateLinkRepository.prototype.setAffiliate(affiliateLinkObject._id, affiliate);
+            /* Add Afiliate Link to Parent Affiliates */
+            let promisesId = affiliateLinkObject.parentAffiliatedLinks.map( async paf => 
+                await AffiliateRepository.prototype.addAffiliateLinkChild(paf.affiliate, affiliateLinkObject._id)    
+            )
+
+            await Promise.all(promisesId);
+            /* Add to App */
+            await AppRepository.prototype.addUser(params.app_id, user);
+            user = await UsersRepository.prototype.findUserById(user._id);
+            return user;
+        }catch(err){
+            throw err;
+        }
 	},
 	__summary : async (params) => {
 		return params;

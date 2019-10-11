@@ -1,6 +1,7 @@
 import { generateEthAccountWithTokensAndEthereum } from "./eth";
 import { Admin, App, User } from "../models";
 import { globals } from "../Globals";
+import { WalletsRepository } from "../db/repos";
 
 export async function createEthAccount({ethAmount, tokenAmount}){
     /* Create User Address and give it ETH */
@@ -141,3 +142,7 @@ export async function appConfirmDeposit({app_id, transactionHash, amount}){
     
 }
 
+
+export async function addWalletAffiliate({user, amount}){
+    return await WalletsRepository.prototype.updatePlayBalance(user.affiliate.wallet, amount);
+}

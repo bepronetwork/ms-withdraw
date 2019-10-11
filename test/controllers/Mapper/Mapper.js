@@ -101,7 +101,8 @@ let outputs = {
             },
             "withdraws" : object.withdraws,
             "deposits"  : object.deposits,
-            "verifiedAccounts" : object.verifiedAccount
+            "verifiedAccounts" : object.verifiedAccount,
+            ...object
         }
     },
     deposit : (object) => {
