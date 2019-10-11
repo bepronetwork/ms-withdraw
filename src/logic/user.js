@@ -39,7 +39,7 @@ const processActions = {
             if(params.tokenAmount <= 0){throwError('INVALID_AMOUNT')}
             /* Get User Id */
             user = await UsersRepository.prototype.findUserById(params.user);
-            let app = await AppRepository.prototype.findAppById(params.app);
+            var app = await AppRepository.prototype.findAppById(params.app);
             if(!app){throwError('APP_NOT_EXISTENT')}
             if(!user){throwError('USER_NOT_EXISTENT')}
             
@@ -89,7 +89,63 @@ const processActions = {
         }catch(err){ 
             throw err;
         }
-    }
+    },
+    __requestAffiliateWithdraw : async (params) => {
+        var user;
+        try{
+            if(params.tokenAmount <= 0){throwError('INVALID_AMOUNT')}
+            /* Get User Id */
+            user = await UsersRepository.prototype.findUserById(params.user);
+            let app = await AppRepository.prototype.findAppById(params.app);
+            if(!app){throwError('APP_NOT_EXISTENT')}
+            if(!user){throwError('USER_NOT_EXISTENT')}
+            
+            /* Create Casino Contract Instance */
+            let casinoContract = new CasinoContract({
+                web3                : globals.web3,
+                account             : globals.getManagerAccount(),
+                contractAddress     : app.platformAddress,
+                tokenAddress        : app.platformTokenAddress
+            })
+            
+            let amount = Numbers.toFloat(Math.abs(params.tokenAmount));
+
+            /* Verify if Withdraw position is already opened in the system */
+            let amountApprovedForWithdrawal = await casinoContract.getApprovedWithdrawAmount({
+                address : user.address, decimals : app.decimals
+            })
+            let isWithdrawingSmartContract = (amountApprovedForWithdrawal) > 0 ? true : false;
+
+            /* User Current Balance */
+            let currentBalance = Numbers.toFloat(user.affiliate.wallet.playBalance);
+            /* Verify if User has Enough Balance for Withdraw */
+            let hasEnoughBalance = (amount <= currentBalance);
+            /* Verify if User is in App */
+            let user_in_app = (app.users.findIndex(x => (x._id.toString() == user._id.toString())) > -1);
+
+            /* Verify if Withdraw position is already opened in the Smart-Contract */
+            let res = {
+                hasEnoughBalance,
+                user_in_app,
+                currencyTicker      : app.currencyTicker,
+                withdrawAddress : user.address,
+                amount,
+                playBalanceDelta : Numbers.toFloat(-Math.abs(amount)),
+                casinoContract : casinoContract,
+                user : user,
+                address     : user.address,
+                app : app,
+                decimals : app.decimals,
+                nonce : params.nonce,
+                amountApprovedForWithdrawal,
+                isAlreadyWithdrawingAPI : user.isWithdrawing,
+                isAlreadyWithdrawingSmartContract : isWithdrawingSmartContract,
+            }
+            return res;
+        }catch(err){ 
+            throw err;
+        }
+    },
 }
 
 
@@ -131,7 +187,6 @@ const progressActions = {
                 amount              : Numbers.toFloat(params.amount),
                 decimals            : params.decimals
             });
-            console.log("Withdraw Done")
 
             return params;
         }catch(err){
@@ -144,6 +199,49 @@ const progressActions = {
             // Transaction Error
             throwError('ERROR_TRANSACTION')
         }
+    },
+    __requestAffiliateWithdraw :  async (params) => {
+        
+        /* Add Withdraw to user */
+        var withdraw = new Withdraw({
+           user                    : params.user,
+           creation_timestamp      : new Date(),                    
+           address                 : params.withdrawAddress,                         // Deposit Address 
+           currency                : params.currencyTicker,
+           amount                  : params.amount,
+           nonce                   : params.nonce,
+           isAffiliate             : true
+       })
+   
+       /* Save Deposit Data */
+       var withdrawSaveObject = await withdraw.createWithdraw();
+
+       try{
+           
+           /* Update User Wallet in the Platform */
+           await WalletsRepository.prototype.updatePlayBalance(params.user.affiliate.wallet, params.playBalanceDelta);
+           
+           /* Add Deposit to user */
+           await UsersRepository.prototype.addWithdraw(params.user._id, withdrawSaveObject._id);
+
+           /* Makes Withdrawal Available on the Smart-Contract */
+           await params.casinoContract.approveWithdraw({
+               address             : params.address,
+               amount              : Numbers.toFloat(params.amount),
+               decimals            : params.decimals
+           });
+
+           return params;
+       }catch(err){
+           console.log(err);
+
+           /* Add Deposit to user */
+           await UsersRepository.prototype.removeWithdraw(params.user._id, withdrawSaveObject._id);
+           /* Update User Wallet in the Platform */
+           await WalletsRepository.prototype.updatePlayBalance(params.user.affiliate.wallet, -params.playBalanceDelta);
+           // Transaction Error
+           throwError('ERROR_TRANSACTION')
+       }
     }
 }
 
@@ -198,6 +296,9 @@ class UserLogic extends LogicComponent {
                 case 'RequestWithdraw' : {
 					return await library.process.__requestWithdraw(params); 
                 };
+                case 'RequestAffiliateWithdraw' : {
+                    return await library.process.__requestAffiliateWithdraw(params); 
+                }
 			}
 		}catch(err){
 			throw err;
@@ -227,6 +328,9 @@ class UserLogic extends LogicComponent {
                 case 'RequestWithdraw' : {
 					return await library.progress.__requestWithdraw(params); 
                 };
+                case 'RequestAffiliateWithdraw' : {
+                    return await library.progress.__requestAffiliateWithdraw(params); 
+                }
 			}
 		}catch(err){
 			throw err;

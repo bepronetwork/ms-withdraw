@@ -25,6 +25,7 @@ const initialState = {
 const runTests = async () => {
 
     mocha
+    .addFile('./test/tests/affiliateWithdraw/index.js')
     .addFile('./test/tests/appWithdraw/index.js')
     .addFile('./test/tests/userWithdraw/index.js')
     .timeout(10*60*60*1000)
@@ -50,7 +51,6 @@ const test = async () => {
             let MASTER_ETH_AMOUNT = await globals.masterAccount.getBalance();
             let erc20Contract = globals.getERC20Contract(global.erc20TokenAddress)
             let MASTER_TOKEN_AMOUNT =  Numbers.fromDecimals(await erc20Contract.getTokenAmount(globals.masterAccount.getAddress()), 18);
-
             if(MASTER_ETH_AMOUNT < 0.5){
                 throw new Error(`ETH is less than 1 for Master \nPlease recharge ETH for Address : ${globals.masterAccount.getAddress()}`)
             }
