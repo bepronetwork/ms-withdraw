@@ -56,6 +56,7 @@ if(ETH_RPC_URL){
     ETH_NETWORK = changeAllStringsInObjectRecursive(ETH_NETWORK, 'ETH_NET_NAME', ETH_NET_NAME);
     ETH_NETWORK = changeAllStringsInObjectRecursive(ETH_NETWORK, 'INFURA_KEY', INFURA_KEY);
 }
+
 export {
     ETH_NETWORK,
     DB_MONGO
