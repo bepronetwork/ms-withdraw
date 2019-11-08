@@ -23,6 +23,7 @@ WithdrawSchema.prototype.schema =  {
     maxConfirmations        : { type: Number, required : true, default : 0},
     confirmed               : { type: Boolean, default : false},
     done                    : { type: Boolean, default : false},
+    status                  : { type: String, required : true, default : 'Queue'},
     isAffiliate             : { type: Boolean, default : false}
 }
 

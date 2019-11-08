@@ -183,21 +183,18 @@ const processActions = {
             withdraw = await WithdrawRepository.prototype.findWithdrawById(params.withdraw_id);
             let withdrawExists = withdraw ? true : false;
 
-            /* Verify App Balance in Smart-Contract */
+            /* Verify App Balance in Smart-Contract
             let currentOpenWithdrawingAmount = await casinoContract.getApprovedWithdrawAmount(
                 {address : user.address, decimals : app.decimals});
             
             var hashWithdrawingPositionOpen = (currentOpenWithdrawingAmount != 0 ) ? true : false;
-
-            /* Verify User Balance in Smart-Contract */
-            let newBalance = Numbers.toFloat(Numbers.fromDecimals(await casinoContract.getUserBalance(params.address), app.decimals));
-            
+            */
             /* Verify User Balance in API */
             let currentAPIBalance = Numbers.toFloat(user.wallet.playBalance);
     
             /* Withdraw Occured in the Smart-Contract */
             transaction_params = await verifytransactionHashWithdrawUser(
-                'eth', params_input.transactionHash, params_input.tokenAmount, app.platformAddress, app.decimals
+                'eth', params_input.transactionHash, app.platformAddress, app.decimals
             )
 
             let transactionIsValid = transaction_params.isValid;
@@ -218,11 +215,9 @@ const processActions = {
                 user_in_app,
                 withdraw_id : params.withdraw_id,
                 transactionIsValid,
-                hashWithdrawingPositionOpen,
+                //hashWithdrawingPositionOpen,
                 isValidAddress,
-                newDecentralizedBalance : newBalance,
                 currentAPIBalance,
-                newBalance,
                 currentOpenWithdrawingAmount,
                 casinoContract : casinoContract,
                 wasAlreadyAdded,
@@ -332,9 +327,7 @@ const progressActions = {
             await WithdrawRepository.prototype.finalizeWithdraw(params.withdraw_id, {
                 transactionHash         : params.transactionHash,
                 last_update_timestamp   : new Date(),                             
-                amount                  : Numbers.toFloat(Math.abs(params.amount)),
-                confirmed               : true,
-                done                    : params.withdrawExists
+                amount                  : Numbers.toFloat(Math.abs(params.amount))
             });
             return params;
         }catch(err){

@@ -101,7 +101,7 @@ async function verifytransactionHashDepositUser(blockchain, transactionHash, amo
     }
 };
 
-async function verifytransactionHashWithdrawUser(blockchain, transactionHash, transferedAmount, platformAddress, decimals){
+async function verifytransactionHashWithdrawUser(blockchain, transactionHash, platformAddress, decimals){
     try{
         /* Get Information of this transactionHash */
         let res_transaction = await globals.web3.eth.getTransaction(transactionHash);
@@ -112,12 +112,7 @@ async function verifytransactionHashWithdrawUser(blockchain, transactionHash, tr
         if(new String(res_transaction_decoded.tokensTransferedFrom).toLowerCase() != new String(platformAddress).toLowerCase()){
             throw false;
         }
-        if(
-            Numbers.fromExponential(new Number(res_transaction_decoded.tokenAmount)) 
-            != Numbers.toSmartContractDecimals(new Number(transferedAmount), decimals)){
-            throw false;
-        }
-
+       
         return {
             isValid : true,
             tokensTransferedFrom : res_transaction_decoded.tokensTransferedFrom,
@@ -133,7 +128,7 @@ async function verifytransactionHashWithdrawUser(blockchain, transactionHash, tr
     }
 };
 
-async function verifytransactionHashWithdrawApp(blockchain, transactionHash, transferedAmount, platformAddress, decimals){
+async function verifytransactionHashWithdrawApp(blockchain, transactionHash, platformAddress, decimals){
     try{
         /* Get Information of this transactionHash */
         let res_transaction = await globals.web3.eth.getTransaction(transactionHash);
@@ -143,14 +138,7 @@ async function verifytransactionHashWithdrawApp(blockchain, transactionHash, tra
         /* Verify if sender of Transaction is platformAddress */
         if(new String(res_transaction_decoded.tokensTransferedFrom).toLowerCase() != new String(platformAddress).toLowerCase()){
             throw false;
-        }
-
-        /* Verify if the Token Amount is the same */
-        if(
-            Numbers.fromExponential(new Number(res_transaction_decoded.tokenAmount)) 
-            != Numbers.toSmartContractDecimals(new Number(transferedAmount), decimals)){
-            throw false;
-        }
+        }       
 
         return {
             isValid : true,

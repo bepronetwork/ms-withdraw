@@ -212,7 +212,7 @@ const processActions = {
 
         /* Withdraw Occured in the Smart-Contract */
         transaction_params = await verifytransactionHashWithdrawApp(
-            'eth', params_input.transactionHash, params_input.tokenAmount, app.platformAddress, app.decimals
+            'eth', params_input.transactionHash, app.platformAddress, app.decimals
         )
 
         let transactionIsValid = transaction_params.isValid;
@@ -464,14 +464,11 @@ const progressActions = {
     },
    
     __finalizeWithdraw : async (params) => {
-            
         /* Add Withdraw to user */
         await WithdrawRepository.prototype.finalizeWithdraw(params.withdraw_id, {
             transactionHash         : params.transactionHash,
             last_update_timestamp   : new Date(),                             
-            amount                  : Numbers.toFloat(Math.abs(params.amount)),
-            confirmed               : true,
-            done                    : params.withdrawExists
+            amount                  : Numbers.toFloat(Math.abs(params.amount))
         })
 
         return params;
