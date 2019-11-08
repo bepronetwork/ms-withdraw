@@ -160,10 +160,9 @@ class CasinoContract{
         }   
     }
 
-    async approveOwnerWithdrawal({newPlayersBalance, decimals, address, amount}){
+    async approveOwnerWithdrawal({newPlayersBalance, decimals, amount}){
         try{
             let data = await self.contract.getContract().methods.setOwnerWithdrawal(
-                address, 
                 Numbers.toSmartContractDecimals(newPlayersBalance, decimals),
                 Numbers.toSmartContractDecimals(amount, decimals)
                 ).encodeABI();
@@ -265,20 +264,6 @@ class CasinoContract{
         }
     }
 
-    async approveWithdraw({address, amount, decimals}){
-        try{
-            let data = await self.contract.getContract().methods.setUserWithdrawal(
-                address, 
-                Numbers.toSmartContractDecimals(amount, decimals)
-                ).encodeABI();
-            let response = await self.contract.send(self.account.getAccount(), data);
-            return response;  
-        }catch(err){
-            console.log(err);
-            throw err;
-        }
-    }
-
     fromIntToFloatEthereum(int){
         return Math.round(int*100);
     }
@@ -351,18 +336,6 @@ class CasinoContract{
             return await self.contract.send(self.account.getAccount(), data);  
         }catch(err){
             console.log(err)
-        }
-    }
-
-    async withdrawFunds({amount}){
-        try{
-            let amountWithDecimals = Numbers.toSmartContractDecimals(amount, self.decimals);
-            let data = self.contract.getContract().methods.withdraw(
-                amountWithDecimals
-            ).encodeABI(); 
-            return await self.contract.send(self.account.getAccount(), data);  
-        }catch(err){
-            throw err;
         }
     }
 

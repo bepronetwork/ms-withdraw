@@ -5,7 +5,7 @@ import {  appWalletInfo } from "../../utils/env";
 import Numbers from "../../logic/services/numbers";
 const expect = chai.expect;
 
-context('Withdraw All Amount', async () => {
+context('Withdraw 0', async () => {
     var app, contract, admin, admin_eth_account;
 
     before( async () =>  {

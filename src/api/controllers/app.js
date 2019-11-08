@@ -16,7 +16,7 @@ import MiddlewareSingleton from '../helpers/middleware';
  * @todo Add description of AppsController
  */
 
-async function requestAppWithdraw (req, res) {
+async function requestAppWithdraw(req, res) {
     try{
         SecuritySingleton.verify({type : 'app', req});
         let params = req.body;
@@ -28,6 +28,32 @@ async function requestAppWithdraw (req, res) {
 	}
 }
 
+async function finalizeAppWithdraw(req, res) {
+    try{
+        SecuritySingleton.verify({type : 'app', req});
+        let params = req.body;
+		let app = new App(params);
+		let data = await app.finalizeWithdraw();
+        MiddlewareSingleton.respond(res, data);
+	}catch(err){
+        MiddlewareSingleton.respondError(res, err);
+	}
+}
+
+async function getUserWithdraws(req, res) {
+    try{
+        SecuritySingleton.verify({type : 'app', req});
+        let params = req.body;
+		let app = new App(params);
+		let data = await app.getUserWithdraws();
+        MiddlewareSingleton.respond(res, data);
+	}catch(err){
+        MiddlewareSingleton.respondError(res, err);
+	}
+}
+
 export {
-  requestAppWithdraw
+    requestAppWithdraw,
+    finalizeAppWithdraw,
+    getUserWithdraws
 };

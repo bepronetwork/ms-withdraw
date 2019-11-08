@@ -62,6 +62,15 @@ class User extends ModelComponent{
         }
     }
 
+    
+    async finalizeWithdraw(){
+        try{
+            return await this.process('FinalizeWithdraw');
+        }catch(err){
+            throw err;
+        }
+    }
+
 }
 
 export default User;

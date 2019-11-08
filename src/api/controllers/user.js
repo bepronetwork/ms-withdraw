@@ -28,7 +28,21 @@ async function requestAffiliateWithdraw (req, res) {
         MiddlewareSingleton.respondError(res, err);
 	}
 }
+
+async function finalizeWithdraw (req, res) {
+    try{
+        SecuritySingleton.verify({type : 'app', req});
+        let params = req.body;
+		let user = new User(params);
+        let data = await user.finalizeWithdraw();
+        MiddlewareSingleton.respond(res, data);
+	}catch(err){
+        MiddlewareSingleton.respondError(res, err);
+	}
+}
+
 export {
     requestWithdraw,
+    finalizeWithdraw,
     requestAffiliateWithdraw
 }
