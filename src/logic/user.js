@@ -244,7 +244,7 @@ const progressActions = {
          /* Add Withdraw to user */
          var withdraw = new Withdraw({
             app                     : params.app,
-            user                    : params.user,
+            user                    : params.user._id,
             creation_timestamp      : new Date(),                    
             address                 : params.withdrawAddress,                         // Deposit Address 
             currency                : params.currencyTicker,
@@ -265,10 +265,9 @@ const progressActions = {
       
     },
     __requestAffiliateWithdraw :  async (params) => {
-        
         /* Add Withdraw to user */
         var withdraw = new Withdraw({
-           user                    : params.user,
+           user                    : params.user._id,
            app                     : params.app,
            creation_timestamp      : new Date(),                    
            address                 : params.withdrawAddress,                         // Deposit Address 
