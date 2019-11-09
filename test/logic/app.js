@@ -462,7 +462,6 @@ const progressActions = {
 
         return params;
     },
-   
     __finalizeWithdraw : async (params) => {
         /* Add Withdraw to user */
         await WithdrawRepository.prototype.finalizeWithdraw(params.withdraw_id, {

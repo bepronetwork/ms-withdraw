@@ -8,7 +8,7 @@ export default {
             master : '0x6E390AC06C6CCFB01D8F10C417EFD5A23B5217A9268D95D6E0B9E8FE035D1156',
             mgmt : '0xA109C83409D4DCB71DD1CFAA8048004969126D9CAEF12BB86E0CA6056BB67DA6'
         },
-        erc20Address : '0x4ED7654d64272b6DbC09E9627Cd8DF1200f1912B'
+        erc20Address : '0xd6835a70ac85c51a0844baad61be7ff5d4700360'
     },
     mongo : {
         connection_string : "mongodb://BetProtocolAdmin:wNmm4OmASXEp8UXi@cluster0-shard-00-00-2gxjd.mongodb.net:27017,cluster0-shard-00-01-2gxjd.mongodb.net:27017,cluster0-shard-00-02-2gxjd.mongodb.net:27017/",
