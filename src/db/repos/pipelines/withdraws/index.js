@@ -43,7 +43,13 @@ export function userWithdrawsFiltered({size, offset, app, user, status}){
             '$match': {
                 app : mongoose.Types.ObjectId(app)
             }
-        }
+        },
+        {
+            '$match': {
+                'user' : { '$ne' : null }
+            }
+        },
+
     ]
 
     populate.push(user);
