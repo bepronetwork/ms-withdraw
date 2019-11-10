@@ -46,6 +46,26 @@ class App extends ModelComponent{
         }
     }
 
+         /**
+     * @param {String} 
+     * @return {bool || Exception}  
+     */
+
+    async finalizeWithdraw(){
+        try{
+            return await this.process('FinalizeWithdraw');
+        }catch(err){
+            throw err;
+        }
+    }
+
+    async getUserWithdraws(){
+        try{
+            return await this.process('GetUsersWithdraws');
+        }catch(err){
+            throw err;
+        }
+    }
 }
 
 export default App;

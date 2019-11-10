@@ -1,7 +1,7 @@
 import { mochaAsync, detectValidationErrors } from "../../utils/testing";
 import { Logger } from "../../utils/logger";
 import { createEthAccount, registerUser, userConfirmDeposit, loginUser } from "../../utils/env";
-import { userDepositToContract, userWithdrawFromContract } from "../../utils/eth";
+import { userDepositToContract, appWithdrawForUser } from "../../utils/eth";
 import { requestUserWithdraw } from "../../methods";
 import chai from 'chai';
 const expect = chai.expect;
@@ -61,7 +61,7 @@ context('Withdraw Some Amount', async () => {
 
     it('should be able withdraw some Amount', mochaAsync(async () => {
         /* Withdraw from Smart-Contract */
-        let withdrawTxResponse = await userWithdrawFromContract({
+        let withdrawTxResponse = await appWithdrawForUser({
             eth_account : user_eth_account,
             tokenAmount : 3,
             platformAddress : contract.platformAddress

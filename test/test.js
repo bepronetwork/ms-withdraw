@@ -28,6 +28,7 @@ const runTests = async () => {
     .addFile('./test/tests/affiliateWithdraw/index.js')
     .addFile('./test/tests/appWithdraw/index.js')
     .addFile('./test/tests/userWithdraw/index.js')
+    .addFile('./test/tests/appUserWithdraws/index.js')
     .timeout(10*60*60*1000)
     .run()
     .on('fail', function(test, err) {
@@ -71,7 +72,8 @@ const test = async () => {
             app = await registerApp({admin_id : admin._id})
             global.test.app = app;
             global.test.admin_eth_account = admin_eth_account;
-
+            console.log(admin);
+            console.log(admin_eth_account.getPrivateKey())
             /* Deploy Smart-Contract & Register Smart-Contract Data */
             let contract = await deploySmartContract({eth_account : admin_eth_account});
             global.test.contract = contract;

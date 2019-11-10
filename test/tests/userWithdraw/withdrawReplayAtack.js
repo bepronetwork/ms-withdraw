@@ -1,7 +1,7 @@
 import { mochaAsync, detectValidationErrors } from "../../utils/testing";
 import { Logger } from "../../utils/logger";
 import { createEthAccount, registerUser, userConfirmDeposit, loginUser } from "../../utils/env";
-import { userDepositToContract, userWithdrawFromContract, getWithdrawalAmount } from "../../utils/eth";
+import { userDepositToContract, appWithdrawForUser, getWithdrawalAmount } from "../../utils/eth";
 import { requestUserWithdraw } from "../../methods";
 import chai from 'chai';
 import Numbers from "../../logic/services/numbers";
@@ -64,7 +64,6 @@ context('Withdraw Replay Atack', async () => {
         let ret = await Promise.resolve(await res);
         let status_1 = ret.data.status;
         const { status } = res_replay_atack.data;
-        let dexWithdrawalAmount = await casino.getApprovedWithdrawAmount({address : user_eth_account.getAddress()});
 
         // Confirm either one or the other tx got phroibited
         if(status_1 == 200){
@@ -74,7 +73,6 @@ context('Withdraw Replay Atack', async () => {
             expect(status_1).to.be.equal(14);
             expect(status).to.be.equal(200);
         }
-        expect(Numbers.toFloat(dexWithdrawalAmount)).to.be.equal(3)
         expect(detectValidationErrors(res_replay_atack)).to.be.equal(false);
 
     }));
