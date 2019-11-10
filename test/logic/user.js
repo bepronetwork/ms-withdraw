@@ -392,13 +392,13 @@ class UserLogic extends LogicComponent {
 		try{			
 			switch(processAction) {
 				case 'Login' : {
-					return await library.process.__login(params); break;
+					return await library.process.__login(params);
 				};
 				case 'Register' : {
-					return library.process.__register(params); break;
+					return library.process.__register(params);
 				};
 				case 'Summary' : {
-					return await library.process.__summary(params); break;
+					return await library.process.__summary(params);
                 };
                 case 'UpdateWallet' : {
 					return await library.process.__updateWallet(params); 
@@ -407,10 +407,10 @@ class UserLogic extends LogicComponent {
 					return await library.process.__finalizeWithdraw(params); 
                 };
                 case 'CreateAPIToken' : {
-					return await library.process.__createApiToken(params); break;
+					return await library.process.__createApiToken(params);
                 };
                 case 'GetBets' : {
-					return await library.process.__getBets(params); break;
+					return await library.process.__getBets(params); 
                 };
 			}
 		}catch(err){
@@ -450,10 +450,10 @@ class UserLogic extends LogicComponent {
 					return await library.progress.__finalizeWithdraw(params); 
                 };
                 case 'CreateAPIToken' : {
-					return await library.progress.__createApiToken(params); break;
+					return await library.progress.__createApiToken(params);
                 };
                 case 'GetBets' : {
-					return await library.progress.__getBets(params); break;
+					return await library.progress.__getBets(params);
                 };
 			}
 		}catch(err){
