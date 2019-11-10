@@ -7,6 +7,7 @@ import CasinoContract from './eth/CasinoContract';
 import { globals } from '../Globals';
 import Numbers from './services/numbers';
 import { throwError } from '../controllers/Errors/ErrorManager';
+import { verifytransactionHashWithdrawApp } from './services/services';
 let error = new ErrorManager();
 
 
