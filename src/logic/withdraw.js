@@ -43,7 +43,6 @@ const processActions = {
         let entityType = params.user ? 'user' : 'app';
 
         let normalized = {
-            app                     : params.app,
 			[entityType]			: params[entityType],
             entityType				: entityType,
             creation_timestamp      : params.creation_timestamp,                        

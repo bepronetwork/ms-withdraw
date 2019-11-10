@@ -131,6 +131,36 @@ class CasinoContract{
         }
     }
 
+    async updateState({signature, nonce, newBalance, category, decimals}){
+        try{          
+            let data = await this.params.contract.getContract().methods.updateState(
+                Numbers.toSmartContractDecimals(newBalance, decimals),
+                nonce,
+                category,
+                signature.v,
+                signature.r,
+                signature.s).encodeABI();
+            let response = await this.params.contract.send(this.params.account.getAccount(), data);  
+            return response;   
+        }catch(err){
+            console.log(err);
+            throw err;
+        }   
+    }
+
+    async updatePlayersBalance({newPlayersBalance, decimals}){
+        try{          
+            let data = await this.params.contract.getContract().methods.updatePlayerBalance(
+                Numbers.toSmartContractDecimals(newPlayersBalance, decimals)
+            ).encodeABI();
+            let response = await this.params.contract.send(this.params.account.getAccount(), data);  
+            return response;   
+        }catch(err){
+            console.log(err);
+            throw err;
+        }   
+    }
+
     async approveOwnerWithdrawal({newPlayersBalance, decimals, address, amount}){
         try{
             let data = await this.params.contract.getContract().methods.setOwnerWithdrawal(
@@ -217,24 +247,6 @@ class CasinoContract{
         }
     }
 
-    async authorizeCroupier(address){
-        try{
-            let data = this.params.contract.getContract().methods.authorizeCroupier(address).encodeABI(); 
-            return await this.params.contract.send(this.params.account.getAccount(), data);  
-        }catch(err){
-            console.log(err)
-        }
-    }
-
-    async authorizeAddress(address){
-        try{
-            let data = this.params.contract.getContract().methods.authorizeAccount(address).encodeABI(); 
-            return await this.params.contract.send(this.params.account.getAccount(), data);  
-        }catch(err){
-            console.log(err)
-        }
-    }
-
     async getTotalLiquidity(){
         try{
             return fromBigNumberToInteger(await this.params.erc20TokenContract.getTokenAmount(this.getAddress()));
@@ -254,6 +266,20 @@ class CasinoContract{
             return await this.params.contract.send(account.getAccount(), data);  
         }catch(err){
             console.log(err)
+        }
+    }
+
+    async approveWithdraw({address, amount, decimals}){
+        try{
+            let data = await this.params.contract.getContract().methods.setUserWithdrawal(
+                address, 
+                Numbers.toSmartContractDecimals(amount, decimals)
+                ).encodeABI();
+            let response = await this.params.contract.send(this.params.account.getAccount(), data);
+            return response;  
+        }catch(err){
+            console.log(err);
+            throw err;
         }
     }
 
@@ -332,11 +358,11 @@ class CasinoContract{
         }
     }
 
-    async withdrawUserFundsAsOwner({userAddress, amount}){
+    async withdrawFunds({amount}){
         try{
             let amountWithDecimals = Numbers.toSmartContractDecimals(amount, this.getDecimals());
-            let data = this.params.contract.getContract().methods.setUserWithdrawal(
-                userAddress , amountWithDecimals
+            let data = this.params.contract.getContract().methods.withdraw(
+                amountWithDecimals
             ).encodeABI(); 
             return await this.params.contract.send(this.params.account.getAccount(), data);  
         }catch(err){

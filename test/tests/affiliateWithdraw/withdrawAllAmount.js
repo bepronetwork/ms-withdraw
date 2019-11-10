@@ -1,7 +1,7 @@
 import { mochaAsync, detectValidationErrors } from "../../utils/testing";
 import { createEthAccount, registerUser, loginUser, addWalletAffiliate } from "../../utils/env";
-import { appWithdrawForUser } from "../../utils/eth";
-import { requestUserAffiliateWithdraw, finalizeUserWithdraw, getAppUserWithdraws } from "../../methods";
+import { userWithdrawFromContract } from "../../utils/eth";
+import { requestUserAffiliateWithdraw } from "../../methods";
 
 import chai from 'chai';
 const expect = chai.expect;
@@ -14,7 +14,7 @@ const initialState = {
 }
 
 context('Withdraw Min Passed', async () => {
-    var user, app, user_eth_account, contract, withdrawTxResponse;
+    var user, app, user_eth_account, contract;
     
     before( async () =>  {
 
@@ -48,24 +48,12 @@ context('Withdraw Min Passed', async () => {
 
     it('should be able withdraw all Amount', mochaAsync(async () => {
         /* Withdraw from Smart-Contract */
-        withdrawTxResponse = await appWithdrawForUser({
+        let withdrawTxResponse = await userWithdrawFromContract({
             eth_account : user_eth_account,
             tokenAmount : 5,
             platformAddress : contract.platformAddress
-        });
-
-        let withdraws_res = await getAppUserWithdraws({app : app.id, user : user.id}, app.bearerToken , {id : app.id});
-        const { status, message } = withdraws_res.data;
-        
-        let res = await finalizeUserWithdraw({
-            app : app.id,
-            user : user.id,
-            withdraw_id : message[0]._id,
-            transactionHash : withdrawTxResponse.transactionHash,
-        }, app.bearerToken , {id : app.id});
+        })
 
         expect(withdrawTxResponse).to.not.equal(false);
-        expect(res.data.status).to.equal(200);
-
     }));
 });

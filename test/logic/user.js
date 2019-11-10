@@ -183,18 +183,21 @@ const processActions = {
             withdraw = await WithdrawRepository.prototype.findWithdrawById(params.withdraw_id);
             let withdrawExists = withdraw ? true : false;
 
-            /* Verify App Balance in Smart-Contract
+            /* Verify App Balance in Smart-Contract */
             let currentOpenWithdrawingAmount = await casinoContract.getApprovedWithdrawAmount(
                 {address : user.address, decimals : app.decimals});
             
             var hashWithdrawingPositionOpen = (currentOpenWithdrawingAmount != 0 ) ? true : false;
-            */
+
+            /* Verify User Balance in Smart-Contract */
+            let newBalance = Numbers.toFloat(Numbers.fromDecimals(await casinoContract.getUserBalance(params.address), app.decimals));
+            
             /* Verify User Balance in API */
             let currentAPIBalance = Numbers.toFloat(user.wallet.playBalance);
     
             /* Withdraw Occured in the Smart-Contract */
             transaction_params = await verifytransactionHashWithdrawUser(
-                'eth', params_input.transactionHash, app.platformAddress, app.decimals
+                'eth', params_input.transactionHash, params_input.tokenAmount, app.platformAddress, app.decimals
             )
 
             let transactionIsValid = transaction_params.isValid;
@@ -215,9 +218,11 @@ const processActions = {
                 user_in_app,
                 withdraw_id : params.withdraw_id,
                 transactionIsValid,
-                //hashWithdrawingPositionOpen,
+                hashWithdrawingPositionOpen,
                 isValidAddress,
+                newDecentralizedBalance : newBalance,
                 currentAPIBalance,
+                newBalance,
                 currentOpenWithdrawingAmount,
                 casinoContract : casinoContract,
                 wasAlreadyAdded,
@@ -327,7 +332,9 @@ const progressActions = {
             await WithdrawRepository.prototype.finalizeWithdraw(params.withdraw_id, {
                 transactionHash         : params.transactionHash,
                 last_update_timestamp   : new Date(),                             
-                amount                  : Numbers.toFloat(Math.abs(params.amount))
+                amount                  : Numbers.toFloat(Math.abs(params.amount)),
+                confirmed               : true,
+                done                    : params.withdrawExists
             });
             return params;
         }catch(err){
@@ -392,13 +399,13 @@ class UserLogic extends LogicComponent {
 		try{			
 			switch(processAction) {
 				case 'Login' : {
-					return await library.process.__login(params);
+					return await library.process.__login(params); break;
 				};
 				case 'Register' : {
-					return library.process.__register(params);
+					return library.process.__register(params); break;
 				};
 				case 'Summary' : {
-					return await library.process.__summary(params);
+					return await library.process.__summary(params); break;
                 };
                 case 'UpdateWallet' : {
 					return await library.process.__updateWallet(params); 
@@ -407,10 +414,10 @@ class UserLogic extends LogicComponent {
 					return await library.process.__finalizeWithdraw(params); 
                 };
                 case 'CreateAPIToken' : {
-					return await library.process.__createApiToken(params);
+					return await library.process.__createApiToken(params); break;
                 };
                 case 'GetBets' : {
-					return await library.process.__getBets(params); 
+					return await library.process.__getBets(params); break;
                 };
 			}
 		}catch(err){
@@ -450,10 +457,10 @@ class UserLogic extends LogicComponent {
 					return await library.progress.__finalizeWithdraw(params); 
                 };
                 case 'CreateAPIToken' : {
-					return await library.progress.__createApiToken(params);
+					return await library.progress.__createApiToken(params); break;
                 };
                 case 'GetBets' : {
-					return await library.progress.__getBets(params);
+					return await library.progress.__getBets(params); break;
                 };
 			}
 		}catch(err){

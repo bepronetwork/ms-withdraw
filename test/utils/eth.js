@@ -50,8 +50,6 @@ export async function deploySmartContract({eth_account}){
         let res = await casino.__init__();
         await casino.setMaxWithdrawal(globals.constants.deploy.maxWithdrawal);
         await casino.setMaxDeposit(globals.constants.deploy.maxDeposit);
-        await casino.authorizeCroupier(globals.croupierAccount.getAddress());
-        await casino.authorizeAddress(eth_account.getAddress());
 
         return {    
             casino : casino,
@@ -89,26 +87,23 @@ export async function userDepositToContract({eth_account, platformAddress, token
 }
 
 
-export async function appWithdrawForUser({eth_account, platformAddress, tokenAmount}){
+export async function userWithdrawFromContract({eth_account, platformAddress, tokenAmount}){
     try{
         let erc20Contract = globals.getERC20Contract(globals.constants.erc20TokenAddress);
 
         let casinoContract = new CasinoContract({
             web3 : global.web3,
-            account : global.test.admin_eth_account,
+            account : eth_account,
             erc20TokenContract : erc20Contract,
             contractAddress: platformAddress,
             decimals : globals.constants.tokenDecimals,
-        });
-        
-        /* Withdraw Tokens to User */
-        return await casinoContract.withdrawUserFundsAsOwner({
-            userAddress : eth_account.getAddress(),
+        })
+        /* Deposit Tokens */
+        return await casinoContract.withdrawFunds({
             amount : tokenAmount,
         });
-        
+
     }catch(err){
-        console.log(err);
         return false
     }
 }

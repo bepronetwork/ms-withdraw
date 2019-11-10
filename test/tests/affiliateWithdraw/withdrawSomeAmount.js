@@ -1,7 +1,8 @@
 import { mochaAsync, detectValidationErrors } from "../../utils/testing";
+import { Logger } from "../../utils/logger";
 import { createEthAccount, registerUser, loginUser, addWalletAffiliate } from "../../utils/env";
-import { appWithdrawForUser } from "../../utils/eth";
-import { requestUserAffiliateWithdraw, getAppUserWithdraws, finalizeUserWithdraw } from "../../methods";
+import { userWithdrawFromContract } from "../../utils/eth";
+import { requestUserAffiliateWithdraw } from "../../methods";
 import chai from 'chai';
 const expect = chai.expect;
 
@@ -52,26 +53,13 @@ context('Withdraw Some Amount', async () => {
     }));
 
     it('should be able withdraw some Amount', mochaAsync(async () => {
-        
         /* Withdraw from Smart-Contract */
-        let withdrawTxResponse = await appWithdrawForUser({
+        let withdrawTxResponse = await userWithdrawFromContract({
             eth_account : user_eth_account,
             tokenAmount : 3,
             platformAddress : contract.platformAddress
         })
 
         expect(withdrawTxResponse).to.not.equal(false);
-        let res = await getAppUserWithdraws({app : app.id, user : user.id}, app.bearerToken , {id : app.id});
-        const { status, message } = res.data;
-
-        res = await finalizeUserWithdraw({
-            app : app.id,
-            user : user.id,
-            withdraw_id : message[0]._id,
-            transactionHash : withdrawTxResponse.transactionHash,
-        }, app.bearerToken , {id : app.id});
-
-        expect(withdrawTxResponse).to.not.equal(false);
-        expect(res.data.status).to.equal(200);
     }));
 });
