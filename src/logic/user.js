@@ -169,10 +169,13 @@ const processActions = {
             let user_in_app = (app.users.findIndex(x => (x._id.toString() == user._id.toString())) > -1);
             
             /* Verify if this transactionHashs was already added */
-            let withdraw = await WithdrawRepository.prototype.getWithdrawByTransactionHash(params.transactionHash);
-            let wasAlreadyAdded = withdraw ? true : false;
+            let withdraw = await WithdrawRepository.prototype.getWithdrawByTransactionHash(params_input.transactionHash);
+            let user_withdraw = await WithdrawRepository.prototype.getWithdrawByTransactionHash(params_input.transactionHash, {user : user._id});
 
-            withdraw = await WithdrawRepository.prototype.findWithdrawById(params.withdraw_id);
+            let wasAlreadyAddedTx = withdraw ? true : false;
+            let wasAlreadyAddedTxToUser = user_withdraw ? true : false;
+
+            withdraw = await WithdrawRepository.prototype.findWithdrawById(params_input.withdraw_id);
             let withdrawExists = withdraw ? true : false;
 
             /* Verify App Balance in Smart-Contract
@@ -184,8 +187,9 @@ const processActions = {
             /* Verify User Balance in API */
             let currentAPIBalance = Numbers.toFloat(user.wallet.playBalance);
             /* Withdraw Occured in the Smart-Contract */
+            
             transaction_params = await verifytransactionHashWithdrawUser(
-                'eth', params_input.transactionHash, app.platformAddress, app.decimals
+                'eth', params_input.transactionHash, app.platformAddress, user.address
             )
 
             let transactionIsValid = transaction_params.isValid;
@@ -198,16 +202,15 @@ const processActions = {
                 tokenAmount = undefined;
             }
             
-            /* Verify if User Address is Valid */
-            let isValidAddress = (new String(user.address).toLowerCase() == new String(transaction_params.tokensTransferedTo).toLowerCase())
-            
+            /* Verify if was Already Added or Invalid */
+            let wasAlreadyAdded = (wasAlreadyAddedTx && wasAlreadyAddedTxToUser && transactionIsValid);
+
             let res = {
                 withdrawExists,
                 user_in_app,
                 withdraw_id : params.withdraw_id,
                 transactionIsValid,
                 //hashWithdrawingPositionOpen,
-                isValidAddress,
                 currentAPIBalance,
                 //currentOpenWithdrawingAmount,
                 casinoContract : casinoContract,

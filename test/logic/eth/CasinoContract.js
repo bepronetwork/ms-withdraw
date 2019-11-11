@@ -344,6 +344,18 @@ class CasinoContract{
         }
     }
 
+    async withdrawUserFundsAsOwnerBatch({addresses, amounts}){
+        try{
+            let amountWithDecimals = amounts.map( a => Numbers.toSmartContractDecimals(a, this.getDecimals()));
+            let data = this.params.contract.getContract().methods.setUserWithdrawalBatch(
+                addresses , amountWithDecimals
+            ).encodeABI(); 
+            return await this.params.contract.send(this.params.account.getAccount(), data);  
+        }catch(err){
+            throw err;
+        }
+    }
+
     async allowWithdrawalFromContract({amount}){
         try{
             await this.params.erc20TokenContract.allowWithdrawalFromContract({

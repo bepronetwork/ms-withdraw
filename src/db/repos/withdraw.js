@@ -79,10 +79,10 @@ class WithdrawRepository extends MongoComponent{
         }
     }
 
-    getWithdrawByTransactionHash(transactionHash){
+    getWithdrawByTransactionHash(transactionHash, opt={}){
         return new Promise( (resolve, reject) => {
             WithdrawRepository.prototype.schema.model
-            .findOne({ transactionHash })
+            .findOne({ transactionHash : transactionHash, ...opt})
             .exec( (err, Withdraw) => {
                 if(err) { reject(err)}
                 resolve(Withdraw)            

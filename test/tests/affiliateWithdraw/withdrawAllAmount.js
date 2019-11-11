@@ -55,7 +55,7 @@ context('Withdraw Min Passed', async () => {
         });
 
         let withdraws_res = await getAppUserWithdraws({app : app.id, user : user.id}, app.bearerToken , {id : app.id});
-        const { status, message } = withdraws_res.data;
+        const { message } = withdraws_res.data;
         
         let res = await finalizeUserWithdraw({
             app : app.id,

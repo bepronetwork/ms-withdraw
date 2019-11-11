@@ -2,7 +2,7 @@ import { mochaAsync, detectValidationErrors } from "../../utils/testing";
 import { Logger } from "../../utils/logger";
 import { createEthAccount, registerUser, userConfirmDeposit, loginUser } from "../../utils/env";
 import { userDepositToContract, appWithdrawForUser } from "../../utils/eth";
-import { requestUserWithdraw } from "../../methods";
+import { requestUserWithdraw, getAppUserWithdraws, finalizeUserWithdraw } from "../../methods";
 import chai from 'chai';
 const expect = chai.expect;
 
@@ -68,5 +68,19 @@ context('Withdraw Some Amount', async () => {
         })
 
         expect(withdrawTxResponse).to.not.equal(false);
+        let withdraws_res = await getAppUserWithdraws({app : app.id, user : user.id}, app.bearerToken , {id : app.id});
+        const { message } = withdraws_res.data;
+
+        let res = await finalizeUserWithdraw({
+            app : app.id,
+            user : user.id,
+            withdraw_id : message[0]._id,
+            transactionHash : withdrawTxResponse.transactionHash,
+        }, app.bearerToken , {id : app.id});
+
+        expect(withdrawTxResponse).to.not.equal(false);
+        expect(res.data.status).to.equal(200);
     }));
+
+    
 });
