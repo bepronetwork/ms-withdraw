@@ -28,7 +28,7 @@ context('Get App Users Withdraw Normal', async () => {
                 processed += 1;
             }
         }
-        expect(processed).to.be.equal(2);
+        expect(processed).to.be.equal(5);
 
     }));
 
@@ -41,7 +41,7 @@ context('Get App Users Withdraw Normal', async () => {
         expect(detectValidationErrors(res)).to.be.equal(false);
         const { status, message } = res.data;
         expect(status).to.be.equal(200);
-        expect(message.length).to.be.equal(totalWithdraws-2);
+        expect(message.length).to.be.equal(totalWithdraws-5);
 
     }));
 
@@ -54,7 +54,7 @@ context('Get App Users Withdraw Normal', async () => {
         expect(detectValidationErrors(res)).to.be.equal(false);
         const { status, message } = res.data;
         expect(status).to.be.equal(200);
-        expect(message.length).to.be.equal(2);
+        expect(message.length).to.be.equal(5);
 
     }));
 });

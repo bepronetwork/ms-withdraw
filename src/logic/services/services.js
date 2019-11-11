@@ -100,24 +100,31 @@ async function verifytransactionHashDepositUser(blockchain, transactionHash, amo
     }
 };
 
-async function verifytransactionHashWithdrawUser(blockchain, transactionHash,  platformAddress, decimals){
+async function verifytransactionHashWithdrawUser(blockchain, transactionHash,  platformAddress, user_address){
     try{
         /* Get Information of this transactionHash */
-        let res_transaction = await globals.web3.eth.getTransaction(transactionHash);
         let res_transaction_recipt = await globals.web3.eth.getTransactionReceipt(transactionHash);
-        let res_transaction_decoded = EtherscanSingleton.getTransactionDataCasinoWithdraw(res_transaction_recipt);
-        
-        /* Verify if sender of Transaction is platformAddress */
-        if(new String(res_transaction_decoded.tokensTransferedFrom).toLowerCase() != new String(platformAddress).toLowerCase()){
-            throw false;
+        let res_transactions_decoded = EtherscanSingleton.getTransactionDataCasinoWithdraw(res_transaction_recipt);
+        var transactionTranfer = res_transactions_decoded.map( r => {
+            /* Verify if sender of Transaction is platformAddress */
+            if(
+                new String(r.tokensTransferedFrom).toLowerCase() == new String(platformAddress).toLowerCase()
+                &&
+                new String(user_address).toLowerCase() == new String(r.tokensTransferedTo).toLowerCase()
+            ){
+                return r;
+            }
+        }).filter(el=> el != null)[0];
+        if(!transactionTranfer){
+            throw new Error();
         }
-        console.log(res_transaction_decoded)
+
         return {
             isValid : true,
-            tokensTransferedFrom : res_transaction_decoded.tokensTransferedFrom,
-            tokensTransferedTo  : res_transaction_decoded.tokensTransferedTo,
-            tokenAmount : res_transaction_decoded.tokenAmount,
-            from :  res_transaction.from 
+            tokensTransferedFrom : transactionTranfer.tokensTransferedFrom,
+            tokensTransferedTo  : transactionTranfer.tokensTransferedTo,
+            tokenAmount : transactionTranfer.tokenAmount,
+            from :  transactionTranfer.tokensTransferedTo
         };
 
     }catch(err){
@@ -132,8 +139,8 @@ async function verifytransactionHashWithdrawApp(blockchain, transactionHash, pla
         /* Get Information of this transactionHash */
         let res_transaction = await globals.web3.eth.getTransaction(transactionHash);
         let res_transaction_recipt = await globals.web3.eth.getTransactionReceipt(transactionHash);
-        let res_transaction_decoded = EtherscanSingleton.getTransactionDataCasinoWithdraw(res_transaction_recipt);
-        
+        let res_transactions_decoded = EtherscanSingleton.getTransactionDataCasinoWithdraw(res_transaction_recipt);
+        let res_transaction_decoded = res_transactions_decoded[0];
         /* Verify if sender of Transaction is platformAddress */
         if(new String(res_transaction_decoded.tokensTransferedFrom).toLowerCase() != new String(platformAddress).toLowerCase()){
             throw false;

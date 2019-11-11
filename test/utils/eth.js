@@ -113,6 +113,30 @@ export async function appWithdrawForUser({eth_account, platformAddress, tokenAmo
     }
 }
 
+export async function appWithdrawForUserBatch({platformAddress, addresses, amounts}){
+    try{
+        let erc20Contract = globals.getERC20Contract(globals.constants.erc20TokenAddress);
+
+        let casinoContract = new CasinoContract({
+            web3 : global.web3,
+            account : global.test.admin_eth_account,
+            erc20TokenContract : erc20Contract,
+            contractAddress: platformAddress,
+            decimals : globals.constants.tokenDecimals,
+        });
+        
+        /* Withdraw Tokens to User */
+        return await casinoContract.withdrawUserFundsAsOwnerBatch({
+            addresses : addresses,
+            amounts : amounts
+        });
+        
+    }catch(err){
+        console.log(err);
+        return false
+    }
+}
+
 export async function appDepositToContract({casinoContract, tokenAmount}){
     try{        
         return await casinoContract.sendTokensToCasinoContract(tokenAmount);

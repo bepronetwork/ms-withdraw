@@ -77,6 +77,20 @@ class ErrorManager {
                         libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.BAD_WITHDRAW_AMOUNT_SIGNED));*/
                     break;
                 };
+                case 'FinalizeWithdraw' : {
+                    // Verify User
+                    if(typeof object == 'undefined' || Object.is(object, null))
+                        libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.USER_NOT_EXISTENT));
+                    if(!object.transactionIsValid)
+                        libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.TRANSACTION_NOT_VALID));  
+                    // Verify User is in App
+                    if(!object.user_in_app)
+                        throw libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.USER_NOT_EXISTENT_IN_APP));      
+                    // Verify if transaction was already added
+                    if(object.wasAlreadyAdded)
+                        libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.WITHDRAW_ALREADY_ADDED));
+                    break;
+                }
             }
         }catch(err){
             throw err
@@ -117,6 +131,28 @@ class ErrorManager {
                         libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.BAD_WITHDRAW_AMOUNT_SIGNED));*/
                     break;
                 };
+                case 'FinalizeWithdraw' : {
+                    // Verify User
+                    if(typeof object == 'undefined' || Object.is(object, null))
+                        libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.APP_NOT_EXISTENT));
+                    // Verify if Transaction is not Valid
+                    if(!object.transactionIsValid)
+                        libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.TRANSACTION_NOT_VALID));  
+                    // Verify if Address of User is the Same as the Withdraw one
+                    if(!object.isValidAddress)
+                        libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.APP_ADDRESS_IS_NOT_VALID));    
+                    // Verify if transaction was already added
+                    if(object.wasAlreadyAdded)
+                        libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.WITHDRAW_ALREADY_ADDED));
+                    // Verify if App is Mentioned
+                    if(!object.app || _.isEmpty(object.app)){
+                        libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.APP_NOT_EXISTENT)); break;   
+                    }
+                    // Verify if transaction was already added
+                    if(!object.withdrawExists)
+                        libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.WITHDRAW_ID_NOT_DEFINED));
+                    break;
+                }
             }
         }catch(err){
             throw err
