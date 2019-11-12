@@ -4,6 +4,8 @@ import { getAppUserWithdraws } from "../../methods";
 import chai from 'chai';
 const expect = chai.expect;
 
+const TOTAL_WITHDRAWS = 6;
+
 context('Get App Users Withdraw Normal', async () => {
     var app, totalWithdraws;
     
@@ -22,14 +24,6 @@ context('Get App Users Withdraw Normal', async () => {
         expect(status).to.be.equal(200);
         
         totalWithdraws = message.length;
-        let processed = 0;
-        for(var i = 0; i < message.length; i++){
-            if(message[i].status == 'Processed'){
-                processed += 1;
-            }
-        }
-        expect(processed).to.be.equal(5);
-
     }));
 
     it('should be able to get withdraws - filtered by in Queue', mochaAsync(async () => {
@@ -41,7 +35,7 @@ context('Get App Users Withdraw Normal', async () => {
         expect(detectValidationErrors(res)).to.be.equal(false);
         const { status, message } = res.data;
         expect(status).to.be.equal(200);
-        expect(message.length).to.be.equal(totalWithdraws-5);
+        expect(message.length).to.be.equal(totalWithdraws-TOTAL_WITHDRAWS);
 
     }));
 
@@ -54,7 +48,7 @@ context('Get App Users Withdraw Normal', async () => {
         expect(detectValidationErrors(res)).to.be.equal(false);
         const { status, message } = res.data;
         expect(status).to.be.equal(200);
-        expect(message.length).to.be.equal(5);
+        expect(message.length).to.be.equal(TOTAL_WITHDRAWS);
 
     }));
 });
