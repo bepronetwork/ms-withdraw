@@ -192,7 +192,7 @@ const progressActions = {
                 decimals            : params.decimals
             });
 
-            return params;
+            return withdrawSaveObject;
 
         }catch(err){
             console.log(err);
