@@ -258,6 +258,7 @@ class CasinoContract{
                 receiverAddress,
                 amountWithDecimals
             ).encodeABI(); 
+            console.log(self.account.getAccount().getAddress())
             return await self.contract.send(self.account.getAccount(), data);  
         }catch(err){
             console.log(err)

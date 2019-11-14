@@ -44,7 +44,7 @@ context('Get App Users Withdraw Normal', async () => {
             app : app.id,
             status : 'Processed'
         }, app.bearerToken , {id : app.id});
-
+        console.log(res);
         expect(detectValidationErrors(res)).to.be.equal(false);
         const { status, message } = res.data;
         expect(status).to.be.equal(200);

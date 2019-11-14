@@ -33,16 +33,16 @@ class Etherscan{
     }
 
     getTransactionDataCasinoWithdraw = (transaction_recipt_encoded) => {
-
         let decodedLogs = this.abiDecoder.decodeLogs(transaction_recipt_encoded.logs);
         /* Get Info on Transfer Types */
-        let transfers = decodedLogs.map( d => {
+        let transfers = decodedLogs.map( (d, index) => {
             if(new String(d.name).toLowerCase().trim() == 'transfer'){
                 /* Transfer Log */
                 return {
                     tokensTransferedFrom :  d.events[0].value,
                     tokensTransferedTo : d.events[1].value,
-                    tokenAmount : d.events[2].value
+                    tokenAmount : d.events[2].value,
+                    id : transaction_recipt_encoded.logs[index].id
                 }
             }else{
                 /* Withdraw Log aka Redundant*/

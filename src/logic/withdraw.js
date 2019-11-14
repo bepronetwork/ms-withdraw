@@ -50,6 +50,7 @@ const processActions = {
             last_update_timestamp   : params.last_update_timestamp,                      
             address                 : params.address,                       
             currency                : params.currency,
+            logId                   : params.logId,
             transactionHash         : params.transactionHash,
             amount                  : params.amount,
             confirmations           : params.confirmations || 0,
