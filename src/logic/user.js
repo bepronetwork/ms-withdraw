@@ -191,12 +191,9 @@ const processActions = {
             transaction_params = await verifytransactionHashWithdrawUser(
                 'eth', params_input.transactionHash, app.platformAddress, user.address
             )
-            console.log(transaction_params.id)
+
             withdraw = await WithdrawRepository.prototype.getWithdrawByTransactionLogId(transaction_params.id);
-            console.log("\n New info")
-            console.log(withdraw)
             let wasAddedLogId = withdraw ? true : false;
-            console.log(wasAddedLogId);
 
             let transactionIsValid = transaction_params.isValid;
 
