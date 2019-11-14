@@ -20,10 +20,8 @@ context('Withdraw All Amount', async () => {
 
         app = global.test.app;
         contract = global.test.contract;
-
         /* Create User Address and give it ETH */
         user_eth_account = await createEthAccount({ethAmount : initialState.user.eth_balance, tokenAmount : initialState.user.token_balance});
-
         /* Create User on Database */
         user = await registerUser({address : user_eth_account.getAddress(), app_id : app.id});
         user = await loginUser({username : user.username, password : user.password, app_id : app.id});
@@ -64,14 +62,12 @@ context('Withdraw All Amount', async () => {
 
         let withdraws_res = await getAppUserWithdraws({app : app.id }, app.bearerToken , {id : app.id});
         const { message } = withdraws_res.data;
-        console.log(message);
         let res = await finalizeUserWithdraw({
             app : app.id,
             user : user.id,
             withdraw_id : message[0]._id,
             transactionHash : withdrawTxResponse.transactionHash,
         }, app.bearerToken , {id : app.id});
-        console.log(res);
 
         expect(res.data.status).to.equal(200);
         expect(withdrawTxResponse).to.not.equal(false);

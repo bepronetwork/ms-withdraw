@@ -81,6 +81,5 @@ context('Withdraw Some Amount', async () => {
         expect(withdrawTxResponse).to.not.equal(false);
         expect(res.data.status).to.equal(200);
     }));
-
     
 });

@@ -53,6 +53,7 @@ class WithdrawRepository extends MongoComponent{
                         confirmed               : true,
                         status                  : 'Processed',
                         transactionHash         : params.transactionHash,
+                        logId                   : params.logId,
                         last_update_timestamp   : params.last_update_timestamp
                 }},{ new: true }
             )
@@ -90,6 +91,16 @@ class WithdrawRepository extends MongoComponent{
         });
     }
 
+    getWithdrawByTransactionLogId(logId, opt={}){
+        return new Promise( (resolve, reject) => {
+            WithdrawRepository.prototype.schema.model
+            .findOne({ logId : logId, ...opt})
+            .exec( (err, Withdraw) => {
+                if(err) { reject(err)}
+                resolve(Withdraw)            
+            });
+        });
+    }
 
     confirmWithdraw(id, new_Withdraw_params){
         return new Promise( (resolve, reject) => {

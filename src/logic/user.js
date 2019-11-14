@@ -191,6 +191,12 @@ const processActions = {
             transaction_params = await verifytransactionHashWithdrawUser(
                 'eth', params_input.transactionHash, app.platformAddress, user.address
             )
+            console.log(transaction_params.id)
+            withdraw = await WithdrawRepository.prototype.getWithdrawByTransactionLogId(transaction_params.id);
+            console.log("\n New info")
+            console.log(withdraw)
+            let wasAddedLogId = withdraw ? true : false;
+            console.log(wasAddedLogId);
 
             let transactionIsValid = transaction_params.isValid;
 
@@ -203,7 +209,7 @@ const processActions = {
             }
             
             /* Verify if was Already Added or Invalid */
-            let wasAlreadyAdded = (wasAlreadyAddedTx && wasAlreadyAddedTxToUser && transactionIsValid);
+            let wasAlreadyAdded = wasAddedLogId
 
             let res = {
                 withdrawExists,
@@ -215,6 +221,7 @@ const processActions = {
                 //currentOpenWithdrawingAmount,
                 casinoContract : casinoContract,
                 wasAlreadyAdded,
+                logId : transaction_params.id,
                 transactionHash : params.transactionHash,
                 currencyTicker      : app.currencyTicker,
                 creationDate        : new Date(),
@@ -265,7 +272,7 @@ const progressActions = {
         await UsersRepository.prototype.addWithdraw(params.user._id, withdrawSaveObject._id);
         
         return params;
-      
+        
     },
     __requestAffiliateWithdraw :  async (params) => {
         /* Add Withdraw to user */
@@ -288,7 +295,6 @@ const progressActions = {
         
         /* Add Deposit to user */
         await UsersRepository.prototype.addWithdraw(params.user._id, withdrawSaveObject._id);
-
         return params;
     },
     __finalizeWithdraw : async (params) => {
@@ -296,6 +302,7 @@ const progressActions = {
             /* Add Withdraw to user */
             await WithdrawRepository.prototype.finalizeWithdraw(params.withdraw_id, {
                 transactionHash         : params.transactionHash,
+                logId                   : params.logId,
                 last_update_timestamp   : new Date(),                             
                 amount                  : Numbers.toFloat(Math.abs(params.amount))
             });

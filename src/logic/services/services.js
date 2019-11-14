@@ -115,6 +115,7 @@ async function verifytransactionHashWithdrawUser(blockchain, transactionHash,  p
                 return r;
             }
         }).filter(el=> el != null)[0];
+
         if(!transactionTranfer){
             throw new Error();
         }
@@ -124,6 +125,7 @@ async function verifytransactionHashWithdrawUser(blockchain, transactionHash,  p
             tokensTransferedFrom : transactionTranfer.tokensTransferedFrom,
             tokensTransferedTo  : transactionTranfer.tokensTransferedTo,
             tokenAmount : transactionTranfer.tokenAmount,
+            id : transactionTranfer.id,
             from :  transactionTranfer.tokensTransferedTo
         };
 
