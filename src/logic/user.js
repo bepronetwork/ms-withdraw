@@ -150,7 +150,7 @@ const processActions = {
     __finalizeWithdraw : async (params) => {
         try{
             var params_input = params;
-            var transaction_params = { }, tokenAmount;
+            var transaction_params = { }, tokenAmount, wasAddedLogId;
 
             /* Get User Id */
             let user = await UsersRepository.prototype.findUserById(params.user);
@@ -187,23 +187,42 @@ const processActions = {
             /* Verify User Balance in API */
             let currentAPIBalance = Numbers.toFloat(user.wallet.playBalance);
             /* Withdraw Occured in the Smart-Contract */
-            
-            transaction_params = await verifytransactionHashWithdrawUser(
+                
+            /* Get all transactions which match */
+            let all_transaction_params = await verifytransactionHashWithdrawUser(
                 'eth', params_input.transactionHash, app.platformAddress, user.address
             )
-
-            withdraw = await WithdrawRepository.prototype.getWithdrawByTransactionLogId(transaction_params.id);
-            let wasAddedLogId = withdraw ? true : false;
-
-            let transactionIsValid = transaction_params.isValid;
+            let transactionIsValid = all_transaction_params.isValid;
 
             if(transactionIsValid){
-                /* Transaction is Valid */
-                tokenAmount = Numbers.toFloat(Numbers.fromDecimals(transaction_params.tokenAmount, app.decimals));
+                /* Get One of them */
+                transaction_params = (await Promise.all(all_transaction_params.transactionTranfer.map( async t => {
+                    withdraw = await WithdrawRepository.prototype.getWithdrawByTransactionLogId(t.id);
+                    wasAddedLogId = withdraw ? true : false;
+                    if(wasAddedLogId) {
+                        // Was added 
+                        return false;
+                    }else{
+                        return t;
+                    }
+                }))).filter(el => el != false)[0];
+
+                if(transaction_params){
+                    /* Transaction is Valid */
+                    tokenAmount = Numbers.toFloat(Numbers.fromDecimals(transaction_params.tokenAmount, app.decimals));
+                }else{
+                    transaction_params = {};
+                    tokenAmount = undefined;
+                }
             }else{
                 /* Transaction is Not Valid */
                 tokenAmount = undefined;
             }
+
+            console.log(transaction_params.id);
+            
+            withdraw = await WithdrawRepository.prototype.getWithdrawByTransactionLogId(transaction_params.id);
+            wasAddedLogId = withdraw ? true : false;
             
             /* Verify if was Already Added or Invalid */
             let wasAlreadyAdded = wasAddedLogId

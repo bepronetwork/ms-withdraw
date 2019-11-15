@@ -116,8 +116,7 @@ async function verifytransactionHashWithdrawUser(blockchain, transactionHash,  p
             ){
                 return r;
             }
-        }).filter(el=> el != null)[0];
-        console.log(transactionTranfer.length);
+        }).filter(el=> el != null);
 
         if(!transactionTranfer){
             throw new Error();
@@ -125,16 +124,16 @@ async function verifytransactionHashWithdrawUser(blockchain, transactionHash,  p
 
         return {
             isValid : true,
-            tokensTransferedFrom : transactionTranfer.tokensTransferedFrom,
-            tokensTransferedTo  : transactionTranfer.tokensTransferedTo,
-            tokenAmount : transactionTranfer.tokenAmount,
-            id : transactionTranfer.id,
-            from :  transactionTranfer.tokensTransferedTo
+            transactionTranfer : transactionTranfer,
+            tokensTransferedFrom : transactionTranfer[0].tokensTransferedFrom,
+            tokensTransferedTo  : transactionTranfer[0].tokensTransferedTo,
+            from :  transactionTranfer[0].tokensTransferedTo
         };
 
     }catch(err){
         return {
-            isValid : false
+            isValid : false,
+            transactionTranfer : []
         };
     }
 };
