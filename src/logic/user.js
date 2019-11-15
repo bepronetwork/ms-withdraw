@@ -150,7 +150,7 @@ const processActions = {
     __finalizeWithdraw : async (params) => {
         try{
             var params_input = params;
-            var transaction_params = { }, tokenAmount, wasAddedLogId;
+            var transaction_params = { }, tokenAmount, wasAddedLogId, withdraw;
 
             /* Get User Id */
             let user = await UsersRepository.prototype.findUserById(params.user);
@@ -167,26 +167,9 @@ const processActions = {
 
             /* Verify if User is in App */
             let user_in_app = (app.users.findIndex(x => (x._id.toString() == user._id.toString())) > -1);
-            
-            /* Verify if this transactionHashs was already added */
-            let withdraw = await WithdrawRepository.prototype.getWithdrawByTransactionHash(params_input.transactionHash);
-            let user_withdraw = await WithdrawRepository.prototype.getWithdrawByTransactionHash(params_input.transactionHash, {user : user._id});
 
-            let wasAlreadyAddedTx = withdraw ? true : false;
-            let wasAlreadyAddedTxToUser = user_withdraw ? true : false;
-
-            withdraw = await WithdrawRepository.prototype.findWithdrawById(params_input.withdraw_id);
-            let withdrawExists = withdraw ? true : false;
-
-            /* Verify App Balance in Smart-Contract
-            let currentOpenWithdrawingAmount = await casinoContract.getApprovedWithdrawAmount(
-                {address : user.address, decimals : app.decimals});
-            
-            var hashWithdrawingPositionOpen = (currentOpenWithdrawingAmount != 0 ) ? true : false;
-            */
             /* Verify User Balance in API */
             let currentAPIBalance = Numbers.toFloat(user.wallet.playBalance);
-            /* Withdraw Occured in the Smart-Contract */
                 
             /* Get all transactions which match */
             let all_transaction_params = await verifytransactionHashWithdrawUser(
