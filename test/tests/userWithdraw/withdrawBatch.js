@@ -94,8 +94,7 @@ context('Withdraw Batch Several Users', async () => {
 
         let withdraws_res = await getAppUserWithdraws({app : app.id, user : user.id}, app.bearerToken , {id : app.id});
         let withdraws_res_2 = await getAppUserWithdraws({app : app.id, user : user_2.id}, app.bearerToken , {id : app.id});
-        console.log("\n herehrhehr \n")
-
+        
         let res = await finalizeUserWithdraw({
             app : app.id,
             user : user.id,
