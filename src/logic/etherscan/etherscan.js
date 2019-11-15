@@ -34,14 +34,10 @@ class Etherscan{
 
     getTransactionDataCasinoWithdraw = (transaction_recipt_encoded) => {
         let decodedLogs = this.abiDecoder.decodeLogs(transaction_recipt_encoded.logs);
-        console.log(transaction_recipt_encoded.logs.length);
         /* Get Info on Transfer Types */
         let transfers = decodedLogs.map( (d, index) => {
             if(new String(d.name).toLowerCase().trim() == 'transfer'){
                 /* Transfer Log */
-                console.log(transaction_recipt_encoded.logs[index].data);
-                console.log(transaction_recipt_encoded.logs[index].id);
-
                 return {
                     tokensTransferedFrom :  d.events[0].value,
                     tokensTransferedTo : d.events[1].value,
@@ -49,7 +45,7 @@ class Etherscan{
                     id : transaction_recipt_encoded.logs[index].id+transaction_recipt_encoded.logs[index].data
                 }
             }else{
-                /* Withdraw Log aka Redundant*/
+                /* Withdraw Log aka Redundant */
             }
         }).filter(el => el!=null);
 

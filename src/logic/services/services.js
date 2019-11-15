@@ -105,6 +105,8 @@ async function verifytransactionHashWithdrawUser(blockchain, transactionHash,  p
         /* Get Information of this transactionHash */
         let res_transaction_recipt = await globals.web3.eth.getTransactionReceipt(transactionHash);
         let res_transactions_decoded = EtherscanSingleton.getTransactionDataCasinoWithdraw(res_transaction_recipt);
+        console.log(res_transactions_decoded.length);
+
         var transactionTranfer = res_transactions_decoded.map( r => {
             /* Verify if sender of Transaction is platformAddress */
             if(
@@ -115,6 +117,7 @@ async function verifytransactionHashWithdrawUser(blockchain, transactionHash,  p
                 return r;
             }
         }).filter(el=> el != null)[0];
+        console.log(transactionTranfer.length);
 
         if(!transactionTranfer){
             throw new Error();
