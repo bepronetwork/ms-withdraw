@@ -211,7 +211,6 @@ const processActions = {
             let wasAlreadyAdded = wasAddedLogId
 
             let res = {
-                withdrawExists,
                 user_in_app,
                 withdraw_id : params.withdraw_id,
                 transactionIsValid,
