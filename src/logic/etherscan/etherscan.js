@@ -33,21 +33,23 @@ class Etherscan{
     }
 
     getTransactionDataCasinoWithdraw = (transaction_recipt_encoded) => {
-
         let decodedLogs = this.abiDecoder.decodeLogs(transaction_recipt_encoded.logs);
-        let decodedLogsEventTransfer = decodedLogs[0].events;
-        let tokensTransferedTo = decodedLogsEventTransfer[1].value;
-        let tokensTransferedFrom = decodedLogsEventTransfer[0].value;
-        let tokenAmount = decodedLogsEventTransfer[2].value;
+        /* Get Info on Transfer Types */
+        let transfers = decodedLogs.map( (d, index) => {
+            if(new String(d.name).toLowerCase().trim() == 'transfer'){
+                /* Transfer Log */
+                return {
+                    tokensTransferedFrom :  d.events[0].value,
+                    tokensTransferedTo : d.events[1].value,
+                    tokenAmount : d.events[2].value,
+                    id : transaction_recipt_encoded.logs[index].id+transaction_recipt_encoded.logs[index].data
+                }
+            }else{
+                /* Withdraw Log aka Redundant */
+            }
+        }).filter(el => el!=null);
 
-        /* Response Object */
-        let res = {
-            tokensTransferedFrom,
-            tokensTransferedTo,
-            tokenAmount
-        }
-
-        return res;   
+        return transfers;   
     }
 
     getTransactionDataERC20 = (transaction_data_encoded) => {

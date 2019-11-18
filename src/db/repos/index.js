@@ -14,8 +14,16 @@ import BlockchainsRepository from './ecosystem/blockchain';
 import TokensRepository from './ecosystem/token';
 import SecurityRepository from './security';
 import ResultSpaceEcoRepository from './ecosystem/resultSpace';
+import AffiliateRepository from './affiliate';
+import AffiliateLinkRepository from './affiliateLink';
+import AffiliateStructureRepository from './affiliateStructure';
+import AffiliateSetupRepository from './affiliateSetup';
 
 export{
+    AffiliateLinkRepository,
+    AffiliateRepository,
+    AffiliateSetupRepository,
+    AffiliateStructureRepository,
     UsersRepository,
     SecurityRepository,
     AppRepository,

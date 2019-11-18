@@ -49,6 +49,96 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+  /users/finalizeWithdraw:
+    x-swagger-router-controller: user
+    post:
+      tags:
+      - user
+      summary: Request for User Finalize Withdraw
+      operationId: finalizeWithdraw
+      description: Request Finalize Withdraw
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: user
+          description: User Information
+          required: true
+          schema:
+            $ref: '#/definitions/UserFinalizeWithdrawRequest'
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/GeneralResponse"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /app/finalizeWithdraw:
+    x-swagger-router-controller: app
+    post:
+      tags:
+      - app
+      summary: Request for App Finalize Withdraw
+      operationId: finalizeAppWithdraw
+      description: Request Finalize Withdraw
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: app
+          description: App Information
+          required: true
+          schema:
+            $ref: '#/definitions/AppFinalizeWithdrawRequest'
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/GeneralResponse"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /users/affiliate/requestWithdraw:
+    x-swagger-router-controller: user
+    post:
+      tags:
+      - user
+      summary: Request for User Withdraw
+      operationId: requestAffiliateWithdraw
+      description: Update Wallet Amount for the User
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: user
+          description: User Information
+          required: true
+          schema:
+            $ref: '#/definitions/UserWithdrawRequest'
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/GeneralResponse"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
   /app/requestWithdraw: 
     x-swagger-router-controller: app
     post:
@@ -68,6 +158,36 @@ paths:
           required: true
           schema:
             $ref: '#/definitions/AppRequestWithdrawRequest'
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/GeneralResponse"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /app/users/withdraws:
+    x-swagger-router-controller: app
+    post:
+      tags:
+      - app
+      summary: Request for User Withdraw
+      operationId: getUserWithdraws
+      description: Get User Withdraws
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: app
+          description: App Information
+          required: true
+          schema:
+            $ref: '#/definitions/GetAllUsersAppWithdraws'
       responses:
         "200":
           description: Success
@@ -115,7 +235,7 @@ definitions:
         example: "0xe8rghwe8rghwe9r87ynw987eyncwre"
         description: |
           User Address
-  UserWithdrawRequest  : 
+  UserWithdrawRequest : 
     type: object
     required:
       - app
@@ -152,6 +272,87 @@ definitions:
         example: "0xe8rghwe8rghwe9r87ynw987eyncwre"
         description: |
           User Address
+  UserFinalizeWithdrawRequest : 
+    type: object
+    required:
+      - app
+      - user
+      - transactionHash
+      - withdraw_id
+    properties:
+      app :
+        type : string
+        format : name
+        example : "5cuedgq7e6t334t34" 
+        description: |
+          App ID
+      user :
+        type : string
+        format: name
+        example : "5cuedgq7e6t334t34" 
+        description: |
+          User ID
+      transactionHash :
+        type : string
+        format: name
+        example: "0xe8rghwe8rghwe9r87ynw987eyncwre"
+        description: |
+          Transaction Hash
+      withdraw_id :
+        type : string
+        format: name
+        example: "65f76st8vdsb3181"
+        description: |
+            Withdraw Id
+  AppFinalizeWithdrawRequest : 
+    type: object
+    required:
+      - app
+      - transactionHash
+      - withdraw_id
+    properties:
+      app :
+        type : string
+        format : name
+        example : "5cuedgq7e6t334t34" 
+        description: |
+          App ID
+      transactionHash :
+        type : string
+        format: name
+        example: "0xe8rghwe8rghwe9r87ynw987eyncwre"
+        description: |
+          Transaction Hash
+      withdraw_id :
+        type : string
+        format: name
+        example: "53746tcuhn324"
+        description: |
+          Withdraw Id
+  GetAllUsersAppWithdraws : 
+    type: object
+    required:
+      - app
+    properties:
+      app :
+        type : string
+        format : name
+        example : "5cuedgq7e6t334t34" 
+        description: |
+          App ID
+      size :
+        type : number
+      user :
+        type : string
+        format : name
+        example : "5cuedgq7e6t334t34" 
+        description: |
+          User Id
+      offset :
+        type : number
+      status :
+        type : string
+        example : "Queue" 
   GeneralResponse : 
     type: object
     required:

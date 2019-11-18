@@ -13,7 +13,7 @@ import {
     pipeline_popular_numbers
 } from './pipelines/app';
 
-import { populate_app } from './populates';
+import { populate_app_all, populate_app_affiliates } from './populates';
 import { throwError } from '../../controllers/Errors/ErrorManager';
 
 
@@ -184,18 +184,21 @@ class AppRepository extends MongoComponent{
         }
     }
 
-    findAppById(_id){ 
+    findAppById(_id, populate_type=populate_app_all){
+        switch(populate_type){
+            case 'affiliates' : { populate_type = populate_app_affiliates; break; }
+        }        
         try{
             return new Promise( (resolve, reject) => {
                 AppRepository.prototype.schema.model.findById(_id)
-                .populate(populate_app)
+                .populate(populate_type)
                 .exec( (err, App) => {
                     if(err) { reject(err)}
                     resolve(App);
                 });
             });
         }catch(err){
-            throw err
+            throw err;
         }
     }
 
@@ -277,7 +280,7 @@ class AppRepository extends MongoComponent{
     addWithdraw(id, withdraw){
         return new Promise( (resolve,reject) => {
             AppRepository.prototype.schema.model.findOneAndUpdate(
-                { _id: id, withdraws : {$nin : [withdraw._id] } }, 
+                { _id: id, withdraws : {$nin : [withdraw] } }, 
                 { $push: { "withdraws" : withdraw } },
                 (err, item) => {
                     if(err){reject(err)}
@@ -286,6 +289,21 @@ class AppRepository extends MongoComponent{
             )
         });
     }
+
+
+    removeWithdraw(id, withdraw){
+        return new Promise( (resolve,reject) => {
+            AppRepository.prototype.schema.model.findOneAndUpdate(
+                { _id: id }, 
+                { $pull: { "withdraws" : withdraw } },
+                (err, item) => {
+                    if(err){reject(err)}
+                    resolve(true);
+                }
+            )
+        });
+    }
+
 
     findApp = (App_name) => {
         return new Promise( (resolve, reject) => {

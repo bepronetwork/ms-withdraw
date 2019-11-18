@@ -1,8 +1,8 @@
 import { mochaAsync, detectValidationErrors } from "../../utils/testing";
 import { Logger } from "../../utils/logger";
 import { createEthAccount, registerUser, userConfirmDeposit, loginUser } from "../../utils/env";
-import { userDepositToContract, userWithdrawFromContract } from "../../utils/eth";
-import { requestUserWithdraw } from "../../methods";
+import { userDepositToContract, appWithdrawForUser } from "../../utils/eth";
+import { requestUserWithdraw, getAppUserWithdraws, finalizeUserWithdraw } from "../../methods";
 import chai from 'chai';
 const expect = chai.expect;
 
@@ -12,6 +12,8 @@ const initialState = {
         token_balance : 5,
     }
 }
+
+const WITHDRAW_AMOUNT = 5;
 
 context('Withdraw Some Amount', async () => {
     var user, app, user_eth_account, contract;
@@ -29,13 +31,16 @@ context('Withdraw Some Amount', async () => {
         user = await loginUser({username : user.username, password : user.password, app_id : app.id});
 
         /* Add Amount for User on Database */
-        let user_deposit_transaction = await userDepositToContract({eth_account : user_eth_account, tokenAmount : 5, platformAddress : contract.platformAddress});
+        let user_deposit_transaction = await userDepositToContract({eth_account : user_eth_account, tokenAmount : WITHDRAW_AMOUNT, platformAddress : contract.platformAddress});
         await userConfirmDeposit({
             app_id : app.id,
             user_id : user.id,
             transactionHash : user_deposit_transaction.transactionHash,
-            amount : 5
+            amount :WITHDRAW_AMOUNT
         })
+
+        global.test.user = user;
+        global.test.user_eth_account = user_eth_account;
     
     });
 
@@ -56,12 +61,25 @@ context('Withdraw Some Amount', async () => {
 
     it('should be able withdraw some Amount', mochaAsync(async () => {
         /* Withdraw from Smart-Contract */
-        let withdrawTxResponse = await userWithdrawFromContract({
+        let withdrawTxResponse = await appWithdrawForUser({
             eth_account : user_eth_account,
             tokenAmount : 3,
             platformAddress : contract.platformAddress
         })
 
         expect(withdrawTxResponse).to.not.equal(false);
+        let withdraws_res = await getAppUserWithdraws({app : app.id, user : user.id}, app.bearerToken , {id : app.id});
+        const { message } = withdraws_res.data;
+
+        let res = await finalizeUserWithdraw({
+            app : app.id,
+            user : user.id,
+            withdraw_id : message[0]._id,
+            transactionHash : withdrawTxResponse.transactionHash,
+        }, app.bearerToken , {id : app.id});
+
+        expect(withdrawTxResponse).to.not.equal(false);
+        expect(res.data.status).to.equal(200);
     }));
+    
 });

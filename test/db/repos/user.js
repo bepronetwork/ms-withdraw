@@ -9,6 +9,7 @@ import {
     pipeline_my_bets
 } from './pipelines/user';
 import { populate_user } from './populates';
+import { throwError } from '../../controllers/Errors/ErrorManager';
 /**
  * Accounts database interaction class.
  *
@@ -72,7 +73,7 @@ class UsersRepository extends MongoComponent{
     findUser(username){
         return new Promise( (resolve, reject) => {
             UsersRepository.prototype.schema.model.findOne({'username' : username})
-            .populate(foreignKeys)
+            .populate(populate_user)
             .lean()
             .exec( (err, user) => {
                 if(err) {reject(err)}
@@ -91,6 +92,32 @@ class UsersRepository extends MongoComponent{
                     resolve(true);
                 }
             )
+        });
+    }
+
+    setAffiliateLink(user_id, affiliateLinkId){
+        return new Promise( (resolve,reject) => {
+            UsersRepository.prototype.schema.model.findOneAndUpdate(
+                { _id: user_id },
+                { $set: { "affiliateLink" : affiliateLinkId} },
+                { 'new': true })
+            .exec( (err, item) => {
+                if(err){reject(err)}
+                resolve(item);
+            })
+        });
+    }
+
+    setAffiliate(user_id, affiliateId){
+        return new Promise( (resolve,reject) => {
+            UsersRepository.prototype.schema.model.findOneAndUpdate(
+                { _id: user_id },
+                { $set: { "affiliate" : affiliateId} },
+                { 'new': true })
+            .exec( (err, item) => {
+                if(err){reject(err)}
+                resolve(item);
+            })
         });
     }
     
@@ -224,6 +251,30 @@ class UsersRepository extends MongoComponent{
                 resolve(item);
             });
         });
+    }
+
+
+    async changeWithdrawPosition(_id, state){
+        try{
+            return new Promise( (resolve, reject) => {
+                UsersRepository.prototype.schema.model.findByIdAndUpdate(
+                    _id,
+                    { $set: { "isWithdrawing" : state} }) 
+                    .exec( (err, item) => {
+                        if(err){reject(err)}
+                        try{
+                            if((state == true) && (item.isWithdrawing == true)){throwError('WITHDRAW_MODE_IN_API')}
+                            resolve(item);
+                        }catch(err){
+                            reject(err);
+                        }
+
+                    }
+                )
+            })
+        }catch(err){
+            throw (err)
+        }
     }
 }
 

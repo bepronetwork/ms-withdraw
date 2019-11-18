@@ -22,6 +22,42 @@ export async function requestAppWithdraw(params, bearerToken, payload){
     .then(res => {return res.body})
 };
 
+export async function requestUserAffiliateWithdraw(params, bearerToken, payload){
+    return request(global.app)
+    .post('/api/users/affiliate/requestWithdraw')
+    .set("authorization", "Bearer " + bearerToken)
+    .set("payload", getPayloadString(payload))
+    .send(params)
+    .then(res => {return res.body})
+};
+
+export async function finalizeUserWithdraw(params, bearerToken, payload){
+    return request(global.app)
+    .post('/api/users/finalizeWithdraw')
+    .set("authorization", "Bearer " + bearerToken)
+    .set("payload", getPayloadString(payload))
+    .send(params)
+    .then(res => {return res.body})
+};
+
+export async function finalizeAppWithdraw(params, bearerToken, payload){
+    return request(global.app)
+    .post('/api/app/finalizeWithdraw')
+    .set("authorization", "Bearer " + bearerToken)
+    .set("payload", getPayloadString(payload))
+    .send(params)
+    .then(res => {return res.body})
+};
+
+export async function getAppUserWithdraws(params, bearerToken, payload){
+    return request(global.app)
+    .post('/api/app/users/withdraws')
+    .set("authorization", "Bearer " + bearerToken)
+    .set("payload", getPayloadString(payload))
+    .send(params)
+    .then(res => {return res.body})
+};
+
 function getPayloadString(payloadObject){
     if(!payloadObject){return null}
     return JSON.stringify({ id : payloadObject.id })

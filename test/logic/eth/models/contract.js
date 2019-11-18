@@ -46,7 +46,7 @@ class contract{
         this.contract = new this.web3.eth.Contract(contract_json.abi, this.address)
     } 
 
-    async send(account, byteCode, value='0x0'){        
+    async send(account, byteCode, value='0x0'){
         let tx = {
             data : byteCode,
             from  : account.address,

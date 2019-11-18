@@ -3,6 +3,7 @@ import ModelComponent from './modelComponent';
 import {AppRepository} from '../db/repos';
 import Wallet from './wallet';
 import { MapperSingleton } from '../controllers/Mapper/Mapper';
+import { AffiliateSetup } from '.';
 
 class App extends ModelComponent{
 
@@ -18,7 +19,15 @@ class App extends ModelComponent{
                 self : null, 
                 params : params,
                 children : [
-                    new Wallet(params)
+                    new Wallet(params),
+                    new AffiliateSetup({...params, 
+                        structures : [
+                            {
+                                level : 1,
+                                percentageOnLoss : 0.02
+                            }
+                        ]
+                    })
                 ]
             }
             );
@@ -33,7 +42,7 @@ class App extends ModelComponent{
     
     async register(){
         try{
-            let app = await this.process('Register');
+            let app =  await this.process('Register');
             return MapperSingleton.output('App', app);
         }catch(err){
             throw err;
@@ -259,6 +268,20 @@ class App extends ModelComponent{
             throw err;
         }
     }
+
+    /**
+     * @param {String} 
+     * @return {bool || Exception}  
+     */
+
+
+    async editAffiliateStructure(){
+        try{
+            return await this.process('EditAffiliateStructure');
+        }catch(err){
+            throw err;
+        }
+    }
      
      /**
      * @param {String} 
@@ -266,13 +289,23 @@ class App extends ModelComponent{
      */
 
     async updateWallet(){
+        const { app } = this.self.params;
         try{
-            return await this.process('UpdateWallet');
+            /* Close Mutex */
+            await AppRepository.prototype.changeWithdrawPosition(app, true);
+            let res = await this.process('UpdateWallet');
+            /* Open Mutex */
+            await AppRepository.prototype.changeWithdrawPosition(app, false);
+            return res;
         }catch(err){
+            if(parseInt(err.code) != 14){
+                /* If not withdrawing atm */
+                /* Open Mutex */
+                await AppRepository.prototype.changeWithdrawPosition(app, false);
+            }
             throw err;
         }
     }
-
 }
 
 export default App;

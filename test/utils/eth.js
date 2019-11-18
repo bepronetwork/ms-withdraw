@@ -50,6 +50,8 @@ export async function deploySmartContract({eth_account}){
         let res = await casino.__init__();
         await casino.setMaxWithdrawal(globals.constants.deploy.maxWithdrawal);
         await casino.setMaxDeposit(globals.constants.deploy.maxDeposit);
+        await casino.authorizeCroupier(globals.croupierAccount.getAddress());
+        await casino.authorizeAddress(eth_account.getAddress());
 
         return {    
             casino : casino,
@@ -87,23 +89,50 @@ export async function userDepositToContract({eth_account, platformAddress, token
 }
 
 
-export async function userWithdrawFromContract({eth_account, platformAddress, tokenAmount}){
+export async function appWithdrawForUser({eth_account, platformAddress, tokenAmount}){
     try{
         let erc20Contract = globals.getERC20Contract(globals.constants.erc20TokenAddress);
 
         let casinoContract = new CasinoContract({
             web3 : global.web3,
-            account : eth_account,
+            account : global.test.admin_eth_account,
             erc20TokenContract : erc20Contract,
             contractAddress: platformAddress,
             decimals : globals.constants.tokenDecimals,
-        })
-        /* Deposit Tokens */
-        return await casinoContract.withdrawFunds({
+        });
+        
+        /* Withdraw Tokens to User */
+        return await casinoContract.withdrawUserFundsAsOwner({
+            userAddress : eth_account.getAddress(),
             amount : tokenAmount,
         });
-
+        
     }catch(err){
+        console.log(err);
+        return false
+    }
+}
+
+export async function appWithdrawForUserBatch({platformAddress, addresses, amounts}){
+    try{
+        let erc20Contract = globals.getERC20Contract(globals.constants.erc20TokenAddress);
+
+        let casinoContract = new CasinoContract({
+            web3 : global.web3,
+            account : global.test.admin_eth_account,
+            erc20TokenContract : erc20Contract,
+            contractAddress: platformAddress,
+            decimals : globals.constants.tokenDecimals,
+        });
+        
+        /* Withdraw Tokens to User */
+        return await casinoContract.withdrawUserFundsAsOwnerBatch({
+            addresses : addresses,
+            amounts : amounts
+        });
+        
+    }catch(err){
+        console.log(err);
         return false
     }
 }

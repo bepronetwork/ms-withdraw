@@ -98,8 +98,21 @@ class UsersRepository extends MongoComponent{
     addWithdraw(user_id, withdraw){
         return new Promise( (resolve,reject) => {
             UsersRepository.prototype.schema.model.findOneAndUpdate(
-                { _id: user_id, withdraws : {$nin : [withdraw._id] } }, 
+                { _id: user_id, withdraws : {$nin : [withdraw] } }, 
                 { $push: { "withdraws" : withdraw } },
+                (err, item) => {
+                    if(err){reject(err)}
+                    resolve(true);
+                }
+            )
+        });
+    }
+
+    removeWithdraw(user_id, withdraw){
+        return new Promise( (resolve,reject) => {
+            UsersRepository.prototype.schema.model.findOneAndUpdate(
+                { _id: user_id }, 
+                { $pull: { "withdraws" : withdraw } },
                 (err, item) => {
                     if(err){reject(err)}
                     resolve(true);

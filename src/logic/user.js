@@ -4,12 +4,13 @@
 const _ = require('lodash');
 import { ErrorManager } from '../controllers/Errors';
 import LogicComponent from './logicComponent';
-import { UsersRepository, AppRepository, WalletsRepository } from '../db/repos';
+import { UsersRepository, AppRepository, WalletsRepository, WithdrawRepository } from '../db/repos';
 import Numbers from './services/numbers';
 import { Withdraw } from '../models';
 import CasinoContract from './eth/CasinoContract';
 import { globals } from '../Globals';
 import { throwError } from '../controllers/Errors/ErrorManager';
+import { verifytransactionHashWithdrawUser } from './services/services';
 let error = new ErrorManager();
 
 
@@ -39,7 +40,7 @@ const processActions = {
             if(params.tokenAmount <= 0){throwError('INVALID_AMOUNT')}
             /* Get User Id */
             user = await UsersRepository.prototype.findUserById(params.user);
-            let app = await AppRepository.prototype.findAppById(params.app);
+            var app = await AppRepository.prototype.findAppById(params.app);
             if(!app){throwError('APP_NOT_EXISTENT')}
             if(!user){throwError('USER_NOT_EXISTENT')}
             
@@ -89,6 +90,150 @@ const processActions = {
         }catch(err){ 
             throw err;
         }
+    },
+    __requestAffiliateWithdraw : async (params) => {
+        var user;
+        try{
+            if(params.tokenAmount <= 0){throwError('INVALID_AMOUNT')}
+            /* Get User Id */
+            user = await UsersRepository.prototype.findUserById(params.user);
+            let app = await AppRepository.prototype.findAppById(params.app);
+            if(!app){throwError('APP_NOT_EXISTENT')}
+            if(!user){throwError('USER_NOT_EXISTENT')}
+            
+            /* Create Casino Contract Instance */
+            let casinoContract = new CasinoContract({
+                web3                : globals.web3,
+                account             : globals.getManagerAccount(),
+                contractAddress     : app.platformAddress,
+                tokenAddress        : app.platformTokenAddress
+            })
+            
+            let amount = Numbers.toFloat(Math.abs(params.tokenAmount));
+
+            /* Verify if Withdraw position is already opened in the system */
+            let amountApprovedForWithdrawal = await casinoContract.getApprovedWithdrawAmount({
+                address : user.address, decimals : app.decimals
+            })
+            let isWithdrawingSmartContract = (amountApprovedForWithdrawal) > 0 ? true : false;
+
+            /* User Current Balance */
+            let currentBalance = Numbers.toFloat(user.affiliate.wallet.playBalance);
+            /* Verify if User has Enough Balance for Withdraw */
+            let hasEnoughBalance = (amount <= currentBalance);
+            /* Verify if User is in App */
+            let user_in_app = (app.users.findIndex(x => (x._id.toString() == user._id.toString())) > -1);
+
+            /* Verify if Withdraw position is already opened in the Smart-Contract */
+            let res = {
+                hasEnoughBalance,
+                user_in_app,
+                currencyTicker      : app.currencyTicker,
+                withdrawAddress : user.address,
+                amount,
+                playBalanceDelta : Numbers.toFloat(-Math.abs(amount)),
+                casinoContract : casinoContract,
+                user : user,
+                address     : user.address,
+                app : app,
+                decimals : app.decimals,
+                nonce : params.nonce,
+                amountApprovedForWithdrawal,
+                isAlreadyWithdrawingAPI : user.isWithdrawing,
+                isAlreadyWithdrawingSmartContract : isWithdrawingSmartContract,
+            }
+            return res;
+        }catch(err){ 
+            throw err;
+        }
+    },
+    __finalizeWithdraw : async (params) => {
+        try{
+            var params_input = params;
+            var transaction_params = { }, tokenAmount, wasAddedLogId, withdraw;
+
+            /* Get User Id */
+            let user = await UsersRepository.prototype.findUserById(params.user);
+            let app = await AppRepository.prototype.findAppById(params.app);
+            if(!app){throwError('APP_NOT_EXISTENT')}
+            if(!user){throwError('USER_NOT_EXISTENT')}
+            
+            /* Create Casino Contract Instance */
+            let casinoContract = new CasinoContract({
+                web3                : globals.web3,
+                contractAddress     : app.platformAddress,
+                tokenAddress        : app.platformTokenAddress
+            })
+
+            /* Verify if User is in App */
+            let user_in_app = (app.users.findIndex(x => (x._id.toString() == user._id.toString())) > -1);
+
+            /* Verify User Balance in API */
+            let currentAPIBalance = Numbers.toFloat(user.wallet.playBalance);
+                
+            /* Get all transactions which match */
+            let all_transaction_params = await verifytransactionHashWithdrawUser(
+                'eth', params_input.transactionHash, app.platformAddress, user.address
+            )
+            let transactionIsValid = all_transaction_params.isValid;
+
+            if(transactionIsValid){
+                /* Get One of them */
+                transaction_params = (await Promise.all(all_transaction_params.transactionTranfer.map( async t => {
+                    withdraw = await WithdrawRepository.prototype.getWithdrawByTransactionLogId(t.id);
+                    wasAddedLogId = withdraw ? true : false;
+                    if(wasAddedLogId) {
+                        // Was added 
+                        return false;
+                    }else{
+                        return t;
+                    }
+                }))).filter(el => el != false)[0];
+
+                if(transaction_params){
+                    /* Transaction is Valid */
+                    tokenAmount = Numbers.toFloat(Numbers.fromDecimals(transaction_params.tokenAmount, app.decimals));
+                }else{
+                    transaction_params = {};
+                    tokenAmount = undefined;
+                }
+            }else{
+                /* Transaction is Not Valid */
+                tokenAmount = undefined;
+            }
+
+            console.log(transaction_params.id);
+            
+            withdraw = await WithdrawRepository.prototype.getWithdrawByTransactionLogId(transaction_params.id);
+            wasAddedLogId = withdraw ? true : false;
+            
+            /* Verify if was Already Added or Invalid */
+            let wasAlreadyAdded = wasAddedLogId
+
+            let res = {
+                withdrawExists,
+                user_in_app,
+                withdraw_id : params.withdraw_id,
+                transactionIsValid,
+                //hashWithdrawingPositionOpen,
+                currentAPIBalance,
+                //currentOpenWithdrawingAmount,
+                casinoContract : casinoContract,
+                wasAlreadyAdded,
+                logId : transaction_params.id,
+                transactionHash : params.transactionHash,
+                currencyTicker      : app.currencyTicker,
+                creationDate        : new Date(),
+                app,
+                user,
+                amount : -Math.abs(Numbers.toFloat(tokenAmount)),
+                withdrawAddress : user.address
+            }
+            
+            return res;
+        }catch(err){
+            throw err;
+        }
     }
 }
 
@@ -105,38 +250,62 @@ const processActions = {
   
 const progressActions = {
     __requestWithdraw : async (params) => {
+         /* Add Withdraw to user */
+         var withdraw = new Withdraw({
+            app                     : params.app,
+            user                    : params.user._id,
+            creation_timestamp      : new Date(),                    
+            address                 : params.withdrawAddress,                         // Deposit Address 
+            currency                : params.currencyTicker,
+            amount                  : params.amount,
+            nonce                   : params.nonce,
+        })
+    
+        /* Save Deposit Data */
+        var withdrawSaveObject = await withdraw.createWithdraw();
+        
+        /* Update User Wallet in the Platform */
+        await WalletsRepository.prototype.updatePlayBalance(params.user.wallet, params.playBalanceDelta);
+        
+        /* Add Deposit to user */
+        await UsersRepository.prototype.addWithdraw(params.user._id, withdrawSaveObject._id);
+        
+        return params;
+        
+    },
+    __requestAffiliateWithdraw :  async (params) => {
+        /* Add Withdraw to user */
+        var withdraw = new Withdraw({
+           user                    : params.user._id,
+           app                     : params.app,
+           creation_timestamp      : new Date(),                    
+           address                 : params.withdrawAddress,                         // Deposit Address 
+           currency                : params.currencyTicker,
+           amount                  : params.amount,
+           nonce                   : params.nonce,
+           isAffiliate             : true
+       })
+   
+       /* Save Deposit Data */
+       var withdrawSaveObject = await withdraw.createWithdraw();
+
+        /* Update User Wallet in the Platform */
+        await WalletsRepository.prototype.updatePlayBalance(params.user.affiliate.wallet, params.playBalanceDelta);
+        
+        /* Add Deposit to user */
+        await UsersRepository.prototype.addWithdraw(params.user._id, withdrawSaveObject._id);
+        return params;
+    },
+    __finalizeWithdraw : async (params) => {
         try{
-            try{
-                /* Makes Withdrawal Available on the Smart-Contract */
-                await params.casinoContract.approveWithdraw({
-                    address             : params.address,
-                    amount              : Numbers.toFloat(params.amount),
-                    decimals            : params.decimals
-                });
-
-                /* Add Withdraw to user */
-                let withdraw = new Withdraw({
-                    user                    : params.user,
-                    creation_timestamp      : new Date(),                    
-                    address                 : params.withdrawAddress,                         // Deposit Address 
-                    currency                : params.currencyTicker,
-                    amount                  : params.amount,
-                    nonce                   : params.nonce,
-                })
-            
-                /* Save Deposit Data */
-                let withdrawSaveObject = await withdraw.createWithdraw();
-
-                /* Update User Wallet in the Platform */
-                await WalletsRepository.prototype.updatePlayBalance(params.user.wallet, params.playBalanceDelta);
-                /* Add Deposit to user */
-                await UsersRepository.prototype.addWithdraw(params.user._id, withdrawSaveObject._id);
-                
-                return params;
-            }catch(err){
-                // Transaction Error
-                throwError('ERROR_TRANSACTION')
-            }
+            /* Add Withdraw to user */
+            await WithdrawRepository.prototype.finalizeWithdraw(params.withdraw_id, {
+                transactionHash         : params.transactionHash,
+                logId                   : params.logId,
+                last_update_timestamp   : new Date(),                             
+                amount                  : Numbers.toFloat(Math.abs(params.amount))
+            });
+            return params;
         }catch(err){
             throw err;
         }
@@ -194,6 +363,12 @@ class UserLogic extends LogicComponent {
                 case 'RequestWithdraw' : {
 					return await library.process.__requestWithdraw(params); 
                 };
+                case 'RequestAffiliateWithdraw' : {
+                    return await library.process.__requestAffiliateWithdraw(params); 
+                }
+                case 'FinalizeWithdraw' : {
+					return await library.process.__finalizeWithdraw(params); 
+                };
 			}
 		}catch(err){
 			throw err;
@@ -222,6 +397,12 @@ class UserLogic extends LogicComponent {
 			switch(progressAction) {
                 case 'RequestWithdraw' : {
 					return await library.progress.__requestWithdraw(params); 
+                };
+                case 'RequestAffiliateWithdraw' : {
+                    return await library.progress.__requestAffiliateWithdraw(params); 
+                }
+                case 'FinalizeWithdraw' : {
+					return await library.progress.__finalizeWithdraw(params); 
                 };
 			}
 		}catch(err){

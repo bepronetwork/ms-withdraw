@@ -1,6 +1,7 @@
 import MongoComponent from './MongoComponent';
 import { WithdrawSchema } from '../schemas/withdraw';
 import { pipeline_transactions_app } from './pipelines/transactions';
+import { userWithdrawsFiltered } from './pipelines/withdraws';
 
 /**
  * Accounts database interaction class.
@@ -48,9 +49,11 @@ class WithdrawRepository extends MongoComponent{
                 { $set: 
                     { 
                         amount                  : params.amount,
-                        done                    : params.done,
-                        confirmed               : params.confirmed,
+                        done                    : true,
+                        confirmed               : true,
+                        status                  : 'Processed',
                         transactionHash         : params.transactionHash,
+                        logId                   : params.logId,
                         last_update_timestamp   : params.last_update_timestamp
                 }},{ new: true }
             )
@@ -77,10 +80,10 @@ class WithdrawRepository extends MongoComponent{
         }
     }
 
-    getWithdrawByTransactionHash(transactionHash){
+    getWithdrawByTransactionHash(transactionHash, opt={}){
         return new Promise( (resolve, reject) => {
             WithdrawRepository.prototype.schema.model
-            .findOne({ transactionHash })
+            .findOne({ transactionHash : transactionHash, ...opt})
             .exec( (err, Withdraw) => {
                 if(err) { reject(err)}
                 resolve(Withdraw)            
@@ -88,6 +91,16 @@ class WithdrawRepository extends MongoComponent{
         });
     }
 
+    getWithdrawByTransactionLogId(logId, opt={}){
+        return new Promise( (resolve, reject) => {
+            WithdrawRepository.prototype.schema.model
+            .findOne({ logId : logId, ...opt})
+            .exec( (err, Withdraw) => {
+                if(err) { reject(err)}
+                resolve(Withdraw)            
+            });
+        });
+    }
 
     confirmWithdraw(id, new_Withdraw_params){
         return new Promise( (resolve, reject) => {
@@ -108,6 +121,17 @@ class WithdrawRepository extends MongoComponent{
                 resolve(Withdraw);
             });
         });
+    }
+
+    async getAppFiltered({size=20, offset=0, app, user, status}){
+        return new Promise( (resolve,reject) => {
+            WithdrawRepository.prototype.schema.model
+            .aggregate(userWithdrawsFiltered({size, offset, app, user, status}))
+            .exec( (err, docs) => {
+                if(err){reject(err)}
+                resolve(docs);
+            })
+        })
     }
 
     getAll = async() => {

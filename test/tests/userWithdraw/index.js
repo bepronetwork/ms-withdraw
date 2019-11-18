@@ -1,4 +1,5 @@
 context('User Testing', async () => {
+    require('./withdrawBatch');
     require('./withdrawReplayAtack');
     require('./withdrawNoUser');
     require('./withdrawNoApp');
@@ -6,5 +7,6 @@ context('User Testing', async () => {
     require('./withdraw0');
     require('./withdrawNoFunds');
     require('./withdrawSomeAmount');
+    require('./withdrawMinError');
     require('./withdrawAllAmount');
 });

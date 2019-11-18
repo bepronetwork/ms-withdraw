@@ -5,10 +5,10 @@ const _ = require('lodash');
 import { Security } from '../controllers/Security';
 import { ErrorManager } from '../controllers/Errors';
 import LogicComponent from './logicComponent';
-import { UsersRepository, AppRepository, WalletsRepository, DepositRepository, WithdrawRepository } from '../db/repos';
+import { UsersRepository, AppRepository, WalletsRepository, DepositRepository, WithdrawRepository, AffiliateLinkRepository, AffiliateRepository } from '../db/repos';
 import Numbers from './services/numbers';
 import { verifytransactionHashDepositUser, verifytransactionHashWithdrawUser } from './services/services';
-import { Deposit, Withdraw } from '../models';
+import { Deposit, Withdraw, AffiliateLink } from '../models';
 import CasinoContract from './eth/CasinoContract';
 import codes from './categories/codes';
 import { globals } from '../Globals';
@@ -39,9 +39,9 @@ const processActions = {
         var input_params = params;
         let normalized = {};
         let user = await __private.db.findUser(params.username);     
+        if(!user){throwError('USER_NOT_EXISTENT')}
         var app = user.app_id; 
         var user_in_app = (app._id == params.app);
-
 		if(user){
 			normalized = {
 				username : user.username,
@@ -55,10 +55,15 @@ const processActions = {
 	},
 	__register : async (params) => {
 
+        const { affiliateLink, affiliate } = params;
+
         var input_params = params;
 		//Set up Password Structure
         let user, hash_password;
-        
+
+        let app = await AppRepository.prototype.findAppById(params.app);
+        if(!app){throwError('APP_NOT_EXISTENT')}
+
         if(params.user_external_id){
             // User is Extern (Only Widget Clients)
             user = await AppRepository.prototype.findUserByExternalId(input_params.app, input_params.user_external_id);
@@ -81,16 +86,18 @@ const processActions = {
             isAddressAlreadyRegistered,
 			alreadyExists	: alreadyExists,
 			username 		: params.username,
-			full_name		: params.full_name,
+            full_name		: params.full_name,
             name 			: params.name,
             address         : params.address,
 			hash_password,
             wallet 			: params.wallet,
             register_timestamp : new Date(),
-			nationality		: params.nationality,
+            nationality		: params.nationality,
+            affiliate,
 			age				: params.age,
-			email			: params.email,
-			app_id			: params.app,
+            email			: params.email,
+            affiliateLink,
+			app_id			    : params.app,
 			external_user	: params.user_external_id ? true : false,
 			external_id		: params.user_external_id
 		}
@@ -176,21 +183,18 @@ const processActions = {
             withdraw = await WithdrawRepository.prototype.findWithdrawById(params.withdraw_id);
             let withdrawExists = withdraw ? true : false;
 
-            /* Verify App Balance in Smart-Contract */
+            /* Verify App Balance in Smart-Contract
             let currentOpenWithdrawingAmount = await casinoContract.getApprovedWithdrawAmount(
                 {address : user.address, decimals : app.decimals});
             
             var hashWithdrawingPositionOpen = (currentOpenWithdrawingAmount != 0 ) ? true : false;
-
-            /* Verify User Balance in Smart-Contract */
-            let newBalance = Numbers.toFloat(Numbers.fromDecimals(await casinoContract.getUserBalance(params.address), app.decimals));
-            
+            */
             /* Verify User Balance in API */
             let currentAPIBalance = Numbers.toFloat(user.wallet.playBalance);
     
             /* Withdraw Occured in the Smart-Contract */
             transaction_params = await verifytransactionHashWithdrawUser(
-                'eth', params_input.transactionHash, params_input.tokenAmount, app.platformAddress, app.decimals
+                'eth', params_input.transactionHash, app.platformAddress, app.decimals
             )
 
             let transactionIsValid = transaction_params.isValid;
@@ -211,11 +215,9 @@ const processActions = {
                 user_in_app,
                 withdraw_id : params.withdraw_id,
                 transactionIsValid,
-                hashWithdrawingPositionOpen,
+                //hashWithdrawingPositionOpen,
                 isValidAddress,
-                newDecentralizedBalance : newBalance,
                 currentAPIBalance,
-                newBalance,
                 currentOpenWithdrawingAmount,
                 casinoContract : casinoContract,
                 wasAlreadyAdded,
@@ -261,12 +263,33 @@ const processActions = {
 
   
 const progressActions = {
-	__register : async (params) => {
-		let user = await self.save(params);
-        // Add to App
-        await AppRepository.prototype.addUser(params.app_id, user);
-        user = await UsersRepository.prototype.findUserById(user._id);
-		return user
+    __register : async (params) => {
+        try{
+            const { affiliate } = params;
+            let user = await self.save(params);
+            /* Register of Affiliate Link */
+            let affiliateLinkObject = await (new AffiliateLink({
+                userAffiliated : user._id,
+                app_id : params.app_id,
+                affiliateLink : params.affiliateLink
+            })).register();
+            /* Add affiliateLink _id */ 
+            await UsersRepository.prototype.setAffiliateLink(user._id, affiliateLinkObject._id);
+            /* Add Affiliate to Affiliate Link */ 
+            await AffiliateLinkRepository.prototype.setAffiliate(affiliateLinkObject._id, affiliate);
+            /* Add Afiliate Link to Parent Affiliates */
+            let promisesId = affiliateLinkObject.parentAffiliatedLinks.map( async paf => 
+                await AffiliateRepository.prototype.addAffiliateLinkChild(paf.affiliate, affiliateLinkObject._id)    
+            )
+
+            await Promise.all(promisesId);
+            /* Add to App */
+            await AppRepository.prototype.addUser(params.app_id, user);
+            user = await UsersRepository.prototype.findUserById(user._id);
+            return user;
+        }catch(err){
+            throw err;
+        }
 	},
 	__summary : async (params) => {
 		return params;
@@ -304,9 +327,7 @@ const progressActions = {
             await WithdrawRepository.prototype.finalizeWithdraw(params.withdraw_id, {
                 transactionHash         : params.transactionHash,
                 last_update_timestamp   : new Date(),                             
-                amount                  : Numbers.toFloat(Math.abs(params.amount)),
-                confirmed               : true,
-                done                    : params.withdrawExists
+                amount                  : Numbers.toFloat(Math.abs(params.amount))
             });
             return params;
         }catch(err){
@@ -371,13 +392,13 @@ class UserLogic extends LogicComponent {
 		try{			
 			switch(processAction) {
 				case 'Login' : {
-					return await library.process.__login(params); break;
+					return await library.process.__login(params);
 				};
 				case 'Register' : {
-					return library.process.__register(params); break;
+					return library.process.__register(params);
 				};
 				case 'Summary' : {
-					return await library.process.__summary(params); break;
+					return await library.process.__summary(params);
                 };
                 case 'UpdateWallet' : {
 					return await library.process.__updateWallet(params); 
@@ -386,10 +407,10 @@ class UserLogic extends LogicComponent {
 					return await library.process.__finalizeWithdraw(params); 
                 };
                 case 'CreateAPIToken' : {
-					return await library.process.__createApiToken(params); break;
+					return await library.process.__createApiToken(params);
                 };
                 case 'GetBets' : {
-					return await library.process.__getBets(params); break;
+					return await library.process.__getBets(params); 
                 };
 			}
 		}catch(err){
@@ -429,10 +450,10 @@ class UserLogic extends LogicComponent {
 					return await library.progress.__finalizeWithdraw(params); 
                 };
                 case 'CreateAPIToken' : {
-					return await library.progress.__createApiToken(params); break;
+					return await library.progress.__createApiToken(params);
                 };
                 case 'GetBets' : {
-					return await library.progress.__getBets(params); break;
+					return await library.progress.__getBets(params);
                 };
 			}
 		}catch(err){

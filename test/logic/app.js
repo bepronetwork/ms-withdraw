@@ -3,7 +3,7 @@ import { ErrorManager } from '../controllers/Errors';
 import { AppRepository, AdminsRepository, WalletsRepository, DepositRepository, UsersRepository, WithdrawRepository, GamesRepository } from '../db/repos';
 import LogicComponent from './logicComponent';
 import { getServices, fromDecimals, verifytransactionHashDepositApp, verifytransactionHashWithdrawApp } from './services/services';
-import { Game, Deposit, Withdraw } from '../models';
+import { Game, Deposit, Withdraw, AffiliateSetup } from '../models';
 import games from '../config/games.config.json';
 import CasinoContract from './eth/CasinoContract';
 import { globals } from '../Globals';
@@ -37,8 +37,10 @@ let __private = {};
   
 const processActions = {
 	__register : async (params) => {
+        const { affiliateSetup } = params;
         let admin = await AdminsRepository.prototype.findAdminById(params.admin_id);
         if(!admin){throwError('USER_NOT_EXISTENT')}
+        
           // Get App by Appname
 		let normalized = {
             address             : params.address,
@@ -47,6 +49,7 @@ const processActions = {
             services            : params.services, // Array
 			admin_id		    : admin._id,
             name    			: params.name,
+            affiliateSetup,       
 			description         : params.description,
 			marketType          : params.marketType,
 			metadataJSON        : JSON.parse(params.metadataJSON),
@@ -55,6 +58,7 @@ const processActions = {
 			countriesAvailable  : [], // TO DO
 			isVerified          : false
 		}
+
 		return normalized;
     },
     __get : async (params) => {
@@ -99,6 +103,7 @@ const processActions = {
 		return res;
     },
     __addBlockchainInformation : async (params) => {
+
         let res = {
             app : params.app,
             ownerAddress : params.address,
@@ -151,6 +156,7 @@ const processActions = {
         let { isValid, from } = await verifytransactionHashDepositApp(
             app.blockchain, params.transactionHash, params.amount, 
             app.platformAddress , app.decimals);
+        
         /* Verify if this transactionHashs was already added */
         let deposit = await DepositRepository.prototype.getDepositByTransactionHash(params.transactionHash);
 
@@ -206,7 +212,7 @@ const processActions = {
 
         /* Withdraw Occured in the Smart-Contract */
         transaction_params = await verifytransactionHashWithdrawApp(
-            'eth', params_input.transactionHash, params_input.tokenAmount, app.platformAddress, app.decimals
+            'eth', params_input.transactionHash, app.platformAddress, app.decimals
         )
 
         let transactionIsValid = transaction_params.isValid;
@@ -299,6 +305,17 @@ const processActions = {
         }
 
 		return normalized;
+    },
+    __editAffiliateStructure : async (params) => {
+        let { app, structures, affiliateTotalCut } = params;
+        app = await AppRepository.prototype.findAppById(app, 'affiliates');
+        if(!app){throwError('APP_NOT_EXISTENT')};
+        return {
+            affiliateTotalCut,
+            app_id : app._id,
+            affiliateSetup : app.affiliateSetup,
+            structures
+        }
     }
 }
 
@@ -315,10 +332,10 @@ const processActions = {
   
 const progressActions = {
 	__register : async (params) => {
-		let app = await self.save(params);
+        let app = await self.save(params);
         await AdminsRepository.prototype.addApp(params.admin_id, app);
         let bearerToken = Security.prototype.sign(app._id);
-        await AppRepository.prototype.createAPIToken(app._id, bearerToken)
+        await AppRepository.prototype.createAPIToken(app._id, bearerToken);
 		return app;
 	},
 	__summary : async (params) => {
@@ -328,7 +345,6 @@ const progressActions = {
         // Get Specific App Data
         let res = await AppRepository.prototype.getSummaryStats(params.type, params.app, params.opts);
         let ret = res;
-
         // Normalize Data for Each Call
         switch(params.type){
             case 'wallet' :
@@ -446,16 +462,12 @@ const progressActions = {
 
         return params;
     },
-   
     __finalizeWithdraw : async (params) => {
-            
         /* Add Withdraw to user */
         await WithdrawRepository.prototype.finalizeWithdraw(params.withdraw_id, {
             transactionHash         : params.transactionHash,
             last_update_timestamp   : new Date(),                             
-            amount                  : Numbers.toFloat(Math.abs(params.amount)),
-            confirmed               : true,
-            done                    : params.withdrawExists
+            amount                  : Numbers.toFloat(Math.abs(params.amount))
         })
 
         return params;
@@ -483,7 +495,19 @@ const progressActions = {
         });
 
 		return res;
-    }
+    },
+    __editAffiliateStructure : async (params) => {
+
+        var { affiliateSetup, structures, app_id } = params;
+        /* Create Affiliate Setup if needed */
+        const affiliateSetupSaved = (await (new AffiliateSetup({
+            previousAffiliateSetup : affiliateSetup,
+            structures
+        })).register());
+        const affiliateSetupId = (affiliateSetupSaved._id || affiliateSetupSaved._doc._id);
+        /* Create Affiliate Structures */
+        return await AppRepository.prototype.editAffiliateSetup(app_id, affiliateSetupId)
+    },
 }
 
 /**
@@ -570,6 +594,9 @@ class AppLogic extends LogicComponent{
                 case 'EditGameTableLimit' : {
                     return await library.process.__editGameTableLimit(params); break;
                 };
+                case 'EditAffiliateStructure' : {
+                    return await library.process.__editAffiliateStructure(params); break;
+                };
                 case 'EditGameEdge' : {
                     return await library.process.__editGameEdge(params); break;
                 };
@@ -601,7 +628,11 @@ class AppLogic extends LogicComponent{
 	 */
 
 	async testParams(params, action){
-		
+		try{
+			error.app(params, action);
+		}catch(err){
+            throw err;
+        }
     }
 
 	async progress(params, progressAction){
@@ -645,6 +676,9 @@ class AppLogic extends LogicComponent{
                 };
                 case 'EditGameEdge' : {
                     return await library.progress.__editGameEdge(params); break;
+                };
+                case 'EditAffiliateStructure' : {
+                    return await library.progress.__editAffiliateStructure(params); break;
                 };
                 case 'GetLastBets' : {
 					return await library.progress.__getLastBets(params); break;

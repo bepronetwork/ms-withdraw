@@ -14,6 +14,7 @@ WithdrawSchema.prototype.schema =  {
     address                 : { type: String},                         // Deposit Address 
     currency                : { type: String, required : true},
     transactionHash         : { type: String},
+    logId                   : { type: String},
     amount                  : { type: Number},
     withdraw_external_id    : { type: String},                                          // App Integrated Id Unique for Withdraw
     usd_amount              : { type: Number},
@@ -22,7 +23,9 @@ WithdrawSchema.prototype.schema =  {
     confirmations           : { type: Number, required : true, default : 0},
     maxConfirmations        : { type: Number, required : true, default : 0},
     confirmed               : { type: Boolean, default : false},
-    done                    : { type: Boolean, default : false}
+    done                    : { type: Boolean, default : false},
+    status                  : { type: String, required : true, default : 'Queue'},
+    isAffiliate             : { type: Boolean, default : false}
 }
 
 

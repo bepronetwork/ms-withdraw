@@ -1,8 +1,8 @@
 import {UserLogic} from '../logic';
 import ModelComponent from './modelComponent';
 import {UsersRepository} from '../db/repos';
-import Wallet from './wallet';
 import { MapperSingleton } from '../controllers/Mapper/Mapper';
+import { Affiliate, Wallet } from '.';
 
 class User extends ModelComponent{
 
@@ -18,7 +18,8 @@ class User extends ModelComponent{
                 self : null, 
                 params : params,
                 children : [
-                    new Wallet(params)
+                    new Wallet(params),
+                    new Affiliate(params)
                 ]
             }
             );
@@ -50,9 +51,20 @@ class User extends ModelComponent{
     }
 
     async updateWallet(){
+        const { user } = this.self.params;
         try{
-            return await this.process('UpdateWallet');
+            /* Close Mutex */
+            await UsersRepository.prototype.changeWithdrawPosition(user, true);
+            let res = await this.process('UpdateWallet');
+            /* Open Mutex */
+            await UsersRepository.prototype.changeWithdrawPosition(user, false);
+            return res;
         }catch(err){
+            if(parseInt(err.code) != 14){
+                /* If not withdrawing atm */
+                /* Open Mutex */
+                await UsersRepository.prototype.changeWithdrawPosition(user, false);
+            }
             throw err;
         }
     }
@@ -72,7 +84,7 @@ class User extends ModelComponent{
 
     async createAPIToken(){
         try{
-            let res = await this.process('CreateAPIToken');
+            let res =  await this.process('CreateAPIToken');
             return res.bearerToken;
         }catch(err){
             throw err;

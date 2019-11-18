@@ -19,7 +19,7 @@ const CONSTANTS = {
     croupierAccountPK : config.eth.keys.mgmt,
     masterAccountPK : config.eth.keys.master,
     deploy : {
-        tokenTransferAmount : 10,
+        tokenTransferAmount : 15,
         maxWithdrawal : 20,
         maxDeposit : 20
     }
