@@ -1,4 +1,4 @@
-import { casino, ierc20 } from '../eth/interfaces/index';
+import { casino, ierc20, casinoETH } from '../eth/interfaces/index';
 
 const abiDecoder = require('abi-decoder'); // NodeJS
 
@@ -8,6 +8,8 @@ class Etherscan{
     constructor(){
         this.abiDecoder = abiDecoder;
         this.abiDecoder.addABI(casino.abi);
+        this.abiDecoderETH = abiDecoder;
+        this.abiDecoderETH.addABI(casinoETH.abi);
         this.abiDecoderERC20 = abiDecoder;
         this.abiDecoderERC20.addABI(ierc20.abi);
     }
@@ -42,6 +44,27 @@ class Etherscan{
                     tokensTransferedFrom :  d.events[0].value,
                     tokensTransferedTo : d.events[1].value,
                     tokenAmount : d.events[2].value,
+                    id : transaction_recipt_encoded.logs[index].id+transaction_recipt_encoded.logs[index].data
+                }
+            }else{
+                /* Withdraw Log aka Redundant */
+            }
+        }).filter(el => el!=null);
+
+        return transfers;   
+    }
+
+
+    getTransactionDataCasinoETHWithdraw = (transaction_recipt_encoded) => {
+        let decodedLogs = this.abiDecoderETH.decodeLogs(transaction_recipt_encoded.logs);
+        /* Get Info on Transfer Types */
+        let transfers = decodedLogs.map( (d, index) => {
+            if(new String(d.name).toLowerCase().trim() == 'withdrawalevent'){
+                /* Transfer Log */
+                return {
+                    tokensTransferedFrom :  transaction_recipt_encoded.to,
+                    tokensTransferedTo : d.events[0].value,
+                    tokenAmount : d.events[1].value,
                     id : transaction_recipt_encoded.logs[index].id+transaction_recipt_encoded.logs[index].data
                 }
             }else{

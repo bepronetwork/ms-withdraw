@@ -29,6 +29,7 @@ jobs: # a collection of steps
             echo 'export PUBLIC_KEY=MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBALLaXE1qt9my6cWkh9NGYr+mM/WLagt8AqObSNs9sNbL9da6qrYxuq57XUepaWWgyA81bZXOUy25wfkBpwwQmXsCAwEAAQ==' >> $BASH_ENV
             echo 'export CONFIRMATION_NEEDED=1' >> $BASH_ENV
             echo 'export MIN_WITHDRAW=2' >> $BASH_ENV
+            echo 'export MS_MASTER_URL=https://ms-master-dev.herokuapp.com' >> $BASH_ENV
             source $BASH_ENV
       - run: # run tests
           name: test

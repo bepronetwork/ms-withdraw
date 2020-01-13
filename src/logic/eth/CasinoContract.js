@@ -160,11 +160,11 @@ class CasinoContract{
         }   
     }
 
-    async approveOwnerWithdrawal({newPlayersBalance, decimals, amount}){
+    async setOwnerWithdrawal({newPlayersBalance, amount}){
         try{
             let data = await self.contract.getContract().methods.setOwnerWithdrawal(
-                Numbers.toSmartContractDecimals(newPlayersBalance, decimals),
-                Numbers.toSmartContractDecimals(amount, decimals)
+                new String(newPlayersBalance).toString(),
+                new String(amount).toString()
                 ).encodeABI();
             let response = await self.contract.send(self.account.getAccount(), data);
             return response;  
@@ -179,7 +179,7 @@ class CasinoContract{
             if(!res || (parseFloat(res) == 0)){
                 return 0;
             }else{
-                return Numbers.toFloat(Numbers.fromDecimals(res.amount, decimals))
+                return parseFloat(Numbers.fromDecimals(res.amount, decimals))
             }
         }catch(err){
             throw err;

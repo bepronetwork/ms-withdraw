@@ -12,7 +12,7 @@ WithdrawSchema.prototype.schema =  {
     creation_timestamp      : { type: Date, required : true},                           // Timestamp
     last_update_timestamp   : { type: Date},                           // Last Update Timestamp
     address                 : { type: String},                         // Deposit Address 
-    currency                : { type: String, required : true},
+    currency                : { type: mongoose.Schema.Types.ObjectId, ref: 'Currency', required : true},      // App Integrated Id for Company
     transactionHash         : { type: String},
     logId                   : { type: String},
     amount                  : { type: Number},

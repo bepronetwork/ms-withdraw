@@ -10,12 +10,14 @@ import {BetResultSpaceSchema} from './betResultSpace';
 import { WalletSchema } from './wallet';
 import { SecuritySchema } from './security';
 import { AffiliateStructureSchema } from './affiliateStructure';
+import { CurrencySchema } from './currency';
 
 export {
     UserSchema,
     AppSchema,
     WalletSchema,
     SecuritySchema,
+    CurrencySchema,
     AffiliateStructureSchema,
     DepositSchema,
     GameSchema,

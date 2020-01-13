@@ -14,13 +14,14 @@ const initialState = {
 }
 
 context('Withdraw No Funds', async () => {
-    var user, app, user_eth_account, contract;
+    var user, app, user_eth_account, contract, appWallet, currency;
     
     before( async () =>  {
 
         app = global.test.app;
         contract = global.test.contract;
-
+        appWallet = app.wallet.find( w => new String(w.currency.ticker).toLowerCase() == new String(global.test.ticker).toLowerCase());
+        currency = appWallet.currency;
         /* Create User Address and give it ETH */
         user_eth_account = await createEthAccount({ethAmount : initialState.user.eth_balance, tokenAmount : initialState.user.token_balance});
 
@@ -29,12 +30,13 @@ context('Withdraw No Funds', async () => {
         user = await loginUser({username : user.username, password : user.password, app_id : app.id});
 
         /* Add Amount for User on Database */
-        let user_deposit_transaction = await userDepositToContract({eth_account : user_eth_account, tokenAmount : 3, platformAddress : contract.platformAddress});
+        let user_deposit_transaction = await userDepositToContract({eth_account : user_eth_account, tokenAmount : global.test.depositAmounts[global.test.ticker], platformAddress : appWallet.bank_address, currency});
         await userConfirmDeposit({
             app_id : app.id,
-            user_id : user.id,
+            user : user,
             transactionHash : user_deposit_transaction.transactionHash,
-            amount : 3
+            amount : global.test.depositAmounts[global.test.ticker],
+            currency
         })
     
     });
@@ -43,11 +45,12 @@ context('Withdraw No Funds', async () => {
     it('shouldn´t be able to withdraw a superior to available balance', mochaAsync(async () => {
 
         let res = await requestUserWithdraw({
-            tokenAmount : 10,
+            tokenAmount : global.test.depositAmounts[global.test.ticker]*10,
             nonce : 3456365756,
             app : app.id,
             address : user_eth_account.getAddress(),
-            user : user.id
+            user : user.id,
+            currency : currency._id
         }, user.bearerToken , {id : user.id});
 
         expect(detectValidationErrors(res)).to.be.equal(false);

@@ -19,7 +19,7 @@ AppSchema.prototype.schema =  {
     users               : [{ type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
     external_users      : [{type: String}],
     decimals            : {type : Number},
-    wallet              : {  type: mongoose.Schema.Types.ObjectId, ref: 'Wallet'},
+    wallet              : [{ type: mongoose.Schema.Types.ObjectId, ref: 'Wallet'}],
     deposits            : [{ type: mongoose.Schema.Types.ObjectId, ref: 'Deposit'}],
     withdraws           : [{ type: mongoose.Schema.Types.ObjectId, ref: 'Withdraw'}],
     affiliateSetup      : { type: mongoose.Schema.Types.ObjectId, ref: 'AffiliateSetup', required : true},

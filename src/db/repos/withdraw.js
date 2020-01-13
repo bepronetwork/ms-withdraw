@@ -48,7 +48,6 @@ class WithdrawRepository extends MongoComponent{
             WithdrawRepository.prototype.schema.model.findByIdAndUpdate(id,
                 { $set: 
                     { 
-                        amount                  : params.amount,
                         done                    : true,
                         confirmed               : true,
                         status                  : 'Processed',

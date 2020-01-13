@@ -13,13 +13,14 @@ const initialState = {
 }
 
 context('Withdraw 0', async () => {
-    var user, app, user_eth_account, contract;
+    var user, app, user_eth_account, contract, appWallet, currency;
 
     before( async () =>  {
 
         app = global.test.app;
         contract = global.test.contract;
-
+        appWallet = app.wallet.find( w => new String(w.currency.ticker).toLowerCase() == new String(global.test.ticker).toLowerCase());
+        currency = appWallet.currency;
         /* Create User Address and give it ETH */
         user_eth_account = await createEthAccount({ethAmount : initialState.user.eth_balance, tokenAmount : initialState.user.token_balance});
         /* Create User on Database */
@@ -36,7 +37,8 @@ context('Withdraw 0', async () => {
             nonce : 3456365756,
             app : app.id,
             address : user_eth_account.getAddress(),
-            user : user.id
+            user : user.id,
+            currency : currency._id
         }, user.bearerToken , {id : user.id});
 
         expect(detectValidationErrors(res)).to.be.equal(false);

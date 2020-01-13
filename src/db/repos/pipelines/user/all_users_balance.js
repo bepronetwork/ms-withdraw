@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 
-const pipeline_all_users_balance = (app_id) => 
+const pipeline_all_users_balance = (app_id, currency) => 
     [
         //Stage 0
     {
@@ -18,14 +18,16 @@ const pipeline_all_users_balance = (app_id) =>
         }
       }, {
         '$project': {
-          'wallet': {
-            '$arrayElemAt': [
-              '$wallet', 0
-            ]
-          }
+          'wallet': true
         }
-      }, {
-        '$group': {
+      },
+        {
+            '$match' : {
+                "wallet.currency" : mongoose.Types.ObjectId(currency)
+            }
+
+        }, {
+        '$project': {
           '_id': 'all', 
           'balance': {
             '$sum': '$wallet.playBalance'
