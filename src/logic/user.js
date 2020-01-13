@@ -7,10 +7,10 @@ import LogicComponent from './logicComponent';
 import { UsersRepository, AppRepository, WalletsRepository, WithdrawRepository } from '../db/repos';
 import Numbers from './services/numbers';
 import { Withdraw } from '../models';
-import CasinoContract from './eth/CasinoContract';
 import { globals } from '../Globals';
 import { throwError } from '../controllers/Errors/ErrorManager';
 import { verifytransactionHashWithdrawUser } from './services/services';
+import { detectCurrencyAmountToSmartContractAmount } from './utils/currencies';
 let error = new ErrorManager();
 
 
@@ -37,30 +37,21 @@ const processActions = {
     __requestWithdraw : async (params) => {
         var user;
         try{
-            if(params.tokenAmount <= 0){throwError('INVALID_AMOUNT')}
+            const { currency, address, tokenAmount } = params; 
+            if(tokenAmount <= 0){throwError('INVALID_AMOUNT')}
             /* Get User Id */
             user = await UsersRepository.prototype.findUserById(params.user);
             var app = await AppRepository.prototype.findAppById(params.app);
+            /* Get app and User */
             if(!app){throwError('APP_NOT_EXISTENT')}
             if(!user){throwError('USER_NOT_EXISTENT')}
-            
-            /* Create Casino Contract Instance */
-            let casinoContract = new CasinoContract({
-                web3                : globals.web3,
-                account             : globals.getManagerAccount(),
-                contractAddress     : app.platformAddress,
-                tokenAddress        : app.platformTokenAddress
-            })
-            
-            let amount = Numbers.toFloat(Math.abs(params.tokenAmount));
+            /* Get User and App Wallets */
+            const userWallet = user.wallet.find( w => new String(w.currency._id).toString() == new String(currency).toString());
+            if(!userWallet || !userWallet.currency){throwError('CURRENCY_NOT_EXISTENT')};
+            let amount = parseFloat(Math.abs(tokenAmount));
 
-            /* Verify if Withdraw position is already opened in the system */
-            let amountApprovedForWithdrawal = await casinoContract.getApprovedWithdrawAmount({
-                address : user.address, decimals : app.decimals
-            })
-            let isWithdrawingSmartContract = (amountApprovedForWithdrawal) > 0 ? true : false;
             /* User Current Balance */
-            let currentBalance = Numbers.toFloat(user.wallet.playBalance);
+            let currentBalance = parseFloat(userWallet.playBalance);
             
             /* Verify if User has Enough Balance for Withdraw */
             let hasEnoughBalance = (amount <= currentBalance);
@@ -72,19 +63,15 @@ const processActions = {
             let res = {
                 hasEnoughBalance,
                 user_in_app,
-                currencyTicker      : app.currencyTicker,
-                withdrawAddress : user.address,
+                currency      : userWallet.currency,
+                withdrawAddress : address,
+                userWallet : userWallet,
                 amount,
-                playBalanceDelta : Numbers.toFloat(-Math.abs(amount)),
-                casinoContract : casinoContract,
+                playBalanceDelta : parseFloat(-Math.abs(amount)),
                 user : user,
-                address     : user.address,
-                app : app,
-                decimals : app.decimals,
+                app : app,     
                 nonce : params.nonce,
-                amountApprovedForWithdrawal,
-                isAlreadyWithdrawingAPI : user.isWithdrawing,
-                isAlreadyWithdrawingSmartContract : isWithdrawingSmartContract,
+                isAlreadyWithdrawingAPI : user.isWithdrawing
             }
             return res;
         }catch(err){ 
@@ -94,33 +81,24 @@ const processActions = {
     __requestAffiliateWithdraw : async (params) => {
         var user;
         try{
+            const { currency } = params;
             if(params.tokenAmount <= 0){throwError('INVALID_AMOUNT')}
             /* Get User Id */
             user = await UsersRepository.prototype.findUserById(params.user);
             let app = await AppRepository.prototype.findAppById(params.app);
             if(!app){throwError('APP_NOT_EXISTENT')}
             if(!user){throwError('USER_NOT_EXISTENT')}
-            
-            /* Create Casino Contract Instance */
-            let casinoContract = new CasinoContract({
-                web3                : globals.web3,
-                account             : globals.getManagerAccount(),
-                contractAddress     : app.platformAddress,
-                tokenAddress        : app.platformTokenAddress
-            })
-            
-            let amount = Numbers.toFloat(Math.abs(params.tokenAmount));
+            /* Get User and App Wallets */
+            const userWallet = user.affiliate.wallet.find( w => new String(w.currency._id).toString() == new String(currency).toString());
+            if(!userWallet || !userWallet.currency){throwError('CURRENCY_NOT_EXISTENT')};
 
-            /* Verify if Withdraw position is already opened in the system */
-            let amountApprovedForWithdrawal = await casinoContract.getApprovedWithdrawAmount({
-                address : user.address, decimals : app.decimals
-            })
-            let isWithdrawingSmartContract = (amountApprovedForWithdrawal) > 0 ? true : false;
-
+            let amount = parseFloat(Math.abs(params.tokenAmount));
             /* User Current Balance */
-            let currentBalance = Numbers.toFloat(user.affiliate.wallet.playBalance);
+            let currentBalance = parseFloat(userWallet.playBalance);
+            
             /* Verify if User has Enough Balance for Withdraw */
             let hasEnoughBalance = (amount <= currentBalance);
+
             /* Verify if User is in App */
             let user_in_app = (app.users.findIndex(x => (x._id.toString() == user._id.toString())) > -1);
 
@@ -128,19 +106,15 @@ const processActions = {
             let res = {
                 hasEnoughBalance,
                 user_in_app,
-                currencyTicker      : app.currencyTicker,
-                withdrawAddress : user.address,
+                currency      : userWallet.currency,
+                withdrawAddress : params.address,
+                userWallet : userWallet,
                 amount,
-                playBalanceDelta : Numbers.toFloat(-Math.abs(amount)),
-                casinoContract : casinoContract,
+                playBalanceDelta : parseFloat(-Math.abs(amount)),
                 user : user,
-                address     : user.address,
                 app : app,
-                decimals : app.decimals,
                 nonce : params.nonce,
-                amountApprovedForWithdrawal,
-                isAlreadyWithdrawingAPI : user.isWithdrawing,
-                isAlreadyWithdrawingSmartContract : isWithdrawingSmartContract,
+                isAlreadyWithdrawingAPI : user.isWithdrawing
             }
             return res;
         }catch(err){ 
@@ -150,31 +124,36 @@ const processActions = {
     __finalizeWithdraw : async (params) => {
         try{
             var params_input = params;
-            var transaction_params = { }, tokenAmount, wasAddedLogId, withdraw;
+            var tokenAmount, wasAddedLogId, withdraw, transaction_params;
+            const { currency } = params;
 
             /* Get User Id */
             let user = await UsersRepository.prototype.findUserById(params.user);
             let app = await AppRepository.prototype.findAppById(params.app);
             if(!app){throwError('APP_NOT_EXISTENT')}
             if(!user){throwError('USER_NOT_EXISTENT')}
-            
-            /* Create Casino Contract Instance */
-            let casinoContract = new CasinoContract({
-                web3                : globals.web3,
-                contractAddress     : app.platformAddress,
-                tokenAddress        : app.platformTokenAddress
-            })
+            const wallet = user.wallet.find( w => new String(w.currency._id).toString() == new String(currency).toString());
+            if(!wallet || !wallet.currency){throwError('CURRENCY_NOT_EXISTENT')};
+            const appWallet = app.wallet.find( w => new String(w.currency._id).toString() == new String(currency).toString());
+            if(!wallet || !wallet.currency){throwError('CURRENCY_NOT_EXISTENT')};
 
             /* Verify if User is in App */
             let user_in_app = (app.users.findIndex(x => (x._id.toString() == user._id.toString())) > -1);
 
+            let withdraw = await WithdrawRepository.prototype.findWithdrawById(params.withdraw_id);
+            let withdrawExists = withdraw ? true : false;
+
             /* Verify User Balance in API */
-            let currentAPIBalance = Numbers.toFloat(user.wallet.playBalance);
-                
+            let currentAPIBalance = parseFloat(wallet.playBalance);
+
             /* Get all transactions which match */
-            let all_transaction_params = await verifytransactionHashWithdrawUser(
-                'eth', params_input.transactionHash, app.platformAddress, user.address
-            )
+            let all_transaction_params = await verifytransactionHashWithdrawUser({
+                currency : wallet.currency,
+                amount : withdraw.amount,
+                transactionHash : params_input.transactionHash,
+                platformAddress : appWallet.bank_address
+            })
+
             let transactionIsValid = all_transaction_params.isValid;
 
             if(transactionIsValid){
@@ -192,7 +171,7 @@ const processActions = {
 
                 if(transaction_params){
                     /* Transaction is Valid */
-                    tokenAmount = Numbers.toFloat(Numbers.fromDecimals(transaction_params.tokenAmount, app.decimals));
+                    tokenAmount = detectCurrencyAmountToSmartContractAmount({amount : transaction_params.tokenAmount, currency : appWallet.currency});
                 }else{
                     transaction_params = {};
                     tokenAmount = undefined;
@@ -202,7 +181,6 @@ const processActions = {
                 tokenAmount = undefined;
             }
 
-            console.log(transaction_params.id);
             
             withdraw = await WithdrawRepository.prototype.getWithdrawByTransactionLogId(transaction_params.id);
             wasAddedLogId = withdraw ? true : false;
@@ -212,20 +190,18 @@ const processActions = {
 
             let res = {
                 user_in_app,
+                withdrawExists,
                 withdraw_id : params.withdraw_id,
                 transactionIsValid,
-                //hashWithdrawingPositionOpen,
                 currentAPIBalance,
-                //currentOpenWithdrawingAmount,
-                casinoContract : casinoContract,
                 wasAlreadyAdded,
+                userWallet : wallet,
                 logId : transaction_params.id,
                 transactionHash : params.transactionHash,
-                currencyTicker      : app.currencyTicker,
-                creationDate        : new Date(),
+                currency      : wallet.currency,
                 app,
                 user,
-                amount : -Math.abs(Numbers.toFloat(tokenAmount)),
+                amount : parseFloat(-Math.abs(tokenAmount)),
                 withdrawAddress : user.address
             }
             
@@ -255,7 +231,7 @@ const progressActions = {
             user                    : params.user._id,
             creation_timestamp      : new Date(),                    
             address                 : params.withdrawAddress,                         // Deposit Address 
-            currency                : params.currencyTicker,
+            currency                : params.currency,
             amount                  : params.amount,
             nonce                   : params.nonce,
         })
@@ -264,7 +240,7 @@ const progressActions = {
         var withdrawSaveObject = await withdraw.createWithdraw();
         
         /* Update User Wallet in the Platform */
-        await WalletsRepository.prototype.updatePlayBalance(params.user.wallet, params.playBalanceDelta);
+        await WalletsRepository.prototype.updatePlayBalance(params.userWallet._id, params.playBalanceDelta);
         
         /* Add Deposit to user */
         await UsersRepository.prototype.addWithdraw(params.user._id, withdrawSaveObject._id);
@@ -279,7 +255,7 @@ const progressActions = {
            app                     : params.app,
            creation_timestamp      : new Date(),                    
            address                 : params.withdrawAddress,                         // Deposit Address 
-           currency                : params.currencyTicker,
+           currency                : params.currency,
            amount                  : params.amount,
            nonce                   : params.nonce,
            isAffiliate             : true
@@ -289,7 +265,7 @@ const progressActions = {
        var withdrawSaveObject = await withdraw.createWithdraw();
 
         /* Update User Wallet in the Platform */
-        await WalletsRepository.prototype.updatePlayBalance(params.user.affiliate.wallet, params.playBalanceDelta);
+        await WalletsRepository.prototype.updatePlayBalance(params.userWallet._id, params.playBalanceDelta);
         
         /* Add Deposit to user */
         await UsersRepository.prototype.addWithdraw(params.user._id, withdrawSaveObject._id);
@@ -301,8 +277,7 @@ const progressActions = {
             await WithdrawRepository.prototype.finalizeWithdraw(params.withdraw_id, {
                 transactionHash         : params.transactionHash,
                 logId                   : params.logId,
-                last_update_timestamp   : new Date(),                             
-                amount                  : Numbers.toFloat(Math.abs(params.amount))
+                last_update_timestamp   : new Date()                           
             });
             return params;
         }catch(err){

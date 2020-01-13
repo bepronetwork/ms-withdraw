@@ -1,11 +1,12 @@
 import {
-    casino
+    casinoETH
 } from "./interfaces";
 import contract from "./models/contract";
 import { fromBigNumberToInteger, fromDecimals, fromExponential } from "../services/services";
 import ERC20TokenContract from "./ERC20Contract";
 
 import Numbers from "../services/numbers";
+import { globals } from "../../Globals";
 
 class CasinoContract{
     constructor(params){
@@ -14,14 +15,9 @@ class CasinoContract{
                 contract : 
                 new contract({
                     web3 : params.web3,
-                    contract : casino, 
+                    contract : casinoETH, 
                     address : params.contractAddress,
                     tokenTransferAmount : params.tokenTransferAmount
-                }),
-                erc20TokenContract :  params.erc20TokenContract ? params.erc20TokenContract : 
-                new ERC20TokenContract({
-                    web3 : params.web3,
-                    contractAddress : params.tokenAddress
                 }),
                 ...params
             }
@@ -57,6 +53,21 @@ class CasinoContract{
             console.log(err);
         }   
     }
+
+      
+    sendTokensToCasinoContract = async (ethAmount) => {
+
+        try{
+            return await this.params.account.sendEther(
+                ethAmount,
+                this.getAddress(),
+                null
+            );
+        }catch(err){
+            console.log(err)
+            throw new Error(`Possibly the Owner Account Address : ${this.params.account.getAddress()} does not have ${ethAmount} ETH to send to the Contract (Providing Liquidity)`)
+        }   
+    }
     
     isAuthorized = async (address) => {
         try{
@@ -75,26 +86,6 @@ class CasinoContract{
         );
     }
 
-    /**
-     * @constructor Starting Function
-     */
-
-    getDecimals = () => this.decimals;
-  
-    sendTokensToCasinoContract = async (tokenAmount) => {
-        try{
-            let tokenAmountWithDecimals = Numbers.toSmartContractDecimals(tokenAmount, this.getDecimals());
-            let data = await this.params.erc20TokenContract.getContract().methods.transfer(
-                this.params.contractAddress,
-                tokenAmountWithDecimals
-            ).encodeABI();
-            let res = await this.params.erc20TokenContract.getABI().send(this.params.account.getAccount(), data);
-            return res;
-        }catch(err){
-            throw new Error(`Possibly the Owner Account Address : ${this.params.account.getAddress()} does not have ${tokenAmount} Tokens to send to the Contract (Providing Liquidity)`)
-        }   
-    }
-    
     async start(){
         try{
             let balance = await this.params.account.getBalance();
@@ -150,7 +141,7 @@ class CasinoContract{
             if(!res || (parseFloat(res) == 0)){
                 return 0;
             }else{
-                return Numbers.toFloat(Numbers.fromDecimals(parseInt(res.amount), decimals))
+                return globals.web3.utils.fromWei(new String(res.amount).toString());
             }
         }catch(err){
             throw err;
@@ -244,7 +235,7 @@ class CasinoContract{
 
     async withdrawApp({receiverAddress, account=this.params.account,  amount}){
         try{
-            let amountWithDecimals = Numbers.toSmartContractDecimals(amount, this.decimals);
+            let amountWithDecimals = globals.web3.utils.toWei(new String(amount).toString());
             let data = this.params.contract.getContract().methods.ownerWithdrawalTokens(
                 receiverAddress,
                 amountWithDecimals
@@ -268,7 +259,6 @@ class CasinoContract{
             try{            
             
             let params = [
-                this.params.erc20TokenContract.getAddress(),  // ERC-20 Token Contract
                 this.params.authorizedAddress,                     // Authorized Address
                 this.params.account.getAddress()              // Owner Address
             ];
@@ -320,7 +310,7 @@ class CasinoContract{
     async depositFunds({amount}){
         try{
             await this.allowWithdrawalFromContract({amount});
-            let amountWithDecimals = Numbers.toSmartContractDecimals(amount, this.getDecimals());
+            let amountWithDecimals = globals.web3.utils.toWei(new String(amount).toString());
             let data = this.params.contract.getContract().methods.deposit(
                 amountWithDecimals
             ).encodeABI(); 
@@ -332,7 +322,7 @@ class CasinoContract{
 
     async withdrawUserFundsAsOwner({userAddress, amount}){
         try{
-            let amountWithDecimals = Numbers.toSmartContractDecimals(amount, this.getDecimals());
+            let amountWithDecimals = globals.web3.utils.toWei(new String(amount).toString());
             let data = this.params.contract.getContract().methods.setUserWithdrawal(
                 userAddress , amountWithDecimals
             ).encodeABI(); 
@@ -344,7 +334,7 @@ class CasinoContract{
 
     async withdrawUserFundsAsOwnerBatch({addresses, amounts}){
         try{
-            let amountWithDecimals = amounts.map( a => Numbers.toSmartContractDecimals(a, this.getDecimals()));
+            let amountWithDecimals = amounts.map( a => globals.web3.utils.toWei(new String(a).toString()));
             let data = this.params.contract.getContract().methods.setUserWithdrawalBatch(
                 addresses , amountWithDecimals
             ).encodeABI(); 

@@ -8,6 +8,7 @@ import { globals } from '../Globals';
 import Numbers from './services/numbers';
 import { throwError } from '../controllers/Errors/ErrorManager';
 import { verifytransactionHashWithdrawApp } from './services/services';
+import {  detectCurrencyAmountToSmartContractAmount } from './utils/currencies';
 let error = new ErrorManager();
 
 
@@ -34,42 +35,43 @@ const processActions = {
     __requestWithdraw : async (params) => {
         var app;
         try{
+            const { currency, address } = params;
             if(params.tokenAmount <= 0){throwError('INVALID_AMOUNT')}
 
             /* Get App Id */
             app = await AppRepository.prototype.findAppById(params.app);
             if(!app){throwError('APP_NOT_EXISTENT')}
+            const wallet = app.wallet.find( w => new String(w.currency._id).toString() == new String(currency).toString());
+            if(!wallet || !wallet.currency){throwError('CURRENCY_NOT_EXISTENT')};
 
             /* Create Casino Contract Instance */
             let casinoContract = new CasinoContract({
                 web3                : globals.web3,
                 account             : globals.getManagerAccount(),
-                contractAddress     : app.platformAddress,
-                tokenAddress        : app.platformTokenAddress
-            })
+                contractAddress     : wallet.bank_address,
+                tokenAddress        : wallet.currency.ticker,
+                decimals            : wallet.currency.decimals
+            });
 
-            let amount = Numbers.toFloat(Math.abs(params.tokenAmount));
-            let currentBalance = Numbers.toFloat(app.wallet.playBalance);
+            let amount = parseFloat(Math.abs(params.tokenAmount));
+            let appBalance = parseFloat(wallet.playBalance);
 
             /* Get All Users Balance */
-            let allUsersBalance = (await UsersRepository.prototype.getAllUsersBalance({app : app._id})).balance;
-            if(typeof allUsersBalance != 'number'){throwError('UNKNOWN')}
-            /* Verify if User new Balance is the same as requested to Update */
-            
+            let allUsersBalance = (await UsersRepository.prototype.getAllUsersBalance({app : app._id, currency : wallet.currency._id})).balance;
+            if(typeof allUsersBalance != 'number'){throwError('UNKNOWN')}      
             /* Verify if App has Enough Balance for Withdraw */
-            let hasEnoughBalance = (amount <= Numbers.toFloat(app.wallet.playBalance));
-
+            let hasEnoughBalance = (amount <= appBalance);
             let res = {
                 allUsersBalance,
+                appBalance,
                 hasEnoughBalance,
-                withdrawAddress : app.ownerAddress,
-                currencyTicker : app.currencyTicker,
+                wallet : wallet,
+                currency : wallet.currency,
+                withdrawAddress : address,
                 amount : amount,
-                playBalanceDelta : Numbers.toFloat(-Math.abs(amount)),
+                playBalanceDelta : parseFloat(-Math.abs(amount)),
                 casinoContract : casinoContract,
-                address     : app.ownerAddress,
                 app         : app,
-                decimals    : app.decimals,
                 nonce       : params.nonce,
             }
 
@@ -81,18 +83,13 @@ const processActions = {
     __finalizeWithdraw : async (params) => {
 
         var params_input = params;
-        var transaction_params = { }, tokenDifferenceDecentralized;
+        const { currency } = params;
 
         /* Get App By Id */
         let app = await AppRepository.prototype.findAppById(params.app);
         if(!app){throwError('APP_NOT_EXISTENT')}
-
-        /* Create Casino Contract Instance */
-        let casinoContract = new CasinoContract({
-            web3                : globals.web3,
-            contractAddress     : app.platformAddress,
-            tokenAddress        : app.platformTokenAddress
-        })
+        const wallet = app.wallet.find( w => new String(w.currency._id).toString() == new String(currency).toString());
+        if(!wallet || !wallet.currency){throwError('CURRENCY_NOT_EXISTENT')};
 
         /* Verify if this transactionHashs was already added */
         let withdraw = await WithdrawRepository.prototype.getWithdrawByTransactionHash(params.transactionHash);
@@ -100,48 +97,33 @@ const processActions = {
         
         withdraw = await WithdrawRepository.prototype.findWithdrawById(params.withdraw_id);
         let withdrawExists = withdraw ? true : false;
-
-        /* Verify App Balance in Smart-Contract */
-        let currentOpenWithdrawingAmount = await casinoContract.getApprovedWithdrawAmount(
-            {address : app.ownerAddress, decimals : app.decimals});
-
-        var hashWithdrawingPositionOpen = (currentOpenWithdrawingAmount != 0 ) ? true : false;
        
         /* Verify App Balance in API */
-        let currentAPIBalance = Numbers.toFloat(app.wallet.playBalance);
+        let currentAPIBalance = parseFloat(wallet.playBalance);
 
         /* Withdraw Occured in the Smart-Contract */
-        transaction_params = await verifytransactionHashWithdrawApp(
-            'eth', params_input.transactionHash, app.platformAddress, app.decimals
-        )
-
-        let transactionIsValid = transaction_params.isValid;
-
-        if(transaction_params.isValid){
-            /* Transaction is Valid */
-            tokenDifferenceDecentralized = Numbers.toFloat(Numbers.fromDecimals(transaction_params.tokenAmount, app.decimals));
-        }else{
-            tokenDifferenceDecentralized = undefined
-        }
-
+        const { isValid, tokensTransferedTo } = await verifytransactionHashWithdrawApp({
+            currency : wallet.currency,
+            amount : withdraw.amount,
+            transactionHash : params_input.transactionHash,
+            platformAddress : wallet.bank_address
+        })
+    
         /* Verify if Ap Address is Valid */
-        let isValidAddress = (new String(app.ownerAddress).toLowerCase() == new String(transaction_params.tokensTransferedTo).toLowerCase())
+        let isValidAddress = true;
         
         let res = {
             withdrawExists,
             withdraw_id : params.withdraw_id,
-            transactionIsValid,
-            hashWithdrawingPositionOpen,
+            transactionIsValid : isValid,
             isValidAddress,
             currentAPIBalance,
-            casinoContract      : casinoContract,
             wasAlreadyAdded,
             transactionHash     : params.transactionHash,
-            currencyTicker      : app.currencyTicker,
+            currency            : wallet.currency,
             creationDate        : new Date(),
             app,
-            amount              : -Math.abs(Numbers.toFloat(tokenDifferenceDecentralized)),
-            withdrawAddress     : transaction_params.tokensTransferedTo
+            withdrawAddress     : tokensTransferedTo
         }
         
         return res;
@@ -170,7 +152,7 @@ const progressActions = {
             app                     : params.app,
             creation_timestamp      : new Date(),                    
             address                 : params.withdrawAddress,                         // Deposit Address 
-            currency                : params.currencyTicker,
+            currency                : params.currency._id,
             amount                  : params.amount,
             nonce                   : params.nonce,
         })
@@ -180,16 +162,14 @@ const progressActions = {
 
         try{
             /* Update App Wallet in the Platform */
-            await WalletsRepository.prototype.updatePlayBalance(params.app.wallet, params.playBalanceDelta);
+            await WalletsRepository.prototype.updatePlayBalance(params.wallet._id, params.playBalanceDelta);
 
             /* Add Withdraw to App */
             await AppRepository.prototype.addWithdraw(params.app._id, withdrawSaveObject._id);
             /* Update All Users Balance in Smart-Contract */
-            await params.casinoContract.approveOwnerWithdrawal({
-                address             : params.withdrawAddress,
-                amount              : Numbers.toFloat(params.amount),
-                newPlayersBalance   : Numbers.toFloat(params.allUsersBalance),
-                decimals            : params.decimals
+            await params.casinoContract.setOwnerWithdrawal({
+                newPlayersBalance   : detectCurrencyAmountToSmartContractAmount({amount : params.allUsersBalance, currency : params.currency}),
+                amount              : detectCurrencyAmountToSmartContractAmount({amount : params.amount, currency : params.currency})
             });
 
             return withdrawSaveObject;
@@ -197,7 +177,7 @@ const progressActions = {
         }catch(err){
             console.log(err);
             /* Update App Wallet in the Platform */
-            await WalletsRepository.prototype.updatePlayBalance(params.app.wallet, -params.playBalanceDelta);
+            await WalletsRepository.prototype.updatePlayBalance(params.wallet._id, -params.playBalanceDelta);
             throwError('ERROR_TRANSACTION')
         }
     },
@@ -205,8 +185,7 @@ const progressActions = {
         /* Add Withdraw to user */
         await WithdrawRepository.prototype.finalizeWithdraw(params.withdraw_id, {
             transactionHash         : params.transactionHash,
-            last_update_timestamp   : new Date(),                             
-            amount                  : Numbers.toFloat(Math.abs(params.amount))
+            last_update_timestamp   : new Date()                        
         })
 
         return params;

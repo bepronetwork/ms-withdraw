@@ -145,11 +145,11 @@ class UsersRepository extends MongoComponent{
     }
 
 
-    async getAllUsersBalance({app}){
+    async getAllUsersBalance({app, currency}){
         try{
             return new Promise( (resolve, reject) => {
                 UsersRepository.prototype.schema.model
-                .aggregate(pipeline_all_users_balance(app))
+                .aggregate(pipeline_all_users_balance(app, currency))
                 .exec( (err, item) => {
                     if(err) { reject(err)}
                     var res;

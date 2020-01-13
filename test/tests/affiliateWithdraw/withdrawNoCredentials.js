@@ -5,12 +5,13 @@ import chai from 'chai';
 const expect = chai.expect;
 
 context('Withdraw No Credentials', async () => {
-    var user, app, user_eth_account;
+    var user, app, user_eth_account, currency, appWallet;
 
     before( async () =>  {
 
         app = global.test.app;
-
+        appWallet = app.wallet.find( w => new String(w.currency.ticker).toLowerCase() == new String(global.test.ticker).toLowerCase());
+        currency = appWallet.currency;
         /* Create User on Database */
         user = await registerUser({address : "0x", app_id : app.id});
         /* Gets User Info */
@@ -22,11 +23,12 @@ context('Withdraw No Credentials', async () => {
     it('shouldn´t be able to withdraw, no BearerToken ', mochaAsync(async () => {
 
         let res = await requestUserAffiliateWithdraw({
-            tokenAmount : 1,
+            tokenAmount : global.test.depositAmounts[global.test.ticker],
             nonce : 3456365756,
             app : app.id,
             address : '0x',
-            user : user.id
+            user : user.id,
+            currency : currency._id
         }, null , {id : user.id});
 
         expect(detectValidationErrors(res)).to.be.equal(false);
@@ -38,11 +40,12 @@ context('Withdraw No Credentials', async () => {
     it('shouldn´t be able to withdraw, wrong payload ', mochaAsync(async () => {
 
         let res = await requestUserAffiliateWithdraw({
-            tokenAmount : 1,
+            tokenAmount : global.test.depositAmounts[global.test.ticker],
             nonce : 3456365756,
             app : app.id,
             address : '0x',
-            user : user.id
+            user : user.id,
+            currency : currency._id
         }, user.bearerToken , {id : '0x'});
 
         expect(detectValidationErrors(res)).to.be.equal(false);

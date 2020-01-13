@@ -8,12 +8,14 @@ const expect = chai.expect;
 const WITHDRAW_AMOUNT = 1;
 
 context('Withdraw under min allowed', async () => {
-    var user, app, user_eth_account;
+    var user, app, user_eth_account, currency, appWallet;
     
     before( async () =>  {
         app = global.test.app;
         user = global.test.user;
         user_eth_account = global.test.user_eth_account;    
+        appWallet = app.wallet.find( w => new String(w.currency.ticker).toLowerCase() == new String(global.test.ticker).toLowerCase());
+        currency = appWallet.currency;
     });
 
 
@@ -23,7 +25,8 @@ context('Withdraw under min allowed', async () => {
             nonce : 3456365756,
             app : app.id,
             address : user_eth_account.getAddress(),
-            user : user.id
+            user : user.id,
+            currency : currency._id
         }, user.bearerToken , {id : user.id});
 
         expect(detectValidationErrors(res)).to.be.equal(false);

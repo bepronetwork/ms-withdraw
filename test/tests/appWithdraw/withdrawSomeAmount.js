@@ -7,7 +7,7 @@ import Numbers from "../../logic/services/numbers";
 const expect = chai.expect;
 
 context('Withdraw Some Amount', async () => {
-    var app, contract, admin, admin_eth_account;
+    var app, contract, admin, admin_eth_account, contract, currency, appWallet;
 
     before( async () =>  {
         app = global.test.app;
@@ -15,12 +15,27 @@ context('Withdraw Some Amount', async () => {
         admin_eth_account = global.test.admin_eth_account;
         admin = global.test.admin;
         /* Add Amount for User on Database */
-        let app_deposit_transaction = await appDepositToContract({tokenAmount : 5, casinoContract : contract.casino});
+        appWallet = app.wallet.find( w => new String(w.currency.ticker).toLowerCase() == new String(global.test.ticker).toLowerCase());
+        currency = appWallet.currency;
+
+        switch(new String(currency.ticker).toLowerCase()){
+            case 'dai' : {
+                contract = global.test.contract;
+                break;
+            };
+            case 'eth' : {
+                contract = global.test.contractETH;
+                break;
+            };
+        }
+
+        let app_deposit_transaction = await appDepositToContract({tokenAmount :  global.test.depositAmounts[global.test.ticker], currency, platformAddress : appWallet.bank_address});
 
         await appConfirmDeposit({
             app_id : app.id,
             transactionHash : app_deposit_transaction.transactionHash,
-            amount : 5
+            amount : global.test.depositAmounts[global.test.ticker],
+            currency : currency
         })
     });
 
@@ -41,7 +56,7 @@ context('Withdraw Some Amount', async () => {
         const { status } = res.data;
 
         wallet = await appWalletInfo({app_id : app.id});
-        dexWithdrawalAmount = await contract.casino.getApprovedWithdrawAmount({address : admin_eth_account.getAddress()});
+        dexWithdrawalAmount = await contract.getApprovedWithdrawAmount({address : admin_eth_account.getAddress()});
         // Verify if middle states are met
         expect(detectValidationErrors(res)).to.be.equal(false);
         expect(status).to.be.equal(200);
@@ -60,7 +75,7 @@ context('Withdraw Some Amount', async () => {
         });
 
         let wallet = await appWalletInfo({app_id : app.id});
-        let dexWithdrawalAmount = await contract.casino.getApprovedWithdrawAmount({address : admin_eth_account.getAddress()});
+        let dexWithdrawalAmount = await contract.getApprovedWithdrawAmount({address : admin_eth_account.getAddress()});
 
         expect(dexWithdrawalAmount).to.be.equal(0);
         expect(Numbers.toFloat(wallet.playBalance)).to.be.equal(2);
