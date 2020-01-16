@@ -74,6 +74,21 @@ class AppRepository extends MongoComponent{
         });
     }
 
+    setOwnerAddress(app_id, ownerAddress){
+        return new Promise( (resolve,reject) => {
+            AppRepository.prototype.schema.model.findByIdAndUpdate(
+                app_id, 
+                { $set: { 
+                    "ownerAddress"   : new String(ownerAddress).trim(),
+                } },
+                { 'new': true })
+                .exec( (err, item) => {
+                    if(err){reject(err)}
+                    resolve(item);
+                }
+            )
+        });
+    }
     addBlockchainInformation(app_id, params){
         return new Promise( (resolve,reject) => {
             AppRepository.prototype.schema.model.findByIdAndUpdate(

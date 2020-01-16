@@ -2,6 +2,8 @@ import Numbers from "../logic/services/numbers";
 import { globals } from "../Globals";
 import account from "../logic/eth/models/account";
 import CasinoContract from "../logic/eth/CasinoContract";
+import CasinoContractETH from '../logic/eth/CasinoContractETH';
+
 
 export async function getUserSignature({clientAccount, winBalance, nonce, category, decimals}){
     
@@ -33,23 +35,21 @@ export async function generateEthAccountWithTokensAndEthereum({tokenAmount, ETHA
 }
 
 
-export async function deploySmartContract({eth_account}){
+export async function deploySmartContract({eth_account, decimals, tokenAddress}){
     try{
-        let erc20Contract = globals.getERC20Contract(globals.constants.erc20TokenAddress);
+        let erc20Contract = globals.getERC20Contract(tokenAddress);
 
         let casino = new CasinoContract({
             web3 : globals.web3,
             authorizedAddress : globals.croupierAccount.getAddress(),
             account : eth_account,
             erc20TokenContract : erc20Contract,
-            decimals : globals.constants.tokenDecimals,
+            decimals : decimals,
             tokenTransferAmount : globals.constants.deploy.tokenTransferAmount
         })
        
 
         let res = await casino.__init__();
-        await casino.setMaxWithdrawal(globals.constants.deploy.maxWithdrawal);
-        await casino.setMaxDeposit(globals.constants.deploy.maxDeposit);
         await casino.authorizeCroupier(globals.croupierAccount.getAddress());
         await casino.authorizeAddress(eth_account.getAddress());
 
@@ -68,20 +68,62 @@ export async function deploySmartContract({eth_account}){
     }
 }
 
-export async function userDepositToContract({eth_account, platformAddress, tokenAmount}){
-    try{
-        let erc20Contract = globals.getERC20Contract(globals.constants.erc20TokenAddress);
 
-        let casinoContract = new CasinoContract({
-            web3 : global.web3,
-            account : eth_account,
-            erc20TokenContract : erc20Contract,
-            contractAddress: platformAddress,
-            decimals : globals.constants.tokenDecimals,
+export async function deploySmartContractETH({eth_account}){
+    try{
+        let casino = new CasinoContractETH({
+            web3 : globals.web3,
+            authorizedAddress : globals.croupierAccount.getAddress(),
+            account : eth_account
         })
        
-        /* Deposit Tokens */
-        return await casinoContract.depositFunds({amount : tokenAmount});
+
+        let res = await casino.__init__();
+        await casino.authorizeCroupier(globals.croupierAccount.getAddress());
+        await casino.authorizeAddress(eth_account.getAddress());
+
+        return {    
+            casino : casino,
+            transactionHash         : res.transactionHash,
+            platformAddress         : casino.getAddress(),
+            platformBlockchain      : 'eth',
+            casinoContract          : casino
+        };
+        
+    }catch(err){
+        return false;
+    }
+}
+
+export async function userDepositToContract({eth_account, platformAddress, tokenAmount, currency}){
+    try{
+        switch(new String(currency.ticker).toLowerCase()){
+            case 'eth': {
+                let casinoContract = new CasinoContractETH({
+                    web3 : global.web3,
+                    account : eth_account,
+                    contractAddress: platformAddress
+                })
+            
+                /* Deposit Tokens */
+                return await casinoContract.sendTokensToCasinoContract(tokenAmount);
+            };
+            default : {
+                let erc20Contract = globals.getERC20Contract(currency.address);
+
+                let casinoContract = new CasinoContract({
+                    web3 : global.web3,
+                    account : eth_account,
+                    erc20TokenContract : erc20Contract,
+                    contractAddress: platformAddress,
+                    decimals : currency.decimals
+                })
+                
+            
+                /* Deposit Tokens */
+                return await casinoContract.sendTokensToCasinoContract(tokenAmount);
+            };
+        }
 
     }catch(err){
         throw err;
@@ -89,16 +131,16 @@ export async function userDepositToContract({eth_account, platformAddress, token
 }
 
 
-export async function appWithdrawForUser({eth_account, platformAddress, tokenAmount}){
+export async function appWithdrawForUser({eth_account, platformAddress, tokenAmount, currency}){
     try{
-        let erc20Contract = globals.getERC20Contract(globals.constants.erc20TokenAddress);
+        let erc20Contract = globals.getERC20Contract(currency.address);
 
         let casinoContract = new CasinoContract({
             web3 : global.web3,
             account : global.test.admin_eth_account,
             erc20TokenContract : erc20Contract,
             contractAddress: platformAddress,
-            decimals : globals.constants.tokenDecimals,
+            decimals : currency.decimals,
         });
         
         /* Withdraw Tokens to User */
@@ -113,44 +155,118 @@ export async function appWithdrawForUser({eth_account, platformAddress, tokenAmo
     }
 }
 
-export async function appWithdrawForUserBatch({platformAddress, addresses, amounts}){
+export async function appWithdrawForUserBatch({platformAddress, addresses, amounts, currency}){
     try{
-        let erc20Contract = globals.getERC20Contract(globals.constants.erc20TokenAddress);
+        switch(new String(currency.ticker).toLowerCase()){
+            case 'eth': {
 
-        let casinoContract = new CasinoContract({
-            web3 : global.web3,
-            account : global.test.admin_eth_account,
-            erc20TokenContract : erc20Contract,
-            contractAddress: platformAddress,
-            decimals : globals.constants.tokenDecimals,
-        });
-        
-        /* Withdraw Tokens to User */
-        return await casinoContract.withdrawUserFundsAsOwnerBatch({
-            addresses : addresses,
-            amounts : amounts
-        });
-        
+                let casinoContract = new CasinoContractETH({
+                    web3 : global.web3,
+                    account : global.test.admin_eth_account,
+                    contractAddress: platformAddress
+                });
+                
+                /* Withdraw Tokens to User */
+                return await casinoContract.withdrawUserFundsAsOwnerBatch({
+                    addresses : addresses,
+                    amounts : amounts
+                });
+            };
+            default : {
+                let erc20Contract = globals.getERC20Contract(currency.address);
+
+                let casinoContract = new CasinoContract({
+                    web3 : global.web3,
+                    account : global.test.admin_eth_account,
+                    erc20TokenContract : erc20Contract,
+                    contractAddress: platformAddress,
+                    decimals : currency.decimals,
+                });
+                
+                /* Withdraw Tokens to User */
+                return await casinoContract.withdrawUserFundsAsOwnerBatch({
+                    addresses : addresses,
+                    amounts : amounts
+                });
+            }
+        }
     }catch(err){
         console.log(err);
         return false
     }
 }
 
-export async function appDepositToContract({casinoContract, tokenAmount}){
-    try{        
-        return await casinoContract.sendTokensToCasinoContract(tokenAmount);
+export async function appDepositToContract({tokenAmount, currency, platformAddress}){
+    try{
+        switch(new String(currency.ticker).toLowerCase()){
+            case 'eth': {
+                let casinoContract = new CasinoContractETH({
+                    web3 : global.web3,
+                    account : global.test.admin_eth_account,
+                    contractAddress: platformAddress
+                })
+            
+                /* Deposit Tokens */
+                return await casinoContract.sendTokensToCasinoContract(tokenAmount);
+            };
+            default : {
+                let erc20Contract = globals.getERC20Contract(currency.address);
+
+                let casinoContract = new CasinoContract({
+                    web3 : global.web3,
+                    account : global.test.admin_eth_account,
+                    erc20TokenContract : erc20Contract,
+                    contractAddress: platformAddress,
+                    decimals : currency.decimals
+                })
+                
+            
+                /* Deposit Tokens */
+                return await casinoContract.sendTokensToCasinoContract(tokenAmount);
+            };
+        }
     }catch(err){
         console.log(err);
-        return err;
+        return false;
     }
 }
 
-export async function appWithdrawFromContract({casinoContract, account, address, tokenAmount}){
-    try{        
-        return await casinoContract.withdrawApp({ receiverAddress : address, account, amount : tokenAmount });
+export async function appWithdrawFromContract({currency, account, tokenAmount, platformAddress}){
+
+    try{
+        switch(new String(currency.ticker).toLowerCase()){
+            case 'eth': {
+                let casinoContract = new CasinoContractETH({
+                    web3 : global.web3,
+                    account : global.test.admin_eth_account,
+                    contractAddress: platformAddress
+                })
+            
+                /* Deposit Tokens */
+                return await casinoContract.withdrawApp({
+                    receiverAddress : account.getAddress(), account, amount : tokenAmount 
+                });
+            };
+            default : {
+                let erc20Contract = globals.getERC20Contract(currency.address);
+
+                let casinoContract = new CasinoContract({
+                    web3 : global.web3,
+                    account : global.test.admin_eth_account,
+                    erc20TokenContract : erc20Contract,
+                    contractAddress: platformAddress,
+                    decimals : currency.decimals
+                })
+                
+            
+                /* Deposit Tokens */
+                return await casinoContract.withdrawApp({
+                    receiverAddress : account.getAddress(), account, amount : tokenAmount 
+                });
+            };
+        }
     }catch(err){
-        return false
+        console.log(err);
+        return false;
     }
 }
-

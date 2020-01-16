@@ -1,5 +1,11 @@
 import { generateEthAccountWithTokensAndEthereum } from "./eth";
 import { Admin, App, User } from "../models";
+import {
+    registerUser as registerUserAPI,
+    loginUser as loginUserAPI,
+    updateUserWallet,
+    updateAppWallet
+} from '../methods';
 import { globals } from "../Globals";
 import { WalletsRepository } from "../db/repos";
 
@@ -35,21 +41,17 @@ export async function registerAdmin(){
     let password = 'test123';
     let username = 'James' + Math.random(234234)*199999;
     /* Create Admin on Database */
-    let admin = new Admin({
-        username,
-        name 			: 'Games',
-        password,
-        email			: `rui${Math.random(234234)*199999}@gmail.com`
-    });
+    let admin = new Admin();
+    
     let res = await admin.register();
-    return {...res._doc, username, password};
+    return {...res.data.message, username, password};
 }
 
 export async function registerUser({address, app_id}){
     let password = 'test123';
     let username = 'Daf' + Math.random(234234)*199999;
     /* Create User on Database */
-    let user = new User({
+    let postData = {
         username,
         name 			: 'Games',
         password,
@@ -57,23 +59,22 @@ export async function registerUser({address, app_id}){
         full_name		: 'Ruie',
         address         : address,
         app			    : app_id
-    });
+    };
 
-    return { ...await user.register(), password, username };
+    let user = await registerUserAPI(postData);
+    user = (await loginUser({
+        ...postData,
+        app_id : app_id
+    }));
+    return { ...user, password, username };
 }
 
 export async function loginUser({username, password, app_id}){
-    /* Create User on Database */
-    let user = new User({
+    return (await loginUserAPI({
         username,
         password,
         app : app_id
-    });
-
-    let res_login = await user.login();
-    user = new User(res_login);
-    let bearerToken = await user.createAPIToken();
-    return {...res_login, bearerToken}
+    })).data.message;
 }
 
 export async function registerApp({admin_id}){
@@ -95,7 +96,7 @@ export async function registerApp({admin_id}){
     return {...res, bearerToken : res_api_token.bearerToken};
 }
 
-export async function addBlockchainInformation({app_id, address,  platformAddress, platformBlockchain}){
+export async function addCurrencyWallet({app_id, address,  platformAddress, platformBlockchain}){
     
     /* Create User on Database */
     let app = new App({
@@ -109,40 +110,43 @@ export async function addBlockchainInformation({app_id, address,  platformAddres
         platformTokenAddress : globals.constants.erc20TokenAddress, 
     });
 
-    return await app.addBlockchainInformation();
+    return await app.addCurrencyWallet();
     
 }
 
 
-export async function userConfirmDeposit({app_id, user_id, transactionHash, amount}){
-    
-    /* Create User on Database */
-    let user = new User({
-        app                 : app_id,
-        user                : user_id,
-        transactionHash     : transactionHash,
-        amount              : amount,
-    });
+export async function userConfirmDeposit({app_id, user, transactionHash, amount, currency}){
 
-    return await user.updateWallet();
-    
-}
+    let postData = {
+        user : user.id,
+        app : app_id,
+        amount : amount,
+        transactionHash : transactionHash,
+        currency : currency._id
+    };
 
-
-
-export async function appConfirmDeposit({app_id, transactionHash, amount}){
-    /* Create User on Database */
-    let app = new App({
-        app                 : app_id,
-        transactionHash     : transactionHash,
-        amount              : amount
-    });
-
-    return await app.updateWallet();
+    return await updateUserWallet(postData, user.bearerToken, {id : user.id});            
     
 }
 
 
-export async function addWalletAffiliate({user, amount}){
-    return await WalletsRepository.prototype.updatePlayBalance(user.affiliate.wallet, amount);
+
+export async function appConfirmDeposit({app, transactionHash, amount, currency}){
+
+
+    let postData = {
+        app : app.id,
+        amount : amount,
+        transactionHash : transactionHash,
+        currency : currency._id
+    };
+
+    return await updateAppWallet(postData, app.bearerToken, {id : app.id});          
+    
+}
+
+
+export async function addWalletAffiliate({user, amount, currency}){
+    const wallet_id = user.affiliateInfo.wallet.find( w => new String(w.currency.ticker).toLowerCase() == new String(currency.ticker).toLowerCase());
+    return await WalletsRepository.prototype.updatePlayBalance(wallet_id, amount);
 }

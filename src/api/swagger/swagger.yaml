@@ -204,7 +204,6 @@ paths:
   
 # complex objects have schema definitions
 definitions:
-  
   AppRequestWithdrawRequest : 
     type: object
     required:
@@ -212,6 +211,7 @@ definitions:
       - address
       - tokenAmount
       - nonce
+      - currency
     properties:
       tokenAmount : 
         type : number
@@ -235,6 +235,12 @@ definitions:
         example: "0xe8rghwe8rghwe9r87ynw987eyncwre"
         description: |
           User Address
+      currency :
+        type : string
+        format: name
+        example: "0xe8rghwe8rghwe9r87ynw987eyncwre"
+        description: |
+          User Address
   UserWithdrawRequest : 
     type: object
     required:
@@ -243,6 +249,7 @@ definitions:
       - address
       - tokenAmount
       - nonce
+      - currency
     properties:
       tokenAmount : 
         type : number
@@ -272,6 +279,12 @@ definitions:
         example: "0xe8rghwe8rghwe9r87ynw987eyncwre"
         description: |
           User Address
+      currency :
+        type : string
+        format: name
+        example: "0xe8rghwe8rghwe9r87ynw987eyncwre"
+        description: |
+          User Address
   UserFinalizeWithdrawRequest : 
     type: object
     required:
@@ -279,6 +292,7 @@ definitions:
       - user
       - transactionHash
       - withdraw_id
+      - currency
     properties:
       app :
         type : string
@@ -304,12 +318,19 @@ definitions:
         example: "65f76st8vdsb3181"
         description: |
             Withdraw Id
+      currency :
+        type : string
+        format: name
+        example: "0xe8rghwe8rghwe9r87ynw987eyncwre"
+        description: |
+          User Address
   AppFinalizeWithdrawRequest : 
     type: object
     required:
       - app
       - transactionHash
       - withdraw_id
+      - currency
     properties:
       app :
         type : string
@@ -329,6 +350,12 @@ definitions:
         example: "53746tcuhn324"
         description: |
           Withdraw Id
+      currency :
+        type : string
+        format: name
+        example: "0xe8rghwe8rghwe9r87ynw987eyncwre"
+        description: |
+          User Address
   GetAllUsersAppWithdraws : 
     type: object
     required:

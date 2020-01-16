@@ -8,7 +8,7 @@ class AffiliateSchema{};
 AffiliateSchema.prototype.name = 'Affiliate';
 
 AffiliateSchema.prototype.schema =  {
-    wallet                              : { type: mongoose.Schema.Types.ObjectId, ref: 'Wallet', required : true},
+    wallet                              : [{ type: mongoose.Schema.Types.ObjectId, ref: 'Wallet'}],
     affiliatedLinks                     : [{ type: mongoose.Schema.Types.ObjectId, ref: 'AffiliateLink'}] , //  Mapping purpose, for its child
 }
 

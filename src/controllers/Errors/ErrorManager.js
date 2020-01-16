@@ -34,18 +34,9 @@ class ErrorManager {
                         libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.WITHDRAW_NOT_ENOUGH_BALANCE));
                     }                    
                     // Verify if Minimum Withdraw was passed
-                    if(parseFloat(object.amount) < MIN_WITHDRAW){
+                    /*if(parseFloat(object.amount) < MIN_WITHDRAW){
                         libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.MIN_WITHDRAW_NOT_PASSED));
-                    }
-                    // Verify if Address of User is the Same as the Withdraw one
-                    /*if(!object.isValidAddress)
-                        libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.USER_ADDRESS_IS_NOT_VALID));*/
-                    // Verify if is Already Withdrawing in SmartContract
-                    /*if(object.isAlreadyWithdrawingSmartContract)
-                        libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.WITHDRAW_MODE_IN_SMART_CONTRACT)); */
-                    // Verify if is Amount is Verified
-                    /*if(!object.isAmountVerified)
-                        libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.BAD_WITHDRAW_AMOUNT_SIGNED));*/
+                    }      */            
                     break;
                 };               
                 case 'RequestAffiliateWithdraw' : {
@@ -63,18 +54,9 @@ class ErrorManager {
                         libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.WITHDRAW_NOT_ENOUGH_BALANCE));
                     }                    
                     // Verify if Minimum Withdraw was passed
-                    if(parseFloat(object.amount) < MIN_WITHDRAW){
+                     /*if(parseFloat(object.amount) < MIN_WITHDRAW){
                         libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.MIN_WITHDRAW_NOT_PASSED));
-                    }
-                    // Verify if Address of User is the Same as the Withdraw one
-                    /*if(!object.isValidAddress)
-                        libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.USER_ADDRESS_IS_NOT_VALID));*/
-                    // Verify if is Already Withdrawing in SmartContract
-                    /*if(object.isAlreadyWithdrawingSmartContract)
-                        libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.WITHDRAW_MODE_IN_SMART_CONTRACT)); */
-                    // Verify if is Amount is Verified
-                    /*if(!object.isAmountVerified)
-                        libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.BAD_WITHDRAW_AMOUNT_SIGNED));*/
+                    } */
                     break;
                 };
                 case 'FinalizeWithdraw' : {
@@ -111,24 +93,17 @@ class ErrorManager {
                     // Verify if App does not have enough balance
                     if(!object.hasEnoughBalance)
                         libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.WITHDRAW_NOT_ENOUGH_BALANCE))
-                    // Verify if Address of User is the Same as the Withdraw one
-                    /*if(!object.isValidAddress)
-                        libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.APP_ADDRESS_IS_NOT_VALID));*/
-                    // Verify if is Already Withdrawing in SmartContract
-                    /*if(object.isAlreadyWithdrawingSmartContract)
-                        libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.WITHDRAW_MODE_IN_SMART_CONTRACT));
-                    */
                     // Verify if App is Mentioned
                     if(!object.app || _.isEmpty(object.app)){
                         libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.APP_NOT_EXISTENT)); break;   
                     }
-                    // Verify if Minimum Withdraw was passed
-                    if(parseFloat(object.amount) < MIN_WITHDRAW){
-                        libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.MIN_WITHDRAW_NOT_PASSED));
+                    if(new String(object.app.ownerAddress).toLowerCase() != new String(object.withdrawAddress).toLowerCase()){
+                        libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.APP_ADDRESS_IS_NOT_VALID));    
                     }
-                    // Verify if is Amount is Verified
-                    /*if(!object.isAmountVerified)
-                        libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.BAD_WITHDRAW_AMOUNT_SIGNED));*/
+                    // Verify if Minimum Withdraw was passed
+                    /*if(parseFloat(object.amount) < MIN_WITHDRAW){
+                        libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.MIN_WITHDRAW_NOT_PASSED));
+                    } */
                     break;
                 };
                 case 'FinalizeWithdraw' : {

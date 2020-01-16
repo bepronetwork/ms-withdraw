@@ -1,9 +1,17 @@
+import populate_wallet_all from "./wallet/all";
+
 
 let populate_user = [
+    {
+        path : 'security',
+        model : 'Security',
+        select : { '__v': 0},
+    },
     {
         path : 'wallet',
         model : 'Wallet',
         select : { '__v': 0},
+        populate : populate_wallet_all
     },
     {
         path : 'app_id',
@@ -13,7 +21,8 @@ let populate_user = [
             {
                 path : 'wallet',
                 model : 'Wallet',
-                select : { '__v': 0}
+                select : { '__v': 0},
+                populate : populate_wallet_all
             }
         ]
     },
@@ -35,7 +44,8 @@ let populate_user = [
             {
                 path : 'wallet',
                 model : 'Wallet',
-                select : { '__v': 0}
+                select : { '__v': 0},
+                populate : populate_wallet_all
             }
         ]
     },
@@ -62,7 +72,8 @@ let populate_user = [
                             {
                                 path : 'wallet',
                                 model : 'Wallet',
-                                select : { '__v': 0}
+                                select : { '__v': 0},
+                                populate : populate_wallet_all
                             }
                         ]
                     }

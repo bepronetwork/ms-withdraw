@@ -7,6 +7,6 @@ context('User Testing', async () => {
     require('./withdraw0');
     require('./withdrawNoFunds');
     require('./withdrawSomeAmount');
-    require('./withdrawMinError');
+    //require('./withdrawMinError');
     require('./withdrawAllAmount');
 });

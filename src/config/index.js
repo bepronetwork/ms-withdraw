@@ -29,6 +29,8 @@ export const PRIVATE_KEY = process.env.PRIVATE_KEY;
 
 export const MIN_WITHDRAW = parseFloat(process.env.MIN_WITHDRAW);
 
+export const MS_MASTER_URL = process.env.MS_MASTER_URL;
+
 /* Variables */
 
 var ETH_NETWORK = config.eth;

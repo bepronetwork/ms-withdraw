@@ -1,9 +1,11 @@
+import populate_wallet_all from "../wallet/all";
 
 let populate_app_all = [
     {
         path : 'wallet',
         model : 'Wallet',
         select : { '__v': 0},
+        populate : populate_wallet_all
     },
     {
         path : 'users',
@@ -39,6 +41,11 @@ let populate_app_all = [
         populate : [
             {
                 path : 'affiliateStructures',
+                model : 'AffiliateStructure',
+                select : { '__v': 0}
+            },
+            {
+                path : 'customAffiliateStructures',
                 model : 'AffiliateStructure',
                 select : { '__v': 0}
             }

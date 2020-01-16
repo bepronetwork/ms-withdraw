@@ -26,7 +26,6 @@ class account{
     }
 
     async sendEther(amount, address, data=null){
-        console.log("here", address)
         return new Promise( async (resolve, reject) => {
             try{
                 let tx = {
