@@ -62,6 +62,7 @@ const processActions = {
             /* Verify if App has Enough Balance for Withdraw */
             let hasEnoughBalance = (amount <= appBalance);
             let res = {
+                max_withdraw: (!wallet.max_withdraw) ? 0 : wallet.max_withdraw,
                 allUsersBalance,
                 appBalance,
                 hasEnoughBalance,

@@ -27,7 +27,7 @@ context('Withdraw Max', async () => {
         let dataMaxDeposit = await setAppMaxWithdraw({
             app_id: app.id,
             wallet_id: appWallet._id,
-            amount: 0.01,
+            amount: 1000,
         }, app.bearerToken, {id : app.id});
         expect(dataMaxDeposit.data.status).to.be.equal(200);
         expect(dataMaxDeposit.data.status).to.not.be.null;
@@ -37,7 +37,7 @@ context('Withdraw Max', async () => {
         let dataMaxDeposit = await setAppMaxWithdraw({
             app_id: app.id,
             wallet_id: appWallet._id,
-            amount: 0.01,
+            amount: 1000,
         }, app.bearerToken, {id : app.id});
         expect(dataMaxDeposit.data.status).to.be.equal(200);
         expect(dataMaxDeposit.data.status).to.not.be.null;
