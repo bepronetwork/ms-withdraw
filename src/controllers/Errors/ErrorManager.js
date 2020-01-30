@@ -79,6 +79,20 @@ class ErrorManager {
         }
     }
     
+    wallet = function (wallet, type){
+        try{
+            switch(type){
+                case 'Register' : {  
+                    // Verify wallet (Syntax Error)
+                    if(typeof wallet == 'undefined' || Object.is(wallet, null))
+                        throw libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.USER_NOT_EXISTENT));
+    
+                }
+            }
+        }catch(err){
+            throw err
+        }
+    }
    
     app = function (object, type){
         try{
