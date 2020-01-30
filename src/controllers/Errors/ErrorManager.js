@@ -18,27 +18,29 @@ class ErrorManager {
     user = function (object, type){
         try{
             switch(type){
-               
                 case 'RequestWithdraw' : {
                     // Verify User
                     if(typeof object == 'undefined' || Object.is(object, null))
                         libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.USER_NOT_EXISTENT));
                     // Verify if Withdraw Amount is Positive
                     if(parseFloat(object.amount) <= 0)
-                        libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.NEGATIVE_AMOUNT))
+                        libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.NEGATIVE_AMOUNT));
+                    // verify amount < max withdraw
+                    if(parseFloat(object.amount) > parseFloat(object.max_withdraw))
+                        libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.MAX_WITHDRAW));
                     // Verify User is in App
                     if(!object.user_in_app)
                         throw libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.USER_NOT_EXISTENT_IN_APP));
                     // Verify if User does not have enough balance
                     if(!object.hasEnoughBalance){
                         libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.WITHDRAW_NOT_ENOUGH_BALANCE));
-                    }                    
+                    }
                     // Verify if Minimum Withdraw was passed
                     /*if(parseFloat(object.amount) < MIN_WITHDRAW){
                         libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.MIN_WITHDRAW_NOT_PASSED));
-                    }      */            
+                    }      */
                     break;
-                };               
+                };
                 case 'RequestAffiliateWithdraw' : {
                     // Verify User
                     if(typeof object == 'undefined' || Object.is(object, null))

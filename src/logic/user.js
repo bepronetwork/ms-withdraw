@@ -61,6 +61,7 @@ const processActions = {
 
             /* Verify if Withdraw position is already opened in the Smart-Contract */
             let res = {
+                max_withdraw: (!userWallet.max_withdraw) ? 0 : userWallet.max_withdraw,
                 hasEnoughBalance,
                 user_in_app,
                 currency      : userWallet.currency,
@@ -69,7 +70,7 @@ const processActions = {
                 amount,
                 playBalanceDelta : parseFloat(-Math.abs(amount)),
                 user : user,
-                app : app,     
+                app : app,
                 nonce : params.nonce,
                 isAlreadyWithdrawingAPI : user.isWithdrawing
             }
