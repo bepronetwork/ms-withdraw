@@ -35,7 +35,7 @@ const processActions = {
 	},
 	__updateMaxWithdraw : async (params) => {
 		try{
-			const app = await AppRepository.prototype.findAppById(params.app_id);
+			const app = await AppRepository.prototype.findAppById(params.app);
 			if(!app){
 				// console.log("app id", app.id);
 				throwError('APP_NOT_EXISTENT');

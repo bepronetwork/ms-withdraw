@@ -16,9 +16,8 @@ class Security{
                 const bearerToken = bearer[1];
                 let verified = MiddlewareSingleton.verify({token : bearerToken, payload, id});
                 if(!verified){throw new Error()}
-                
                 return verified;
-            } else { 
+            } else {
                 throw new Error();
             }
         }catch(err){

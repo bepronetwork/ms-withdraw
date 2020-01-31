@@ -30,6 +30,7 @@ async function requestAppWithdraw(req, res) {
 
 async function setMaxWithdraw(req, res) {
     try{
+        SecuritySingleton.verify({type : 'app', req});
         let params = req.body;
         let wallet = new Wallet(params);
         let data = await wallet.setMaxWithdraw();

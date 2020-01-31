@@ -236,14 +236,10 @@ definitions:
   SetMaxWithdraw :
     type: object
     required:
-      - app_id
       - wallet_id
       - amount
+      - app
     properties:
-      app_id:
-        type : string
-        description: |
-          Unique identifier of the user app
       wallet_id:
         type : string
         description: |
@@ -252,6 +248,10 @@ definitions:
         type : number
         description: |
           Max value for withdraw
+      app:
+        type : string
+        description: |
+          ID app
 
   AppRequestWithdrawRequest : 
     type: object
