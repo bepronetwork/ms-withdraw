@@ -28,9 +28,9 @@ const runTests = async () => {
 
     mocha
     .addFile('./test/tests/appWithdraw/index.js')
-    // .addFile('./test/tests/userWithdraw/index.js')
-    // .addFile('./test/tests/affiliateWithdraw/index.js')
-    // .addFile('./test/tests/appUserWithdraws/index.js')
+    .addFile('./test/tests/userWithdraw/index.js')
+    .addFile('./test/tests/affiliateWithdraw/index.js')
+    .addFile('./test/tests/appUserWithdraws/index.js')
     .timeout(10*60*60*1000)
     .run()
     .on('fail', function(test, err) {
