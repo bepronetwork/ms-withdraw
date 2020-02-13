@@ -290,7 +290,6 @@ definitions:
     required:
       - app
       - user
-      - transactionHash
       - withdraw_id
       - currency
     properties:
@@ -306,12 +305,6 @@ definitions:
         example : "5cuedgq7e6t334t34" 
         description: |
           User ID
-      transactionHash :
-        type : string
-        format: name
-        example: "0xe8rghwe8rghwe9r87ynw987eyncwre"
-        description: |
-          Transaction Hash
       withdraw_id :
         type : string
         format: name
@@ -328,7 +321,6 @@ definitions:
     type: object
     required:
       - app
-      - transactionHash
       - withdraw_id
       - currency
     properties:
@@ -338,12 +330,6 @@ definitions:
         example : "5cuedgq7e6t334t34" 
         description: |
           App ID
-      transactionHash :
-        type : string
-        format: name
-        example: "0xe8rghwe8rghwe9r87ynw987eyncwre"
-        description: |
-          Transaction Hash
       withdraw_id :
         type : string
         format: name

@@ -1,7 +1,6 @@
 import { mochaAsync, detectValidationErrors } from "../../utils/testing";
 import { Logger } from "../../utils/logger";
-import { createEthAccount, registerUser, userConfirmDeposit, loginUser, addWalletAffiliate } from "../../utils/env";
-import { userDepositToContract } from "../../utils/eth";
+import { createEthAccount, registerUser, loginUser, addWalletAffiliate } from "../../utils/env";
 import { requestUserAffiliateWithdraw } from "../../methods";
 import chai from 'chai';
 const expect = chai.expect;

@@ -1,42 +1,21 @@
 import { mochaAsync, detectValidationErrors } from "../../utils/testing";
-import { appDepositToContract, appWithdrawFromContract } from "../../utils/eth";
-import { requestAppWithdraw } from "../../methods";
+import { requestAppWithdraw, finalizeAppWithdraw } from "../../methods";
 import chai from 'chai';
-import { appConfirmDeposit, loginAdmin, appWalletInfo } from "../../utils/env";
-import Numbers from "../../logic/services/numbers";
+import { appWalletInfo, depositWallet } from "../../utils/env";
 const expect = chai.expect;
 
 context('Withdraw Replay Atack', async () => {
-    var app, contract, admin, admin_eth_account, appWallet, currency, contract;
+    var app, admin, admin_eth_account, appWallet, currency, app_withdraw;
 
     before( async () =>  {
         app = global.test.app;
-        contract = global.test.contract;
         admin_eth_account = global.test.admin_eth_account;
         admin = global.test.admin;
-
         appWallet = app.wallet.find( w => new String(w.currency.ticker).toLowerCase() == new String(global.test.ticker).toLowerCase());
         currency = appWallet.currency;
         /* Add Amount for User on Database */
-        let app_deposit_transaction = await appDepositToContract({tokenAmount :  global.test.depositAmounts[global.test.ticker], currency, platformAddress : appWallet.bank_address});
+        await depositWallet({wallet_id : appWallet._id, amount : global.test.depositAmounts[global.test.ticker]});
 
-        switch(new String(currency.ticker).toLowerCase()){
-            case 'dai' : {
-                contract = global.test.contract;
-                break;
-            };
-            case 'eth' : {
-                contract = global.test.contractETH;
-                break;
-            };
-        }
-        
-        await appConfirmDeposit({
-            app_id : app,
-            transactionHash : app_deposit_transaction.transactionHash,
-            amount :  global.test.depositAmounts[global.test.ticker],
-            currency
-        })
     });
 
 
@@ -47,6 +26,7 @@ context('Withdraw Replay Atack', async () => {
         let res = requestAppWithdraw({
             tokenAmount :  global.test.depositAmounts[global.test.ticker],
             nonce : 3456365756,
+            currency : currency._id,
             app : app.id,
             address : admin_eth_account.getAddress(),
         }, app.bearerToken , {id : app.id});
@@ -55,17 +35,18 @@ context('Withdraw Replay Atack', async () => {
             tokenAmount :  global.test.depositAmounts[global.test.ticker],
             nonce : 3456365756,
             app : app.id,
+            currency : currency._id,
             address : admin_eth_account.getAddress(),
         }, app.bearerToken , {id : app.id});
         
         let ret = await Promise.resolve(await res);
-        let status_1 = ret.data.status;
-        const { status } = res_replay_attack.data;
+        const status_1 = ret.data.status;
+        const message_1 = ret.data.message;
 
-        let dexWithdrawalAmount = await contract.getApprovedWithdrawAmount({address : admin_eth_account.getAddress()});
+        const { status , message } = res_replay_attack.data;
+
         wallet = await appWalletInfo({app_id : app.id});
 
-        expect(parseFloat(dexWithdrawalAmount)).to.be.equal(global.test.depositAmounts[global.test.ticker])
         expect(parseFloat(wallet.playBalance)).to.be.equal(0);
         expect(detectValidationErrors(res_replay_attack)).to.be.equal(false);
 
@@ -73,29 +54,23 @@ context('Withdraw Replay Atack', async () => {
         if(status_1 == 200){
             expect(status_1).to.be.equal(200)
             expect(status).to.be.equal(14)
+            app_withdraw = message_1;
         }else{
             expect(status_1).to.be.equal(14)
             expect(status).to.be.equal(200)
+            app_withdraw = message;
         }
 
     }));
 
     it('should be able withdraw all Amount', mochaAsync(async () => {
 
-        /* Withdraw from Smart-Contract */
-        let withdrawTxResponse = await appWithdrawFromContract({
-            platformAddress : appWallet.bank_address,
-            account : admin_eth_account,
-            currency, 
-            address : admin_eth_account.getAddress(),
-            tokenAmount : global.test.depositAmounts[global.test.ticker],
-        });
-
-        let wallet = await appWalletInfo({app_id : app.id});
-        let dexWithdrawalAmount = await contract.getApprovedWithdrawAmount({address : admin_eth_account.getAddress()});
-
-        expect(dexWithdrawalAmount).to.be.equal(0);
-        expect(parseFloat(wallet.playBalance)).to.be.equal(0);
-        expect(withdrawTxResponse).to.not.equal(false);
+        let res = await finalizeAppWithdraw({
+            app : app.id,
+            withdraw_id : app_withdraw._id,
+            currency : currency._id
+        }, app.bearerToken , {id : app.id});
+        expect(res.data.status).to.equal(200);
+        expect(res.data.message.transactionHash).to.not.be.null;
     }));
 });

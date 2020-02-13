@@ -20,6 +20,7 @@ WithdrawSchema.prototype.schema =  {
     usd_amount              : { type: Number},
     nonce                   : { type : Number, required : true},
     callback_URL            : { type: String},
+    bitgo_id                : { type: String},
     confirmations           : { type: Number, required : true, default : 0},
     maxConfirmations        : { type: Number, required : true, default : 0},
     confirmed               : { type: Boolean, default : false},

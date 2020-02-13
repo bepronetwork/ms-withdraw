@@ -16,13 +16,11 @@ const initialState = {
 }
 
 context('Withdraw Replay Atack', async () => {
-    var user, app, user_eth_account, contract, casino, appWallet, currency;
+    var user, app, user_eth_account,  appWallet, currency;
     
     before( async () =>  {
 
         app = global.test.app;
-        contract = global.test.contract;
-        casino = contract.casino;
         appWallet = app.wallet.find( w => new String(w.currency.ticker).toLowerCase() == new String(global.test.ticker).toLowerCase());
         currency = appWallet.currency;
 

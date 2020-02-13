@@ -18,7 +18,6 @@ class Globals{
     verify(){
         //Display All and Confirm Running
         globals.log();
-
     }
 
     getCasinoContract(address, tokenAddress){
