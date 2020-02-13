@@ -49,6 +49,7 @@ class WithdrawRepository extends MongoComponent{
                 { $set: 
                     { 
                         done                    : true,
+                        bitgo_id                : params.bitgo_id,
                         confirmed               : true,
                         status                  : 'Processed',
                         transactionHash         : params.transactionHash,

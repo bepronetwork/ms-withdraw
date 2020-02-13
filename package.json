@@ -3,8 +3,8 @@
     "version": "0.1.0",
     "private": true,
     "main": "app.js",
-     "engines" : { 
-        "node" : "8.12.0" 
+    "engines": {
+        "node": "8.12.0"
     },
     "scripts": {
         "start": "babel-node app --nopresets es2015,stage-2",
@@ -38,6 +38,7 @@
         "bcryptjs": "^2.4.3",
         "bee-queue": "^1.2.2",
         "big-number": "^2.0.0",
+        "bitgo": "^9.5.1",
         "bluebird": "^3.5.5",
         "body-parser": "~1.17.1",
         "browser-cookies": "^1.2.0",
@@ -49,6 +50,7 @@
         "colors": "^1.3.3",
         "cookie-parser": "~1.4.3",
         "crypto-js": "^3.1.9-1",
+        "cryptr": "^6.0.1",
         "dbschema-parser": "^1.2.3",
         "debug": "~2.6.3",
         "delay": "^2.0.0",
@@ -62,6 +64,7 @@
         "express3-handlebars": "^0.5.2",
         "faker": "^4.1.0",
         "inquirer": "^6.5.2",
+        "int64-buffer": "^0.99.1007",
         "ip": "^1.1.5",
         "isomorphic-fetch": "^2.2.1",
         "jade": "~1.11.0",

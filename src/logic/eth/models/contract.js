@@ -1,5 +1,3 @@
-import { globals } from "../../../Globals";
-import { ETH_CONFIRMATION_NEEDED } from "../../../config";
 
 class contract{
 
@@ -61,9 +59,7 @@ class contract{
         return new Promise ( (resolve, reject) => {
             this.web3.eth.sendSignedTransaction(result.rawTransaction)
             .on('confirmation', (confirmationNumber, receipt) => {
-                if(parseInt(confirmationNumber) >= ETH_CONFIRMATION_NEEDED){
-                    resolve(receipt)
-                }
+                resolve(receipt)
             })
             .on('error', (err) => {reject(err)})
             .on('transactionHash', (hash) => {

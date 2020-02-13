@@ -1,7 +1,6 @@
 import { mochaAsync, detectValidationErrors } from "../../utils/testing";
 import { Logger } from "../../utils/logger";
-import { createEthAccount, registerUser, userConfirmDeposit, loginUser } from "../../utils/env";
-import { userDepositToContract } from "../../utils/eth";
+import { createEthAccount, registerUser, loginUser, depositWallet } from "../../utils/env";
 import { requestUserWithdraw } from "../../methods";
 import chai from 'chai';
 const expect = chai.expect;
@@ -28,17 +27,10 @@ context('Withdraw No Funds', async () => {
         /* Create User on Database */
         user = await registerUser({address : user_eth_account.getAddress(), app_id : app.id});
         user = await loginUser({username : user.username, password : user.password, app_id : app.id});
+        let userWallet = user.wallet.find( w => new String(w.currency.ticker).toLowerCase() == new String(global.test.ticker).toLowerCase());
 
         /* Add Amount for User on Database */
-        let user_deposit_transaction = await userDepositToContract({eth_account : user_eth_account, tokenAmount : global.test.depositAmounts[global.test.ticker], platformAddress : appWallet.bank_address, currency});
-        await userConfirmDeposit({
-            app_id : app.id,
-            user : user,
-            transactionHash : user_deposit_transaction.transactionHash,
-            amount : global.test.depositAmounts[global.test.ticker],
-            currency
-        })
-    
+        await depositWallet({wallet_id : userWallet._id, amount : global.test.depositAmounts[global.test.ticker]});
     });
 
 

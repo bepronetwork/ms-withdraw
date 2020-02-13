@@ -1,7 +1,6 @@
 import { mochaAsync, detectValidationErrors } from "../../utils/testing";
 import { Logger } from "../../utils/logger";
-import { createEthAccount, registerUser, userConfirmDeposit, loginUser } from "../../utils/env";
-import { userDepositToContract, appWithdrawForUser } from "../../utils/eth";
+import { createEthAccount, registerUser, loginUser, depositWallet } from "../../utils/env";
 import { requestUserWithdraw, getAppUserWithdraws, finalizeUserWithdraw } from "../../methods";
 import chai from 'chai';
 const expect = chai.expect;
@@ -30,17 +29,11 @@ context('Withdraw Some Amount', async () => {
                 /* Create User on Database */
                 user = await registerUser({address : user_eth_account.getAddress(), app_id : app.id});
                 user = await loginUser({username : user.username, password : user.password, app_id : app.id});
+                let userWallet = user.wallet.find( w => new String(w.currency.ticker).toLowerCase() == new String(ticker).toLowerCase());
 
                 /* Add Amount for User on Database */
-                let user_deposit_transaction = await userDepositToContract({eth_account : user_eth_account, tokenAmount : global.test.depositAmounts[ticker], currency, platformAddress : appWallet.bank_address});
-                await userConfirmDeposit({
-                    app_id : app.id,
-                    user : user,
-                    transactionHash : user_deposit_transaction.transactionHash,
-                    amount : global.test.depositAmounts[ticker],
-                    currency
-                })
-
+                await depositWallet({wallet_id : userWallet._id, amount : global.test.depositAmounts[ticker]});
+            
                 global.test.user = user;
                 global.test.user_eth_account = user_eth_account;
             
@@ -63,15 +56,7 @@ context('Withdraw Some Amount', async () => {
             }));
 
             it('should be able withdraw some Amount', mochaAsync(async () => {
-                /* Withdraw from Smart-Contract */
-                let withdrawTxResponse = await appWithdrawForUser({
-                    eth_account : user_eth_account,
-                    tokenAmount : global.test.depositAmounts[ticker]/2,
-                    platformAddress : appWallet.bank_address,
-                    currency
-                })
 
-                expect(withdrawTxResponse).to.not.equal(false);
                 let withdraws_res = await getAppUserWithdraws({app : app.id, user : user.id}, app.bearerToken , {id : app.id});
                 const { message } = withdraws_res.data;
 
@@ -79,11 +64,9 @@ context('Withdraw Some Amount', async () => {
                     app : app.id,
                     user : user.id,
                     withdraw_id : message[0]._id,
-                    transactionHash : withdrawTxResponse.transactionHash,
                     currency : currency._id
                 }, app.bearerToken , {id : app.id});
 
-                expect(withdrawTxResponse).to.not.equal(false);
                 expect(res.data.status).to.equal(200);
             }));
         });

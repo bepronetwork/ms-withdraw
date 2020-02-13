@@ -22,7 +22,7 @@ context('Withdraw 0', async () => {
         appWallet = app.wallet.find( w => new String(w.currency.ticker).toLowerCase() == new String(global.test.ticker).toLowerCase());
         currency = appWallet.currency;
         /* Create User Address and give it ETH */
-        user_eth_account = await createEthAccount({ethAmount : initialState.user.eth_balance, tokenAmount : initialState.user.token_balance});
+        user_eth_account = await createEthAccount({ethAmount : initialState.user.eth_balance});
         /* Create User on Database */
         user = await registerUser({address : user_eth_account.getAddress(), app_id : app.id});
         /* Gets User Info */
@@ -33,9 +33,9 @@ context('Withdraw 0', async () => {
     it('shouldn´t be able to withdraw a 1 balance without depositing', mochaAsync(async () => {
 
         let res = await requestUserWithdraw({
-            tokenAmount : 1,
-            nonce : 3456365756,
             app : app.id,
+            tokenAmount : 0,
+            nonce : 2334534,
             address : user_eth_account.getAddress(),
             user : user.id,
             currency : currency._id
@@ -43,6 +43,6 @@ context('Withdraw 0', async () => {
 
         expect(detectValidationErrors(res)).to.be.equal(false);
         const { status } = res.data;
-        expect(status).to.be.equal(21)
+        expect(status).to.be.equal(2)
     }));
 });

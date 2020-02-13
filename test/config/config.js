@@ -1,7 +1,7 @@
 export default {
     eth : {
-        network : 'rinkeby',
-        url : 'https://rinkeby.infura.io/v3/811fe4fa5c4b41cb9b92f9656aaeaa3b',
+        network : 'kovan',
+        url : 'https://kovan.infura.io/v3/811fe4fa5c4b41cb9b92f9656aaeaa3b',
         keys : {
             user : '0x6E390AC06C6CCFB01D8F10C417EFD5A23B5217A9268D95D6E0B9E8FE035D1156',
             home : '0x0B65E4D1DB96EEF7FAD9EC98ABCDFB410C6DD1A9F6210F3AB7DDF02B4C5C7393',
