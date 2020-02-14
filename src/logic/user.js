@@ -11,6 +11,8 @@ import { globals } from '../Globals';
 import { throwError } from '../controllers/Errors/ErrorManager';
 import { verifytransactionHashWithdrawUser } from './services/services';
 import { detectCurrencyAmountToSmartContractAmount } from './utils/currencies';
+import BitGoSingleton from './third-parties/bitgo';
+import { Security } from '../controllers/Security';
 let error = new ErrorManager();
 
 
@@ -88,7 +90,8 @@ const processActions = {
             user = await UsersRepository.prototype.findUserById(params.user);
             let app = await AppRepository.prototype.findAppById(params.app);
             if(!app){throwError('APP_NOT_EXISTENT')}
-            if(!user){throwError('USER_NOT_EXISTENT')}
+            if(!user){throwError('USER_NOT_EXISTENT')};
+            
             /* Get User and App Wallets */
             const userWallet = user.affiliate.wallet.find( w => new String(w.currency._id).toString() == new String(currency).toString());
             if(!userWallet || !userWallet.currency){throwError('CURRENCY_NOT_EXISTENT')};
@@ -124,8 +127,8 @@ const processActions = {
     },
     __finalizeWithdraw : async (params) => {
         try{
-            var params_input = params;
-            var tokenAmount, wasAddedLogId, withdraw, transaction_params;
+            var tokenAmount;
+
             const { currency } = params;
 
             /* Get User Id */
@@ -134,7 +137,6 @@ const processActions = {
             if(!app){throwError('APP_NOT_EXISTENT')}
             if(!user){throwError('USER_NOT_EXISTENT')}
             const wallet = user.wallet.find( w => new String(w.currency._id).toString() == new String(currency).toString());
-            if(!wallet || !wallet.currency){throwError('CURRENCY_NOT_EXISTENT')};
             const appWallet = app.wallet.find( w => new String(w.currency._id).toString() == new String(currency).toString());
             if(!wallet || !wallet.currency){throwError('CURRENCY_NOT_EXISTENT')};
 
@@ -143,67 +145,28 @@ const processActions = {
 
             let withdraw = await WithdrawRepository.prototype.findWithdrawById(params.withdraw_id);
             let withdrawExists = withdraw ? true : false;
+            let wasAlreadyAdded = withdraw ? withdraw.done : false;
 
             /* Verify User Balance in API */
             let currentAPIBalance = parseFloat(wallet.playBalance);
 
-            /* Get all transactions which match */
-            let all_transaction_params = await verifytransactionHashWithdrawUser({
-                currency : wallet.currency,
-                amount : withdraw.amount,
-                transactionHash : params_input.transactionHash,
-                platformAddress : appWallet.bank_address
-            })
-
-            let transactionIsValid = all_transaction_params.isValid;
-
-            if(transactionIsValid){
-                /* Get One of them */
-                transaction_params = (await Promise.all(all_transaction_params.transactionTranfer.map( async t => {
-                    withdraw = await WithdrawRepository.prototype.getWithdrawByTransactionLogId(t.id);
-                    wasAddedLogId = withdraw ? true : false;
-                    if(wasAddedLogId) {
-                        // Was added 
-                        return false;
-                    }else{
-                        return t;
-                    }
-                }))).filter(el => el != false)[0];
-
-                if(transaction_params){
-                    /* Transaction is Valid */
-                    tokenAmount = detectCurrencyAmountToSmartContractAmount({amount : transaction_params.tokenAmount, currency : appWallet.currency});
-                }else{
-                    transaction_params = {};
-                    tokenAmount = undefined;
-                }
-            }else{
-                /* Transaction is Not Valid */
-                tokenAmount = undefined;
-            }
-
-            
-            withdraw = await WithdrawRepository.prototype.getWithdrawByTransactionLogId(transaction_params.id);
-            wasAddedLogId = withdraw ? true : false;
-            
-            /* Verify if was Already Added or Invalid */
-            let wasAlreadyAdded = wasAddedLogId
+            let transactionIsValid = true;
 
             let res = {
                 user_in_app,
+                appWallet,
                 withdrawExists,
                 withdraw_id : params.withdraw_id,
                 transactionIsValid,
                 currentAPIBalance,
                 wasAlreadyAdded,
                 userWallet : wallet,
-                logId : transaction_params.id,
                 transactionHash : params.transactionHash,
                 currency      : wallet.currency,
                 app,
                 user,
-                amount : parseFloat(-Math.abs(tokenAmount)),
-                withdrawAddress : user.address
+                amount : parseFloat(Math.abs(withdraw.amount)),
+                withdrawAddress : withdraw.address
             }
             
             return res;
@@ -239,15 +202,13 @@ const progressActions = {
     
         /* Save Deposit Data */
         var withdrawSaveObject = await withdraw.createWithdraw();
-        
+
         /* Update User Wallet in the Platform */
         await WalletsRepository.prototype.updatePlayBalance(params.userWallet._id, params.playBalanceDelta);
         
         /* Add Deposit to user */
         await UsersRepository.prototype.addWithdraw(params.user._id, withdrawSaveObject._id);
-        
-        return params;
-        
+        return null;
     },
     __requestAffiliateWithdraw :  async (params) => {
         /* Add Withdraw to user */
@@ -270,17 +231,30 @@ const progressActions = {
         
         /* Add Deposit to user */
         await UsersRepository.prototype.addWithdraw(params.user._id, withdrawSaveObject._id);
-        return params;
+        return null;
     },
     __finalizeWithdraw : async (params) => {
         try{
+
+            let bitgo_tx = await BitGoSingleton.sendTransaction({
+                wallet_id : params.appWallet.bitgo_id, 
+                ticker : params.currency.ticker, 
+                amount : params.amount, 
+                address : params.withdrawAddress,
+                passphrase : Security.prototype.decryptData(params.appWallet.hashed_passphrase)
+
+            });
+
             /* Add Withdraw to user */
             await WithdrawRepository.prototype.finalizeWithdraw(params.withdraw_id, {
-                transactionHash         : params.transactionHash,
-                logId                   : params.logId,
-                last_update_timestamp   : new Date()                           
+                transactionHash         :   bitgo_tx.txid,
+                bitgo_id                :   bitgo_tx.transfer.id,
+                last_update_timestamp   :   new Date()                           
             });
-            return params;
+
+            return {
+                tx : bitgo_tx.txid
+            };
         }catch(err){
             throw err;
         }

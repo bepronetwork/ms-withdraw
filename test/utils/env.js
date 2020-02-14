@@ -9,9 +9,9 @@ import {
 import { globals } from "../Globals";
 import { WalletsRepository } from "../db/repos";
 
-export async function createEthAccount({ethAmount, tokenAmount}){
+export async function createEthAccount({ethAmount}){
     /* Create User Address and give it ETH */
-    var eth_account = await generateEthAccountWithTokensAndEthereum({ETHAmount : ethAmount, tokenAmount : tokenAmount});
+    var eth_account = await generateEthAccountWithTokensAndEthereum({ETHAmount : ethAmount});
     return eth_account;
 }
 
@@ -35,6 +35,10 @@ export async function appWalletInfo({app_id}){
 
     let res = await app.summary();
     return res;
+}
+
+export async function depositWallet({wallet_id, amount}){
+    return await WalletsRepository.prototype.updatePlayBalance(wallet_id, amount);
 }
 
 export async function registerAdmin(){
@@ -113,38 +117,6 @@ export async function addCurrencyWallet({app_id, address,  platformAddress, plat
     return await app.addCurrencyWallet();
     
 }
-
-
-export async function userConfirmDeposit({app_id, user, transactionHash, amount, currency}){
-
-    let postData = {
-        user : user.id,
-        app : app_id,
-        amount : amount,
-        transactionHash : transactionHash,
-        currency : currency._id
-    };
-
-    return await updateUserWallet(postData, user.bearerToken, {id : user.id});            
-    
-}
-
-
-
-export async function appConfirmDeposit({app, transactionHash, amount, currency}){
-
-
-    let postData = {
-        app : app.id,
-        amount : amount,
-        transactionHash : transactionHash,
-        currency : currency._id
-    };
-
-    return await updateAppWallet(postData, app.bearerToken, {id : app.id});          
-    
-}
-
 
 export async function addWalletAffiliate({user, amount, currency}){
     const wallet_id = user.affiliateInfo.wallet.find( w => new String(w.currency.ticker).toLowerCase() == new String(currency.ticker).toLowerCase());

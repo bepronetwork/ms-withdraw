@@ -1,6 +1,6 @@
 context('Affiliate Testing', async () => {
-    //require('./withdrawReplayAtack');
-    //require('./withdrawNoUser');
+    require('./withdrawReplayAtack');
+    require('./withdrawNoUser');
     require('./withdrawNoApp');
     require('./withdrawNoCredentials');
     require('./withdraw0');             
