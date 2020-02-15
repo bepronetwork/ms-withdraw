@@ -63,7 +63,10 @@ const test = async () => {
             global.test.admin_eth_account = admin_eth_account;
 
             Logger.info("Account Admin ", admin_eth_account.getAddress());
+            console.log("a")
+
             let eco = (await getEcosystemData()).data.message;
+
             let currency = eco.currencies.find(c => new String(c.ticker).toLowerCase() == 'dai');
             let currencyETH = eco.currencies.find(c => new String(c.ticker).toLowerCase() == 'eth');
 
@@ -73,7 +76,7 @@ const test = async () => {
             var postDataAdmin = {
                 username : "admin1" + parseInt(Math.random()*10000),
                 name : "test",
-                email : "testt@gmail.com",
+                email : `testt${parseInt(Math.random()*10000)}@gmail.com`,
                 password : 'test123'
             }
          
@@ -93,6 +96,7 @@ const test = async () => {
 
             app = (await registerApp(postData)).data.message;
             admin = (await loginAdmin(postDataAdmin)).data.message;
+
             app = (await getAppAuth({app : admin.app.id}, admin.app.bearerToken, {id : admin.app.id})).data;
             global.test.app = app;
             /* Add Currency Wallet */
@@ -122,7 +126,6 @@ const test = async () => {
             user = (await loginUser(postData)).data.message;
             global.test.user = user;
 
-            console.log(admin_eth_account.getPrivateKey());
             app = (await getAppAuth({app : admin.app.id}, admin.app.bearerToken, {id : admin.app.id})).data;
             // App Deposit
             await admin_eth_account.sendEther(0.05, app.message.wallet[0].bank_address);
@@ -134,6 +137,7 @@ const test = async () => {
             global.test.depositAmounts = {
                 'eth' : 0.01
             }
+
 
             global.test.ticker = global.test.currencies[0];
 
