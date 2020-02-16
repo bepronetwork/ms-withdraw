@@ -50,11 +50,15 @@ const processActions = {
             /* Get User and App Wallets */
             const userWallet = user.wallet.find( w => new String(w.currency._id).toString() == new String(currency).toString());
             if(!userWallet || !userWallet.currency){throwError('CURRENCY_NOT_EXISTENT')};
+
+            const wallet = app.wallet.find( w => new String(w.currency._id).toString() == new String(currency).toString());
+            if(!wallet || !wallet.currency){throwError('CURRENCY_NOT_EXISTENT')};
+
             let amount = parseFloat(Math.abs(tokenAmount));
 
             /* User Current Balance */
             let currentBalance = parseFloat(userWallet.playBalance);
-            
+
             /* Verify if User has Enough Balance for Withdraw */
             let hasEnoughBalance = (amount <= currentBalance);
 
@@ -64,6 +68,7 @@ const processActions = {
             /* Verify if Withdraw position is already opened in the Smart-Contract */
             let res = {
                 // max_withdraw: (!userWallet.max_withdraw) ? 0 : userWallet.max_withdraw,
+                max_withdraw: (!wallet.max_withdraw) ? 0 : wallet.max_withdraw,
                 hasEnoughBalance,
                 user_in_app,
                 currency      : userWallet.currency,
