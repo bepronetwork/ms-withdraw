@@ -113,7 +113,7 @@ const test = async () => {
             var postDataUser = {
                 username : "sdfg" + parseInt(Math.random()*10000),
                 name : "test",
-                email : "testt@gmail.com",
+                email : `testt${parseInt(Math.random()*10000)}@gmail.com`,
                 password : 'test123',
                 address : '90x',
                 app : admin.app.id
