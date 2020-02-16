@@ -19,6 +19,35 @@ consumes:
 produces:
   - application/json
 paths:
+  /withdraw/max/set :
+    x-swagger-router-controller: app
+    post:
+      tags:
+      - app
+      summary: Set max withdraw
+      operationId: setMaxWithdraw
+      description: Set max withdraw Data
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: withdraw
+          description: Set max withdraw
+          required: true
+          schema:
+            $ref: '#/definitions/SetMaxWithdraw'
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/GeneralResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+
   /users/requestWithdraw: 
     x-swagger-router-controller: user
     post:
@@ -204,6 +233,26 @@ paths:
   
 # complex objects have schema definitions
 definitions:
+  SetMaxWithdraw :
+    type: object
+    required:
+      - wallet_id
+      - amount
+      - app
+    properties:
+      wallet_id:
+        type : string
+        description: |
+          Unique identifier of the wallet
+      amount:
+        type : number
+        description: |
+          Max value for withdraw
+      app:
+        type : string
+        description: |
+          ID app
+
   AppRequestWithdrawRequest : 
     type: object
     required:
