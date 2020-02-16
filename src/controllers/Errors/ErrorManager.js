@@ -26,8 +26,8 @@ class ErrorManager {
                     if(parseFloat(object.amount) <= 0)
                         libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.NEGATIVE_AMOUNT));
                     // verify amount < max withdraw
-                    // if(parseFloat(object.amount) > parseFloat(object.max_withdraw))
-                    //     libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.MAX_WITHDRAW));
+                    if(parseFloat(object.amount) > parseFloat(object.max_withdraw))
+                        libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.MAX_WITHDRAW));
                     // Verify User is in App
                     if(!object.user_in_app)
                         throw libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.USER_NOT_EXISTENT_IN_APP));
@@ -108,8 +108,8 @@ class ErrorManager {
                     if(parseFloat(object.amount) <= 0)
                         libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.NEGATIVE_AMOUNT))
                     // verify amount < max withdraw
-                    if(parseFloat(object.amount) > parseFloat(object.max_withdraw))
-                        libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.MAX_WITHDRAW));
+                    // if(parseFloat(object.amount) > parseFloat(object.max_withdraw))
+                    //     libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.MAX_WITHDRAW));
                     // Verify if App does not have enough balance
                     if(!object.hasEnoughBalance)
                         libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.WITHDRAW_NOT_ENOUGH_BALANCE))
