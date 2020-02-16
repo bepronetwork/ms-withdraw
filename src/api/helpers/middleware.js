@@ -60,7 +60,7 @@ class Middleware{
             res.json({
                 data : {
                     status : 404,
-                    message : 'Internal Server Error'
+                    message : 'Contact Support, Action not Allowed'
                 }
             });
         }
