@@ -33,35 +33,10 @@ context('Withdraw Max', async () => {
         expect(dataMaxDeposit.data.status).to.be.equal(200);
         expect(dataMaxDeposit.data.status).to.not.be.null;
     }));
-    it('should set max for DAI success', mochaAsync(async () => {
-        app = (await getAppAuth({app : app.id}, app.bearerToken, {id : app.id})).data.message;
-        updateCurrencyWallet('DAI', app);
-        let dataMaxDeposit = await setAppMaxWithdraw({
-            app         : app.id,
-            wallet_id   : appWallet._id,
-            amount      : 20,
-        }, app.bearerToken, {id : app.id});
-        expect(dataMaxDeposit.data.status).to.be.equal(200);
-        expect(dataMaxDeposit.data.status).to.not.be.null;
-    }));
 
     it('should amount > max withdraw ETH', mochaAsync(async () => {
         app = (await getAppAuth({app : app.id}, app.bearerToken, {id : app.id})).data.message;
         updateCurrencyWallet('ETH', app);
-        currency = appWallet.currency;
-        let res = await requestAppWithdraw({
-            tokenAmount : 22,
-            nonce : 3456365756,
-            app : app.id,
-            address : admin_eth_account.getAddress(),
-            currency : currency._id
-        }, app.bearerToken , {id : app.id});
-        expect(res.data.status).to.not.be.null;
-        expect(res.data.status).to.be.equal(46);
-    }));
-    it('should amount > max withdraw DAI', mochaAsync(async () => {
-        app = (await getAppAuth({app : app.id}, app.bearerToken, {id : app.id})).data.message;
-        updateCurrencyWallet('DAI', app);
         currency = appWallet.currency;
         let res = await requestAppWithdraw({
             tokenAmount : 22,
@@ -84,15 +59,5 @@ context('Withdraw Max', async () => {
         expect(dataMaxDeposit.data.status).to.be.equal(304);
         expect(dataMaxDeposit.data.status).to.not.be.null;
     }));
-    it('should set max for DAI not auth', mochaAsync(async () => {
-        app = (await getAppAuth({app : app.id}, app.bearerToken, {id : app.id})).data.message;
-        updateCurrencyWallet('DAI', app);
-        let dataMaxDeposit = await setAppMaxWithdraw({
-            app         : app.id,
-            wallet_id   : appWallet._id,
-            amount      : 20,
-        }, null, {id : app.id});
-        expect(dataMaxDeposit.data.status).to.be.equal(304);
-        expect(dataMaxDeposit.data.status).to.not.be.null;
-    }));
+
 });
