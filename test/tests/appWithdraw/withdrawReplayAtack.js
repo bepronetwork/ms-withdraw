@@ -1,7 +1,7 @@
 import { mochaAsync, detectValidationErrors } from "../../utils/testing";
-import { requestAppWithdraw, finalizeAppWithdraw } from "../../methods";
+import { requestAppWithdraw, finalizeAppWithdraw, getAppAuth } from "../../methods";
 import chai from 'chai';
-import { appWalletInfo, depositWallet } from "../../utils/env";
+import { appWalletInfo } from "../../utils/env";
 const expect = chai.expect;
 
 context('Withdraw Replay Atack', async () => {
@@ -13,18 +13,22 @@ context('Withdraw Replay Atack', async () => {
         admin = global.test.admin;
         appWallet = app.wallet.find( w => new String(w.currency.ticker).toLowerCase() == new String(global.test.ticker).toLowerCase());
         currency = appWallet.currency;
-        /* Add Amount for User on Database */
-        await depositWallet({wallet_id : appWallet._id, amount : global.test.depositAmounts[global.test.ticker]});
-
     });
 
 
     it('should be able to withdraw only once, and phoibit second', mochaAsync(async () => {
-        let wallet = await appWalletInfo({app_id : app.id});
-        expect(parseFloat(wallet.playBalance)).to.be.equal(global.test.depositAmounts[global.test.ticker]);
+    
+        app = (await getAppAuth({app : app.id}, app.bearerToken, {id : app.id})).data.message;
+        let balance = app.wallet.find( w => new String(w.currency.ticker).toLowerCase() == new String(global.test.ticker).toLowerCase()).playBalance;
+
+        const initialBalance = balance;
+        const deposit = initialBalance/5;
+
+        // Deposit Succeeded
+        expect(parseFloat(balance).toFixed(6)).to.not.equal(0);
 
         let res = requestAppWithdraw({
-            tokenAmount :  global.test.depositAmounts[global.test.ticker],
+            tokenAmount :  deposit, 
             nonce : 3456365756,
             currency : currency._id,
             app : app.id,
@@ -32,7 +36,7 @@ context('Withdraw Replay Atack', async () => {
         }, app.bearerToken , {id : app.id});
 
         let res_replay_attack = await requestAppWithdraw({
-            tokenAmount :  global.test.depositAmounts[global.test.ticker],
+            tokenAmount : deposit, 
             nonce : 3456365756,
             app : app.id,
             currency : currency._id,
@@ -45,9 +49,10 @@ context('Withdraw Replay Atack', async () => {
 
         const { status , message } = res_replay_attack.data;
 
-        wallet = await appWalletInfo({app_id : app.id});
+        app = (await getAppAuth({app : app.id}, app.bearerToken, {id : app.id})).data.message;
+        balance = app.wallet.find( w => new String(w.currency.ticker).toLowerCase() == new String(global.test.ticker).toLowerCase()).playBalance;
 
-        expect(parseFloat(wallet.playBalance)).to.be.equal(0);
+        expect(parseFloat(balance).toFixed(6)).to.be.equal(parseFloat(initialBalance-deposit).toFixed(6));
         expect(detectValidationErrors(res_replay_attack)).to.be.equal(false);
 
         // Confirm either one or the other tx got phroibited

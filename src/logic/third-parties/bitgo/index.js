@@ -4,7 +4,7 @@ import { getCurrencyAmountFromBitGo, getCurrencyAmountToBitGo } from './helpers'
 
 class BitGoClass {
     constructor(){
-        this.bitgo = new BitGo.BitGo({ accessToken: BITGO_ACCESS_TOKEN, proxy : QUOTA_GUARD_URL }); // defaults to testnet. add env: 'prod' if you want to go against mainnet
+        this.bitgo = new BitGo.BitGo({ accessToken: BITGO_ACCESS_TOKEN, proxy : QUOTA_GUARD_URL, env : IS_DEVELOPMENT ? 'test' : 'prod' });
     }
 
     async __init__(){

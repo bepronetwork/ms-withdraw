@@ -12,10 +12,10 @@ function updateCurrencyWallet(localTicker, app) {
 }
 
 context('Withdraw Max', async () => {
-    var app, contract, admin, admin_eth_account, currency;
+    var app, admin_eth_account, admin, currency;
+
     before( async () =>  {
         app = global.test.app;
-        contract = global.test.contract;
         updateCurrencyWallet('ETH', app);
         currency = appWallet.currency;
 
@@ -33,21 +33,6 @@ context('Withdraw Max', async () => {
         expect(dataMaxDeposit.data.status).to.be.equal(200);
         expect(dataMaxDeposit.data.status).to.not.be.null;
     }));
-
-    // it('should amount > max withdraw ETH', mochaAsync(async () => {
-    //     app = (await getAppAuth({app : app.id}, app.bearerToken, {id : app.id})).data.message;
-    //     updateCurrencyWallet('ETH', app);
-    //     currency = appWallet.currency;
-    //     let res = await requestAppWithdraw({
-    //         tokenAmount : 22,
-    //         nonce : 3456365756,
-    //         app : app.id,
-    //         address : admin_eth_account.getAddress(),
-    //         currency : currency._id
-    //     }, app.bearerToken , {id : app.id});
-    //     expect(res.data.status).to.not.be.null;
-    //     expect(res.data.status).to.be.equal(46);
-    // }));
 
     it('should set max for ETH not auth', mochaAsync(async () => {
         app = (await getAppAuth({app : app.id}, app.bearerToken, {id : app.id})).data.message;
