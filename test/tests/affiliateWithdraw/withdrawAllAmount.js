@@ -1,6 +1,5 @@
 import { mochaAsync, detectValidationErrors } from "../../utils/testing";
 import { createEthAccount, registerUser, loginUser, addWalletAffiliate } from "../../utils/env";
-import { appWithdrawForUser } from "../../utils/eth";
 import { requestUserAffiliateWithdraw, finalizeUserWithdraw, getAppUserWithdraws } from "../../methods";
 
 import chai from 'chai';
@@ -16,7 +15,7 @@ const initialState = {
 context('Withdraw All Amount', async () => {
     global.test.currencies.forEach( async ticker => {
         describe(`${ticker}`, async () => {
-            var user, app, user_eth_account, contract, withdrawTxResponse, appWallet, currency;
+            var user, app, user_eth_account, contract, withdrawTxResponse, appWallet, currency, withdraws_res;
             before( async () =>  {
 
                 app = global.test.app;
@@ -36,7 +35,7 @@ context('Withdraw All Amount', async () => {
 
             it('should be able to ask to withdraw all amount', mochaAsync(async () => {
                 let res = await requestUserAffiliateWithdraw({
-                    tokenAmount : global.test.depositAmounts[global.test.ticker],
+                    tokenAmount : global.test.depositAmounts[global.test.ticker]/4,
                     nonce : 3456365756,
                     app : app.id,
                     address : user_eth_account.getAddress(),
@@ -50,27 +49,19 @@ context('Withdraw All Amount', async () => {
             }));
 
             it('should be able withdraw all Amount', mochaAsync(async () => {
-                /* Withdraw from Smart-Contract */
-                withdrawTxResponse = await appWithdrawForUser({
-                    eth_account : user_eth_account,
-                    tokenAmount : global.test.depositAmounts[global.test.ticker],
-                    platformAddress : appWallet.bank_address, 
-                    currency
-                });
 
-                let withdraws_res = await getAppUserWithdraws({app : app.id, user : user.id}, app.bearerToken , {id : app.id});
+                let withdraws_res = await getAppUserWithdraws({app : app.id }, app.bearerToken , {id : app.id});
                 const { message } = withdraws_res.data;
-                
+
                 let res = await finalizeUserWithdraw({
                     app : app.id,
                     user : user.id,
                     withdraw_id : message[0]._id,
-                    transactionHash : withdrawTxResponse.transactionHash,
                     currency : currency._id
                 }, app.bearerToken , {id : app.id});
 
-                expect(withdrawTxResponse).to.not.equal(false);
                 expect(res.data.status).to.equal(200);
+                expect(res.data.message.tx).to.not.be.null;
 
             }));
         });

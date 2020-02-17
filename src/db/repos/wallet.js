@@ -31,8 +31,20 @@ class WalletsRepository extends MongoComponent{
     updateCurrencyAmount(id, currency, amount){
         return new Promise( (resolve, reject) => {
             WalletsRepository.prototype.schema.model.findByIdAndUpdate(id,
-                { $inc : { [currency] : parseFloat(amount).toFixed(6) } } ,{ new: true }
+                { $inc : { [currency] : amount } } ,{ new: true }
             )
+            .exec( (err, wallet) => {
+                if(err) { reject(err)}
+                resolve(wallet);
+            });
+        });
+    }
+
+    updateMaxWithdraw(wallet_id, amount){
+        return new Promise( (resolve, reject) => {
+            WalletsRepository.prototype.schema.model.findByIdAndUpdate(wallet_id, {
+                max_withdraw: amount
+            })
             .exec( (err, wallet) => {
                 if(err) { reject(err)}
                 resolve(wallet);
@@ -43,7 +55,7 @@ class WalletsRepository extends MongoComponent{
     updatePlayBalance(id, amount){
         return new Promise( (resolve, reject) => {
             WalletsRepository.prototype.schema.model.findByIdAndUpdate(id,
-                { $inc : { playBalance : parseFloat(amount).toFixed(6) } } ,{ new: true }
+                { $inc : { playBalance : amount } } ,{ new: true }
             )
             .exec( (err, wallet) => {
                 if(err) { reject(err)}

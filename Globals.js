@@ -7,7 +7,7 @@ import interfaces from "./logic/eth/interfaces";
 import ERC20TokenContract from "./logic/eth/ERC20Contract";
 import { Logger } from "./src/helpers/logger";
 
-let ETH_NETWORK = process.env.ETH_NETWORK || 'rinkeby';
+let ETH_NETWORK = process.env.ETH_NETWORK || 'kovan';
 
 const CONSTANTS = {
     net : ETH_NETWORK,

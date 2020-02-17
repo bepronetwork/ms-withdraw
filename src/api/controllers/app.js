@@ -1,6 +1,6 @@
-
 import {
-    App
+    App,
+    Wallet
 } from '../../models';
 import SecuritySingleton from '../helpers/security';
 import MiddlewareSingleton from '../helpers/middleware';
@@ -24,6 +24,18 @@ async function requestAppWithdraw(req, res) {
         let data = await app.requestWithdraw();
         MiddlewareSingleton.respond(res, data);
 	}catch(err){
+        MiddlewareSingleton.respondError(res, err);
+	}
+}
+
+async function setMaxWithdraw(req, res) {
+    try{
+        SecuritySingleton.verify({type : 'app', req});
+        let params = req.body;
+        let wallet = new Wallet(params);
+        let data = await wallet.setMaxWithdraw();
+        MiddlewareSingleton.respond(res, data);
+	} catch(err) {
         MiddlewareSingleton.respondError(res, err);
 	}
 }
@@ -55,5 +67,6 @@ async function getUserWithdraws(req, res) {
 export {
     requestAppWithdraw,
     finalizeAppWithdraw,
-    getUserWithdraws
+    getUserWithdraws,
+    setMaxWithdraw
 };

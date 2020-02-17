@@ -166,5 +166,9 @@
     "045" : {
         "key" : "CURRENCY_NOT_EXISTENT",
         "message"   : "Currency not existent in this App, please verify the ID"
+    },
+    "046" : {
+        "key": "MAX_WITHDRAW",
+        "message"   : "Withdrawal amount greater than the maximum allowed"
     }
 }

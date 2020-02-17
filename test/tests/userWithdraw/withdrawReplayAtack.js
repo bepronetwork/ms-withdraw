@@ -1,7 +1,6 @@
 import { mochaAsync, detectValidationErrors } from "../../utils/testing";
 import { Logger } from "../../utils/logger";
-import { createEthAccount, registerUser, userConfirmDeposit, loginUser } from "../../utils/env";
-import { userDepositToContract, appWithdrawForUser, getWithdrawalAmount } from "../../utils/eth";
+import { createEthAccount, registerUser, loginUser, depositWallet } from "../../utils/env";
 import { requestUserWithdraw } from "../../methods";
 import chai from 'chai';
 import Numbers from "../../logic/services/numbers";
@@ -20,13 +19,11 @@ context('Withdraw Replay Atack', async () => {
     global.test.currencies.forEach( async ticker => {
         
         describe(`${ticker}`, async () => {
-            var user, app, user_eth_account, contract, casino, currency, appWallet;
+            var user, app, user_eth_account, currency, appWallet;
             
             before( async () =>  {
 
                 app = global.test.app;
-                contract = global.test.contract;
-                casino = contract.casino;
                 appWallet = app.wallet.find( w => new String(w.currency.ticker).toLowerCase() == new String(ticker).toLowerCase());
                 currency = appWallet.currency;
                 /* Create User Address and give it ETH */
@@ -35,16 +32,10 @@ context('Withdraw Replay Atack', async () => {
                 /* Create User on Database */
                 user = await registerUser({address : user_eth_account.getAddress(), app_id : app.id});
                 user = await loginUser({username : user.username, password : user.password, app_id : app.id});
+                let userWallet = user.wallet.find( w => new String(w.currency.ticker).toLowerCase() == new String(ticker).toLowerCase());
 
                 /* Add Amount for User on Database */
-                let user_deposit_transaction = await userDepositToContract({eth_account : user_eth_account, tokenAmount : global.test.depositAmounts[ticker], currency, platformAddress : appWallet.bank_address});
-                await userConfirmDeposit({
-                    app_id : app.id,
-                    user : user,
-                    transactionHash : user_deposit_transaction.transactionHash,
-                    amount : global.test.depositAmounts[ticker],
-                    currency
-                })
+                await depositWallet({wallet_id : userWallet._id, amount : global.test.depositAmounts[ticker]});
             
             });
 

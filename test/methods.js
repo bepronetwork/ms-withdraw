@@ -9,7 +9,7 @@ export async function requestUserWithdraw(params, bearerToken, payload){
     .set("authorization", "Bearer " + bearerToken)
     .set("payload", getPayloadString(payload))
     .send(params)
-    .then(res => {return res.body;})
+    .then(res => detectServerError(res))
 
 };
 
@@ -19,7 +19,7 @@ export async function requestAppWithdraw(params, bearerToken, payload){
     .set("authorization", "Bearer " + bearerToken)
     .set("payload", getPayloadString(payload))
     .send(params)
-    .then(res => {return res.body})
+    .then(res => detectServerError(res))
 };
 
 export async function requestUserAffiliateWithdraw(params, bearerToken, payload){
@@ -28,7 +28,7 @@ export async function requestUserAffiliateWithdraw(params, bearerToken, payload)
     .set("authorization", "Bearer " + bearerToken)
     .set("payload", getPayloadString(payload))
     .send(params)
-    .then(res => {return res.body})
+    .then(res => detectServerError(res))
 };
 
 export async function finalizeUserWithdraw(params, bearerToken, payload){
@@ -37,7 +37,7 @@ export async function finalizeUserWithdraw(params, bearerToken, payload){
     .set("authorization", "Bearer " + bearerToken)
     .set("payload", getPayloadString(payload))
     .send(params)
-    .then(res => {return res.body})
+    .then(res => detectServerError(res))
 };
 
 export async function finalizeAppWithdraw(params, bearerToken, payload){
@@ -46,12 +46,21 @@ export async function finalizeAppWithdraw(params, bearerToken, payload){
     .set("authorization", "Bearer " + bearerToken)
     .set("payload", getPayloadString(payload))
     .send(params)
-    .then(res => {return res.body})
+    .then(res => detectServerError(res))
 };
 
 export async function getAppUserWithdraws(params, bearerToken, payload){
     return request(global.app)
     .post('/api/app/users/withdraws')
+    .set("authorization", "Bearer " + bearerToken)
+    .set("payload", getPayloadString(payload))
+    .send(params)
+    .then(res => detectServerError(res))
+};
+
+export async function setAppMaxWithdraw(params, bearerToken, payload){
+    return request(global.app)
+    .post('/api/withdraw/max/set')
     .set("authorization", "Bearer " + bearerToken)
     .set("payload", getPayloadString(payload))
     .send(params)
@@ -156,3 +165,15 @@ function getPayloadString(payloadObject){
     return JSON.stringify({ id : payloadObject.id })
 }
 
+
+
+function detectServerError(res){
+    if(res.body && !_.isEmpty(res.body)){
+        // Nothing
+    }else{
+        //Error on Server that does not show on testing since mocha hides server logs sometimes 
+        console.log(res.error);
+    }
+
+    return res.body;
+}

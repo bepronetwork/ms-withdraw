@@ -18,27 +18,29 @@ class ErrorManager {
     user = function (object, type){
         try{
             switch(type){
-               
                 case 'RequestWithdraw' : {
                     // Verify User
                     if(typeof object == 'undefined' || Object.is(object, null))
                         libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.USER_NOT_EXISTENT));
                     // Verify if Withdraw Amount is Positive
                     if(parseFloat(object.amount) <= 0)
-                        libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.NEGATIVE_AMOUNT))
+                        libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.NEGATIVE_AMOUNT));
+                    // verify amount < max withdraw
+                    if(parseFloat(object.amount) > parseFloat(object.max_withdraw))
+                        libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.MAX_WITHDRAW));
                     // Verify User is in App
                     if(!object.user_in_app)
                         throw libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.USER_NOT_EXISTENT_IN_APP));
                     // Verify if User does not have enough balance
                     if(!object.hasEnoughBalance){
                         libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.WITHDRAW_NOT_ENOUGH_BALANCE));
-                    }                    
+                    }
                     // Verify if Minimum Withdraw was passed
                     /*if(parseFloat(object.amount) < MIN_WITHDRAW){
                         libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.MIN_WITHDRAW_NOT_PASSED));
-                    }      */            
+                    }      */
                     break;
-                };               
+                };
                 case 'RequestAffiliateWithdraw' : {
                     // Verify User
                     if(typeof object == 'undefined' || Object.is(object, null))
@@ -63,14 +65,15 @@ class ErrorManager {
                     // Verify User
                     if(typeof object == 'undefined' || Object.is(object, null))
                         libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.USER_NOT_EXISTENT));
-                    if(!object.transactionIsValid)
-                        libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.TRANSACTION_NOT_VALID));  
                     // Verify User is in App
                     if(!object.user_in_app)
-                        throw libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.USER_NOT_EXISTENT_IN_APP));      
+                        throw libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.USER_NOT_EXISTENT_IN_APP));     
+                    // Verify if transaction exist
+                    if(!object.withdrawExists)
+                        libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.WITHDRAW_ID_NOT_DEFINED)); 
                     // Verify if transaction was already added
                     if(object.wasAlreadyAdded)
-                        libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.WITHDRAW_ALREADY_ADDED));
+                        libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.WITHDRAW_ALREADY_ADDED)); 
                     break;
                 }
             }
@@ -79,6 +82,20 @@ class ErrorManager {
         }
     }
     
+    wallet = function (wallet, type){
+        try{
+            switch(type){
+                case 'Register' : {  
+                    // Verify wallet (Syntax Error)
+                    if(typeof wallet == 'undefined' || Object.is(wallet, null))
+                        throw libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.USER_NOT_EXISTENT));
+    
+                }
+            }
+        }catch(err){
+            throw err
+        }
+    }
    
     app = function (object, type){
         try{
@@ -90,6 +107,9 @@ class ErrorManager {
                     // Verify if Withdraw Amoount is Positive
                     if(parseFloat(object.amount) <= 0)
                         libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.NEGATIVE_AMOUNT))
+                    // verify amount < max withdraw
+                    // if(parseFloat(object.amount) > parseFloat(object.max_withdraw))
+                    //     libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.MAX_WITHDRAW));
                     // Verify if App does not have enough balance
                     if(!object.hasEnoughBalance)
                         libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.WITHDRAW_NOT_ENOUGH_BALANCE))
@@ -110,9 +130,6 @@ class ErrorManager {
                     // Verify User
                     if(typeof object == 'undefined' || Object.is(object, null))
                         libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.APP_NOT_EXISTENT));
-                    // Verify if Transaction is not Valid
-                    if(!object.transactionIsValid)
-                        libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.TRANSACTION_NOT_VALID));  
                     // Verify if Address of User is the Same as the Withdraw one
                     if(!object.isValidAddress)
                         libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.APP_ADDRESS_IS_NOT_VALID));    

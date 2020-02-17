@@ -148,7 +148,7 @@ class WalletLogic extends LogicComponent {
 	}
 
 	async progress(params, progressAction){
-		try{			
+		try{
 			switch(progressAction) {
 				case 'Register' : {
 					return await library.progress.__register(params);
