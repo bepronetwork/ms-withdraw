@@ -185,7 +185,7 @@ class CasinoLogic{
                     break;
                 };
                 default : { 
-                    throw new Error('Internal Server Error')
+                    throw new Error('Contact Support, Action not Allowed')
                 }
             }
 
@@ -284,7 +284,7 @@ class CasinoLogic{
                     break;
                 };
                 default : { 
-                    throw new Error('Internal Server Error')
+                    throw new Error('Contact Support, Action not Allowed')
                 }
             }
             return {
