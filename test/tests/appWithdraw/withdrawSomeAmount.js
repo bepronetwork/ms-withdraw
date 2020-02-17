@@ -23,10 +23,10 @@ context('Withdraw All Amount', async () => {
 
             it('should be able to ask to withdraw all amount', mochaAsync(async () => {
                 app = (await getAppAuth({app : app.id}, app.bearerToken, {id : app.id})).data.message;
-                let balance = app.wallet.find( w => new String(w.currency.ticker).toLowerCase() == new String(ticker).toLowerCase()).playBalance;
-                console.log(balance);
+                let previousBalance = app.wallet.find( w => new String(w.currency.ticker).toLowerCase() == new String(ticker).toLowerCase()).playBalance;
+                
                 app_withdraw = await requestAppWithdraw({
-                    tokenAmount : balance,
+                    tokenAmount : previousBalance/4,
                     app : app.id,
                     address : admin_eth_account.getAddress(),
                     nonce  : 235934,
@@ -35,12 +35,12 @@ context('Withdraw All Amount', async () => {
                 const { status } = app_withdraw.data;
 
                 app = (await getAppAuth({app : app.id}, app.bearerToken, {id : app.id})).data.message;
-                balance = app.wallet.find( w => new String(w.currency.ticker).toLowerCase() == new String(ticker).toLowerCase()).playBalance;
+                let balance = app.wallet.find( w => new String(w.currency.ticker).toLowerCase() == new String(ticker).toLowerCase()).playBalance;
     
                 // Verify if middle states are met
                 expect(detectValidationErrors(app_withdraw)).to.be.equal(false);
                 expect(status).to.be.equal(200);
-                expect(parseFloat(balance)).to.be.equal(0);
+                expect(parseFloat(balance)).to.be.equal(parseFloat(previousBalance-previousBalance/4));
 
             }));
     
