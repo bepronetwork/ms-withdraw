@@ -46,19 +46,19 @@ context('Withdraw 0', async () => {
         expect(status).to.be.equal(2)
     }));
 
-    it('should amount > max withdraw ETH', mochaAsync(async () => {
+    // it('should amount > max withdraw ETH', mochaAsync(async () => {
 
-        let res = await requestUserWithdraw({
-            app : app.id,
-            tokenAmount : 22,
-            nonce : 2334535,
-            address : user_eth_account.getAddress(),
-            user : user.id,
-            currency : currency._id
-        }, user.bearerToken , {id : user.id});
+    //     let res = await requestUserWithdraw({
+    //         app : app.id,
+    //         tokenAmount : 22,
+    //         nonce : 2334535,
+    //         address : user_eth_account.getAddress(),
+    //         user : user.id,
+    //         currency : currency._id
+    //     }, user.bearerToken , {id : user.id});
 
-        expect(detectValidationErrors(res)).to.be.equal(false);
-        const { status } = res.data;
-        expect(status).to.be.equal(46)
-    }));
+    //     expect(detectValidationErrors(res)).to.be.equal(false);
+    //     const { status } = res.data;
+    //     expect(status).to.be.equal(46)
+    // }));
 });
