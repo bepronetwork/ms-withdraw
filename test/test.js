@@ -17,8 +17,9 @@ global.app = app;
 global.test = {};
 
 const initialState = {
-    owner : {
-        eth_balance : 0.20
+    eth : {
+        balance : 0.20,
+        deposit : 0.05
     }
 }
 
@@ -30,6 +31,7 @@ const runTests = async () => {
     .addFile('./test/tests/userWithdraw/index.js')
     .addFile('./test/tests/affiliateWithdraw/index.js')
     .addFile('./test/tests/appUserWithdraws/index.js')
+    .addFile('./test/tests/appWithdraw/withdrawAllAmount.js')
     .timeout(10*60*60*1000)
     .run()
     .on('fail', function(test, err) {
@@ -59,11 +61,10 @@ const test = async () => {
             /* Setup Ecosystem */
 
             /* Create Admin Address and give it ETH */
-            let admin_eth_account = await createEthAccount({ethAmount : initialState.owner.eth_balance});
+            let admin_eth_account = await createEthAccount({ethAmount : initialState.eth.balance});
             global.test.admin_eth_account = admin_eth_account;
 
             Logger.info("Account Admin ", admin_eth_account.getAddress());
-            console.log("a")
 
             let eco = (await getEcosystemData()).data.message;
 
@@ -127,18 +128,19 @@ const test = async () => {
             global.test.user = user;
 
             app = (await getAppAuth({app : admin.app.id}, admin.app.bearerToken, {id : admin.app.id})).data;
-            // App Deposit
-            await admin_eth_account.sendEther(0.05, app.message.wallet[0].bank_address);
-            // Wait for Deposit to Settle and funds to be there
-            await delay(30*1000);
+           
             global.test.app = app.message;
 
             global.test.currencies = [ 'eth' ];
             global.test.depositAmounts = {
                 'eth' : 0.01
             }
+            global.test.initialState = initialState;
 
-
+            // App Deposit
+            await admin_eth_account.sendEther(0.05, app.message.wallet[0].bank_address);
+            // Wait for Deposit to Settle and funds to be there
+            await delay(30*1000);
             global.test.ticker = global.test.currencies[0];
 
             await AppRepository.prototype.setOwnerAddress(admin.app.id, admin_eth_account.getAddress());
