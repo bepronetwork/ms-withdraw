@@ -1,16 +1,23 @@
 {
-    // Use o IntelliSense para aprender sobre possíveis atributos.
-    // Passe o mouse para ver as descrições dos atributos existentes.
-    // Para obter mais informações, visite: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug Tests",
+            "name": "mocha",
             "type": "node",
-            "request": "attach",
-            "protocol": "inspector",
-            "restart": true,
-            "skipFiles": ["<node_internals>/**"]
-        }
+            "request": "launch",
+            "program": "${workspaceRoot}/node_modules/.bin/mocha",
+            "stopOnEntry": false,
+            "args": ["--no-timeouts", "--colors"], //you can specify paths to specific tests here
+            "cwd": "${workspaceRoot}",
+            "runtimeExecutable": null,
+            "runtimeArgs": [
+                "--require",
+                "babel-core/register",
+                "--require",
+                "babel-polyfill"
+            ],
+            "env": {
+            "NODE_ENV": "development"
+        }}
     ]
 }
