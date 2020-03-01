@@ -261,7 +261,7 @@ const progressActions = {
             let attributes = {
                 TEXT: `There is a withdraw of ${params.amount} ${params.currency.ticker} in your account`
             };
-            new Mailer().sendEmail({app_id : params.app.id, user, action : 'USER_TEXT_DEPOSIT_AND_WITHDRAW', attributes});
+            new Mailer().sendEmail({app_id : params.app._id, user : params.user_id, action : 'USER_TEXT_DEPOSIT_AND_WITHDRAW', attributes});
             return {
                 tx : bitgo_tx.txid
             };
