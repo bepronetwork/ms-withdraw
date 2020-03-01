@@ -161,6 +161,15 @@ class ErrorManager {
             throw err
         }
     }
+    mailSender = function (object, type){
+        try{
+            switch(type){
+              
+            }
+        }catch(err){
+            throw err
+        }
+    }
 }
 
 export default ErrorManager;

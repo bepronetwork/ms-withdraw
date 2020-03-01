@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { ErrorManager } from '../controllers/Errors';
-import { AppRepository,  WalletsRepository,  UsersRepository, WithdrawRepository } from '../db/repos';
+import { AppRepository,  WalletsRepository,  UsersRepository, WithdrawRepository, MailSenderRepository } from '../db/repos';
 import LogicComponent from './logicComponent';
 import { Withdraw } from '../models';
 import CasinoContract from './eth/CasinoContract';
@@ -11,6 +11,8 @@ import { verifytransactionHashWithdrawApp } from './services/services';
 import {  detectCurrencyAmountToSmartContractAmount } from './utils/currencies';
 import BitGoSingleton from './third-parties/bitgo';
 import { Security } from '../controllers/Security';
+import { SendInBlueAttributes } from './third-parties';
+import { SendinBlueSingleton, SendInBlue } from './third-parties/sendInBlue';
 let error = new ErrorManager();
 
 
@@ -73,6 +75,12 @@ const processActions = {
         }catch(err){
             throw err;
         }
+    },
+    __editMailSenderIntegration : async (params) => {
+        let { app } = params;
+        app = await AppRepository.prototype.findAppById(app);
+        if(!app){throwError('APP_NOT_EXISTENT')};
+        return params;
     },
     __finalizeWithdraw : async (params) => {
 
@@ -154,6 +162,31 @@ const progressActions = {
 
         return withdrawSaveObject;
         
+    },
+    __editMailSenderIntegration : async (params) => {
+        let { apiKey, templateIds } = params;
+        let encryptedAPIKey = await Security.prototype.encryptData(apiKey);
+        let mailSender = await MailSenderRepository.prototype.findApiKeyByAppId(params.app);
+        let sendinBlueClient = new SendInBlue({key : apiKey});
+
+        /* Test functioning of Client */
+        await sendinBlueClient.getContacts();
+
+        if(!mailSender){ throwError();}
+
+        await MailSenderRepository.prototype.findByIdAndUpdate(mailSender._id, {
+            apiKey : encryptedAPIKey,
+            templateIds
+        });
+        
+        for (let attribute of SendInBlueAttributes){
+            await sendinBlueClient.createAttribute(attribute).catch((e)=>{
+                if(e.response.body.message !== "Attribute name must be unique") {
+                    // throwError();
+                }
+            });
+        }
+        return params;
     },
     __finalizeWithdraw : async (params) => {
 

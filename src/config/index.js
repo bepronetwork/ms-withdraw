@@ -37,6 +37,10 @@ export const QUOTA_GUARD_URL = process.env.QUOTA_GUARD_URL;
 
 export const IS_DEVELOPMENT = process.env.ENV == 'development';
 
+export const SENDINBLUE_API_KEY = process.env.SENDINBLUE_API_KEY;
+
+export const SENDINBLUE_EMAIL_TO = process.env.SENDINBLUE_EMAIL_TO;
+
 /* Variables */
 
 var ETH_NETWORK = config.eth;

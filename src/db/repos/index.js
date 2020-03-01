@@ -18,6 +18,8 @@ import AffiliateRepository from './affiliate';
 import AffiliateLinkRepository from './affiliateLink';
 import AffiliateStructureRepository from './affiliateStructure';
 import AffiliateSetupRepository from './affiliateSetup';
+import MailSenderRepository from "./mailSender";
+import IntegrationsRepository from './integrations';
 
 export{
     AffiliateLinkRepository,
@@ -39,5 +41,7 @@ export{
     ResultSpacesRepository,
     DepositRepository,
     BetsRepository,
-    AdminsRepository
+    AdminsRepository,
+    MailSenderRepository,
+    IntegrationsRepository
 }  

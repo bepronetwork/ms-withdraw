@@ -142,6 +142,15 @@ export async function getAppAuth(params, bearerToken, payload) {
     })).data;
 }
 
+export async function editAppMailSenderIntegration(params, bearerToken, payload){
+    return (await axios.post(`${MS_MASTER_URL}/api/app/integrations/mailSender/edit`, params,{
+        headers : {
+            "authorization" : `Bearer ${bearerToken}`,
+            "payload" : getPayloadString(payload)
+        }
+    })).data;
+}
+
 export async function updateAppWallet(params, bearerToken, payload){
     return (await axios.post(`${MS_MASTER_URL}/api/app/updateWallet`, params, {
         headers : {

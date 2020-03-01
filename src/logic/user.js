@@ -13,6 +13,7 @@ import { verifytransactionHashWithdrawUser } from './services/services';
 import { detectCurrencyAmountToSmartContractAmount } from './utils/currencies';
 import BitGoSingleton from './third-parties/bitgo';
 import { Security } from '../controllers/Security';
+import Mailer from './services/mailer';
 let error = new ErrorManager();
 
 
@@ -256,7 +257,11 @@ const progressActions = {
                 bitgo_id                :   bitgo_tx.transfer.id,
                 last_update_timestamp   :   new Date()                           
             });
-
+            /* Send Email */
+            let attributes = {
+                TEXT: `There is a withdraw of ${params.amount} ${params.currency.ticker} in your account`
+            };
+            new Mailer().sendEmail({app_id : params.app.id, user, action : 'USER_TEXT_DEPOSIT_AND_WITHDRAW', attributes});
             return {
                 tx : bitgo_tx.txid
             };
