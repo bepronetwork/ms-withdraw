@@ -54,7 +54,8 @@ class WithdrawRepository extends MongoComponent{
                         status                  : 'Processed',
                         transactionHash         : params.transactionHash,
                         logId                   : params.logId,
-                        last_update_timestamp   : params.last_update_timestamp
+                        last_update_timestamp   : params.last_update_timestamp,
+                        link_url                : params.link_url
                 }},{ new: true }
             )
             .exec( (err, Withdraw) => {

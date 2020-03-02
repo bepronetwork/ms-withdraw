@@ -13,7 +13,8 @@ WalletSchema.prototype.schema = {
     max_deposit                 : { type: Number, default: 1},
     max_withdraw                : { type: Number, default: 1},
     bitgo_id                    : { type: String},
-    hashed_passphrase           : { type : String}
+    hashed_passphrase           : { type : String},
+    link_url                    : { type: String, default : null}
 }
 
 WalletSchema.prototype.model = db.model(WalletSchema.prototype.name, new db.Schema(WalletSchema.prototype.schema));

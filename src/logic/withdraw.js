@@ -54,7 +54,8 @@ const processActions = {
             transactionHash         : params.transactionHash,
             amount                  : params.amount,
             confirmations           : params.confirmations || 0,
-            maxConfirmations        : params.maxConfirmations || 0,
+			maxConfirmations        : params.maxConfirmations || 0,
+			link_url				: params.link_url,
             ...params
 		}
 		return normalized;
