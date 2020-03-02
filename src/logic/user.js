@@ -258,10 +258,11 @@ const progressActions = {
                 last_update_timestamp   :   new Date()                           
             });
             /* Send Email */
+            let templateWithDraw = template.find(a => {return a.functionName === "USER_TEXT_DEPOSIT_AND_WITHDRAW"})
             let attributes = {
-                TEXT: `There is a withdraw of ${params.amount} ${params.currency.ticker} in your account`
+                TEXT: templateWithDraw.TEXT({amount: params.amount, ticker: params.wallet.currency.ticker})
             };
-            new Mailer().sendEmail({app_id : params.app._id, user : params.user_id, action : 'USER_TEXT_DEPOSIT_AND_WITHDRAW', attributes});
+            new Mailer().sendEmail({app_id : params.app.id, user : params.user_id, action : 'USER_TEXT_DEPOSIT_AND_WITHDRAW', attributes});
             return {
                 tx : bitgo_tx.txid
             };
