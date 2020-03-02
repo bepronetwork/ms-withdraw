@@ -11,6 +11,7 @@ import { verifytransactionHashWithdrawApp } from './services/services';
 import {  detectCurrencyAmountToSmartContractAmount } from './utils/currencies';
 import BitGoSingleton from './third-parties/bitgo';
 import { Security } from '../controllers/Security';
+import { setLinkUrl } from '../helpers/linkUrl';
 let error = new ErrorManager();
 
 
@@ -96,7 +97,7 @@ const processActions = {
     
         /* Verify if Ap Address is Valid */
         let isValidAddress = true;
-        
+
         let res = {
             withdrawExists,
             withdraw_id : params.withdraw_id,
@@ -111,7 +112,7 @@ const processActions = {
             app,
             withdrawAddress     : withdraw.address
         }
-        
+
         return res;
     },
     __getUsersWithdraws : async (params) => {
@@ -164,12 +165,15 @@ const progressActions = {
             address : params.withdrawAddress, 
             passphrase : Security.prototype.decryptData(params.wallet.hashed_passphrase)
         });
+        
+        let link_url = setLinkUrl({ticker : params.currency.ticker, address : bitgo_tx.txid, isTransactionHash : true })
 
         /* Add Withdraw to user */
-        await WithdrawRepository.prototype.finalizeWithdraw(params.withdraw_id, {
+        let text = await WithdrawRepository.prototype.finalizeWithdraw(params.withdraw_id, {
             transactionHash         :   bitgo_tx.txid,
             bitgo_id                :   bitgo_tx.transfer.id,
-            last_update_timestamp   :   new Date()                        
+            last_update_timestamp   :   new Date(),
+            link_url                :   link_url                      
         })
 
         return {
