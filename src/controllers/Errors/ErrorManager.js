@@ -28,6 +28,9 @@ class ErrorManager {
                     // verify amount < max withdraw
                     if(parseFloat(object.amount) > parseFloat(object.max_withdraw))
                         libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.MAX_WITHDRAW));
+                    // Verify email is confirmed
+                    if(!object.emailConfirmed)
+                        libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.EMAIL_NOT_CONFIRMED));
                     // Verify User is in App
                     if(!object.user_in_app)
                         throw libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.USER_NOT_EXISTENT_IN_APP));
