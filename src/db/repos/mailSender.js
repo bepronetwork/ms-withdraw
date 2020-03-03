@@ -43,7 +43,9 @@ class MailSenderRepository extends MongoComponent{
     findApiKeyByAppId(app_id){ 
         return new Promise( async (resolve, reject) => {
             let app = await AppRepository.prototype.findAppById(app_id);
-            let integration = await IntegrationsRepository.prototype.findById(app.integrations);
+            console.log("APPP:: ",app.bearerToken)
+            let integration = await IntegrationsRepository.prototype.findById(app.integrations.id);
+            console.log("integration::: ",integration)
             resolve(await MailSenderRepository.prototype.findById(integration.mailSender));
         });
     }

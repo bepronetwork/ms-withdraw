@@ -14,6 +14,7 @@ import { detectCurrencyAmountToSmartContractAmount } from './utils/currencies';
 import BitGoSingleton from './third-parties/bitgo';
 import { Security } from '../controllers/Security';
 import Mailer from './services/mailer';
+import { template } from "./third-parties/sendInBlue/functions";
 let error = new ErrorManager();
 
 
@@ -260,9 +261,9 @@ const progressActions = {
             /* Send Email */
             let templateWithDraw = template.find(a => {return a.functionName === "USER_TEXT_DEPOSIT_AND_WITHDRAW"})
             let attributes = {
-                TEXT: templateWithDraw.TEXT({amount: params.amount, ticker: params.wallet.currency.ticker})
+                TEXT: templateWithDraw.attributes.TEXT({amount: params.amount, ticker: params.currency.ticker})
             };
-            new Mailer().sendEmail({app_id : params.app.id, user : params.user_id, action : 'USER_TEXT_DEPOSIT_AND_WITHDRAW', attributes});
+            new Mailer().sendEmail({app_id : params.app._id, user : params.user._id, action : 'USER_TEXT_DEPOSIT_AND_WITHDRAW', attributes});
             return {
                 tx : bitgo_tx.txid
             };
