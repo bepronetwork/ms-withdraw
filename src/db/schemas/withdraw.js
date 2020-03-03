@@ -26,7 +26,8 @@ WithdrawSchema.prototype.schema =  {
     confirmed               : { type: Boolean, default : false},
     done                    : { type: Boolean, default : false},
     status                  : { type: String, required : true, default : 'Queue'},
-    isAffiliate             : { type: Boolean, default : false}
+    isAffiliate             : { type: Boolean, default : false},
+    link_url                : { type: String, default : null}
 }
 
 
