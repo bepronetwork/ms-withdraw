@@ -260,8 +260,6 @@ const progressActions = {
             });
             /* Send Email */
             let mail = new Mailer();
-            console.log(params.amount)
-            console.log(params.currency.ticker)
             let attributes = {
                 TEXT: mail.setTextDeposit({amount : params.amount, ticker : params.currency.ticker, isDeposit : false})
             };

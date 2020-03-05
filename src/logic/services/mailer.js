@@ -9,11 +9,9 @@ class Mailer{
     
     setTextDeposit ({amount, ticker, isDeposit}){
         if(isDeposit){
-            console.log(12)
             let textDeposit = `There is a deposit of ${amount} ${ticker} in your account`
             return textDeposit;
         } else {
-            console.log(16)
             let textWithdraw = `There is a withdraw of ${amount} ${ticker} in your account`
             return textWithdraw;
         }
@@ -21,7 +19,6 @@ class Mailer{
 
     async sendEmail({app_id, user, action, attributes={}}){
         let send = await MailSenderRepository.prototype.findApiKeyByAppId(app_id);
-        console.log(send)
         try{
             if ((send.apiKey != null) && (send.apiKey != undefined)) {
                 let template = send.templateIds.find((t) => { return t.functionName == action });
@@ -44,8 +41,6 @@ class Mailer{
                 } catch (e) {
                    await sendinBlueClient.updateContact(user.email, attributes);
                 }
-                console.log("templateId",templateId)
-                console.log("user.email",user.email)
                 await sendinBlueClient.sendTemplate(templateId, [user.email]);
             }
 
