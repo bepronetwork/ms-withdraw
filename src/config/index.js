@@ -41,6 +41,8 @@ export const SENDINBLUE_API_KEY = process.env.SENDINBLUE_API_KEY;
 
 export const SENDINBLUE_EMAIL_TO = process.env.SENDINBLUE_EMAIL_TO;
 
+export const ENV = process.env.ENV;
+
 /* Variables */
 
 var ETH_NETWORK = config.eth;
