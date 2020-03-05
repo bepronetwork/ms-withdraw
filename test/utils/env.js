@@ -8,6 +8,7 @@ import {
 } from '../methods';
 import { globals } from "../Globals";
 import { WalletsRepository } from "../db/repos";
+import { UsersRepository } from "../db/repos";
 
 export async function createEthAccount({ethAmount}){
     /* Create User Address and give it ETH */
@@ -51,7 +52,7 @@ export async function registerAdmin(){
     return {...res.data.message, username, password};
 }
 
-export async function registerUser({address, app_id}){
+export async function registerUser({address, app_id}, emailConfirmed=true){
     let password = 'test123';
     let username = 'Daf' + Math.random(234234)*199999;
     /* Create User on Database */
@@ -70,6 +71,14 @@ export async function registerUser({address, app_id}){
         ...postData,
         app_id : app_id
     }));
+
+    if(emailConfirmed){
+        await UsersRepository.prototype.updateConfirmEmail({
+            username: user.username,
+            confirm: emailConfirmed
+        });
+    }
+
     return { ...user, password, username };
 }
 

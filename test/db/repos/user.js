@@ -207,6 +207,23 @@ class UsersRepository extends MongoComponent{
         });
     }
 
+    updateConfirmEmail({username, confirm}) {
+        try{
+            return new Promise( (resolve, reject) => {
+                UsersRepository.prototype.schema.model.findOneAndUpdate(
+                    { username },
+                    { $set: { "email_confirmed" : confirm } }
+                )
+                .exec( (err, item) => {
+                    if(err){reject(err)}
+                    resolve(item);
+                });
+            });
+        }catch(err){
+            throw (err)
+        }
+    }
+
     async findUserByAddress({address, app}){
         try{
             return new Promise( (resolve, reject) => {

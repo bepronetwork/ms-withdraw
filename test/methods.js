@@ -77,6 +77,11 @@ export async function addCurrencyWalletToApp(params, bearerToken, payload) {
     })
 }
 
+
+export async function confirmEmail(params) {
+    return (await axios.post(`${MS_MASTER_URL}/api/users/email/confirm`, params)).data;
+}
+
 export async function getEcosystemData(){
     return (await axios.get(`${MS_MASTER_URL}/api/ecosystem/all`)).data
 }
