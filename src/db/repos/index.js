@@ -20,6 +20,7 @@ import AffiliateStructureRepository from './affiliateStructure';
 import AffiliateSetupRepository from './affiliateSetup';
 import MailSenderRepository from "./mailSender";
 import IntegrationsRepository from './integrations';
+import ChatRepository from "./chat";
 
 export{
     AffiliateLinkRepository,
@@ -43,5 +44,6 @@ export{
     BetsRepository,
     AdminsRepository,
     MailSenderRepository,
-    IntegrationsRepository
+    IntegrationsRepository,
+    ChatRepository
 }  

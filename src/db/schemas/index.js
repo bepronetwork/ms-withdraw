@@ -13,6 +13,7 @@ import { AffiliateStructureSchema } from './affiliateStructure';
 import { CurrencySchema } from './currency';
 import { MailSenderSchema } from './integrations/mailSender';
 import { IntegrationsSchema } from "./integrations";
+import { ChatSchema } from './integrations/chat';
 
 export {
     UserSchema,
@@ -29,5 +30,6 @@ export {
     AdminSchema,
     ResultSpaceSchema,
     MailSenderSchema,
-    IntegrationsSchema
+    IntegrationsSchema,
+    ChatSchema
 }

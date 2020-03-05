@@ -1,4 +1,5 @@
 import populate_wallet_all from "./wallet/all";
+import populate_integrations_all from "./integrations/all";
 
 
 let populate_user = [
@@ -23,7 +24,13 @@ let populate_user = [
                 model : 'Wallet',
                 select : { '__v': 0},
                 populate : populate_wallet_all
-            }
+            },
+            {
+                path : 'integrations',
+                model : 'Integrations',
+                select : { '__v': 0},
+                populate : populate_integrations_all
+            },
         ]
     },
     {

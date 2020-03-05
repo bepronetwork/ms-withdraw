@@ -7,7 +7,8 @@ class IntegrationsSchema{};
 IntegrationsSchema.prototype.name = 'Integrations';
 
 IntegrationsSchema.prototype.schema =  {
-    mailSender  : { type : mongoose.Schema.Types.ObjectId, ref: 'MailSender', required : true }
+    chat        : { type : mongoose.Schema.Types.ObjectId, ref: 'Chat', required : true },
+    mailSender  : { type : mongoose.Schema.Types.ObjectId, ref: 'MailSender', required : true },
 }
 
 

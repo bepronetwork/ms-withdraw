@@ -4,6 +4,7 @@ import WithdrawLogic from './withdraw';
 import WalletLogic from './wallet';
 import IntegrationsLogic from './integrations';
 import MailSenderLogic from './mailSender';
+import ChatLogic from './chat';
 
 
 export {
@@ -12,6 +13,7 @@ export {
     WithdrawLogic,
     WalletLogic,
     IntegrationsLogic,
-    MailSenderLogic
+    MailSenderLogic,
+    ChatLogic
 }
 

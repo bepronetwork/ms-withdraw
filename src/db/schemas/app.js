@@ -30,7 +30,8 @@ AppSchema.prototype.schema =  {
     platformTokenAddress: { type : String },
     licensesId          : [{ type: String}],
     metadataJSON        : {  type: JSON},
-    isWithdrawing       : { type : Boolean, default : false, required : true }
+    isWithdrawing       : { type : Boolean, default : false, required : true },
+    integrations        : { type: mongoose.Schema.Types.ObjectId, ref: 'Integrations'},
 }
 
 

@@ -259,11 +259,13 @@ const progressActions = {
                 last_update_timestamp   :   new Date()                           
             });
             /* Send Email */
-            let templateWithDraw = template.find(a => {return a.functionName === "USER_TEXT_DEPOSIT_AND_WITHDRAW"})
+            let mail = new Mailer();
+            console.log(params.amount)
+            console.log(params.currency.ticker)
             let attributes = {
-                TEXT: templateWithDraw.attributes.TEXT({amount: params.amount, ticker: params.currency.ticker})
+                TEXT: mail.setTextDeposit({amount : params.amount, ticker : params.currency.ticker, isDeposit : false})
             };
-            new Mailer().sendEmail({app_id : params.app._id, user : params.user._id, action : 'USER_TEXT_DEPOSIT_AND_WITHDRAW', attributes});
+            mail.sendEmail({app_id : params.app._id, user : params.user, action : 'USER_TEXT_DEPOSIT_AND_WITHDRAW', attributes});
             return {
                 tx : bitgo_tx.txid
             };

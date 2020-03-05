@@ -2,13 +2,26 @@ import { MailSenderRepository } from "../../db/repos";
 import { Security } from "../../controllers/Security";
 import { Logger } from "../../helpers/logger";
 import { SendInBlue } from "../third-parties/sendInBlue";
+import { throwError } from "../../controllers/Errors/ErrorManager";
 
 class Mailer{
     constructor(){}
-
+    
+    setTextDeposit ({amount, ticker, isDeposit}){
+        if(isDeposit){
+            console.log(12)
+            let textDeposit = `There is a deposit of ${amount} ${ticker} in your account`
+            return textDeposit;
+        } else {
+            console.log(16)
+            let textWithdraw = `There is a withdraw of ${amount} ${ticker} in your account`
+            return textWithdraw;
+        }
+    };
 
     async sendEmail({app_id, user, action, attributes={}}){
         let send = await MailSenderRepository.prototype.findApiKeyByAppId(app_id);
+        console.log(send)
         try{
             if ((send.apiKey != null) && (send.apiKey != undefined)) {
                 let template = send.templateIds.find((t) => { return t.functionName == action });
@@ -29,8 +42,10 @@ class Mailer{
                 try {
                     await sendinBlueClient.createContact(user.email, attributes, [listIds]);
                 } catch (e) {
-                    await sendinBlueClient.updateContact(user.email, attributes);
+                   await sendinBlueClient.updateContact(user.email, attributes);
                 }
+                console.log("templateId",templateId)
+                console.log("user.email",user.email)
                 await sendinBlueClient.sendTemplate(templateId, [user.email]);
             }
 

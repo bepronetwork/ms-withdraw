@@ -1,3 +1,4 @@
+import populate_integrations_all from "../integrations/all";
 
 let populate_app_affiliates = [
     {   
@@ -16,6 +17,12 @@ let populate_app_affiliates = [
                 select : { '__v': 0}
             }
         ]
+    },
+    {
+        path : 'integrations',
+        model : 'Integrations',
+        select : { '__v': 0 },
+        populate : populate_integrations_all
     },
 ] 
 
