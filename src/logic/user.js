@@ -80,10 +80,11 @@ const processActions = {
                 user : user,
                 app : app,
                 nonce : params.nonce,
-                isAlreadyWithdrawingAPI : user.isWithdrawing
+                isAlreadyWithdrawingAPI : user.isWithdrawing,
+                emailConfirmed : (user.email_confirmed != undefined && user.email_confirmed === true )
             }
             return res;
-        }catch(err){ 
+        } catch(err) {
             throw err;
         }
     },

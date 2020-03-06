@@ -9,6 +9,15 @@ class Middleware{
     constructor(){}
 
 
+    generateTokenEmail(email) {
+        try{
+            let token = jwt.sign({ email }, privateKEY, { algorithm: 'RS256' });
+            return token;
+        }catch(err){
+            throw err;
+        }
+    }
+
     sign(payload){
         try{
             return jwt.sign({ id : 'Auth/' + payload }, privateKEY, { algorithm: 'RS256' });
