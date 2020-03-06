@@ -24,23 +24,25 @@ context('Withdraw Max', async () => {
     });
 
     it('should set max for ETH success', mochaAsync(async () => {
-        app = (await getAppAuth({app : app.id}, app.bearerToken, {id : app.id})).data.message;
+        app = (await getAppAuth({app : app.id, admin: admin.id}, admin.security.bearerToken, {id : admin.id})).data.message;
         let dataMaxDeposit = await setAppMaxWithdraw({
             app         : app.id,
+            admin       : admin.id,
             wallet_id   : appWallet._id,
             amount      : 20,
-        }, app.bearerToken, {id : app.id});
+        }, admin.security.bearerToken, {id : admin.id});
         expect(dataMaxDeposit.data.status).to.be.equal(200);
         expect(dataMaxDeposit.data.status).to.not.be.null;
     }));
 
     it('should set max for ETH not auth', mochaAsync(async () => {
-        app = (await getAppAuth({app : app.id}, app.bearerToken, {id : app.id})).data.message;
+        app = (await getAppAuth({app : app.id, admin: admin.id}, admin.security.bearerToken, {id : admin.id})).data.message;
         let dataMaxDeposit = await setAppMaxWithdraw({
+            admin       : admin.id,
             app         : app.id,
             wallet_id   : appWallet._id,
             amount      : 20,
-        }, null, {id : app.id});
+        }, null, {id : admin.id});
         expect(dataMaxDeposit.data.status).to.be.equal(304);
         expect(dataMaxDeposit.data.status).to.not.be.null;
     }));

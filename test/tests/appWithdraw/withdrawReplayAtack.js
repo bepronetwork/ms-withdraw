@@ -18,7 +18,7 @@ context('Withdraw Replay Atack', async () => {
 
     it('should be able to withdraw only once, and phoibit second', mochaAsync(async () => {
     
-        app = (await getAppAuth({app : app.id}, app.bearerToken, {id : app.id})).data.message;
+        app = (await getAppAuth({app : app.id, admin: admin.id}, admin.security.bearerToken, {id : admin.id})).data.message;
         let balance = app.wallet.find( w => new String(w.currency.ticker).toLowerCase() == new String(global.test.ticker).toLowerCase()).playBalance;
 
         const initialBalance = balance;
@@ -32,16 +32,18 @@ context('Withdraw Replay Atack', async () => {
             nonce : 3456365756,
             currency : currency._id,
             app : app.id,
+            admin: admin.id,
             address : admin_eth_account.getAddress(),
-        }, app.bearerToken , {id : app.id});
+        }, admin.security.bearerToken , {id : admin.id});
 
         let res_replay_attack = await requestAppWithdraw({
             tokenAmount : deposit, 
             nonce : 3456365756,
             app : app.id,
+            admin : admin.id,
             currency : currency._id,
             address : admin_eth_account.getAddress(),
-        }, app.bearerToken , {id : app.id});
+        }, admin.security.bearerToken , {id : admin.id});
         
         let ret = await Promise.resolve(await res);
         const status_1 = ret.data.status;
@@ -49,7 +51,7 @@ context('Withdraw Replay Atack', async () => {
 
         const { status , message } = res_replay_attack.data;
 
-        app = (await getAppAuth({app : app.id}, app.bearerToken, {id : app.id})).data.message;
+        app = (await getAppAuth({app : app.id, admin: admin.id}, admin.security.bearerToken, {id : admin.id})).data.message;
         balance = app.wallet.find( w => new String(w.currency.ticker).toLowerCase() == new String(global.test.ticker).toLowerCase()).playBalance;
 
         expect(parseFloat(balance).toFixed(6)).to.be.equal(parseFloat(initialBalance-deposit).toFixed(6));
@@ -72,9 +74,10 @@ context('Withdraw Replay Atack', async () => {
 
         let res = await finalizeAppWithdraw({
             app : app.id,
+            admin : admin.id,
             withdraw_id : app_withdraw._id,
             currency : currency._id
-        }, app.bearerToken , {id : app.id});
+        }, admin.security.bearerToken , {id : admin.id});
         expect(res.data.status).to.equal(200);
         expect(res.data.message.transactionHash).to.not.be.null;
     }));

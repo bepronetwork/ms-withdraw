@@ -19,6 +19,7 @@ context('Withdraw All Amount', async () => {
             before( async () =>  {
 
                 app = global.test.app;
+                admin = global.test.admin;
                 contract = global.test.contract;
                 appWallet = app.wallet.find( w => new String(w.currency.ticker).toLowerCase() == new String(global.test.ticker).toLowerCase());
                 currency = appWallet.currency;
@@ -38,10 +39,11 @@ context('Withdraw All Amount', async () => {
                     tokenAmount : global.test.depositAmounts[global.test.ticker]/4,
                     nonce : 3456365756,
                     app : app.id,
+                    admin: admin.id,
                     address : user_eth_account.getAddress(),
                     user : user.id,
                     currency : currency._id
-                }, user.bearerToken , {id : user.id});
+                }, admin.security.bearerToken , {id : admin.id});
 
                 expect(detectValidationErrors(res)).to.be.equal(false);
                 const { status } = res.data;
@@ -50,15 +52,16 @@ context('Withdraw All Amount', async () => {
 
             it('should be able withdraw all Amount', mochaAsync(async () => {
 
-                let withdraws_res = await getAppUserWithdraws({app : app.id }, app.bearerToken , {id : app.id});
+                let withdraws_res = await getAppUserWithdraws({app : app.id, admin: admin.id }, admin.security.bearerToken , {id : admin.id});
                 const { message } = withdraws_res.data;
 
                 let res = await finalizeUserWithdraw({
+                    admin: admin.id,
                     app : app.id,
                     user : user.id,
                     withdraw_id : message[0]._id,
                     currency : currency._id
-                }, app.bearerToken , {id : app.id});
+                }, admin.security.bearerToken , {id : admin.id});
 
                 expect(res.data.status).to.equal(200);
                 expect(res.data.message.tx).to.not.be.null;
