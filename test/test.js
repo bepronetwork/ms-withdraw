@@ -97,7 +97,7 @@ const test = async () => {
             app = (await registerApp(postData)).data.message;
             admin = (await loginAdmin(postDataAdmin)).data.message;
 
-            app = (await getAppAuth({app : admin.app.id, admin: admin.id}, admin.security.bearerToken, {id : admin.id})).data;
+            app = (await getAppAuth({app : admin.app.id, admin: admin.id}, admin.bearerToken, {id : admin.id})).data;
             global.test.app = app;
             /* Add Currency Wallet */
 
@@ -108,7 +108,7 @@ const test = async () => {
                 currency_id : currencyETH._id
             };
 
-            await addCurrencyWalletToApp({...postData, admin: admin.id}, admin.security.bearerToken , {id : admin.id});  
+            await addCurrencyWalletToApp({...postData, admin: admin.id}, admin.bearerToken , {id : admin.id});  
             /* User Register */
             var postDataUser = {
                 username : "sdfg" + parseInt(Math.random()*10000),
@@ -126,7 +126,7 @@ const test = async () => {
             user = (await loginUser(postData)).data.message;
             global.test.user = user;
 
-            app = (await getAppAuth({app : admin.app.id, admin: admin.id}, admin.security.bearerToken, {id : admin.id})).data;
+            app = (await getAppAuth({app : admin.app.id, admin: admin.id}, admin.bearerToken, {id : admin.id})).data;
            
             global.test.app = app.message;
 

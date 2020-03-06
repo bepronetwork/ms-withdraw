@@ -22,7 +22,7 @@ context('Withdraw All Amount', async () => {
             });
 
             it('should be able to ask to withdraw all amount', mochaAsync(async () => {
-                app = (await getAppAuth({app : app.id, admin: admin.id}, admin.security.bearerToken, {id : admin.id})).data.message;
+                app = (await getAppAuth({app : app.id, admin: admin.id}, admin.bearerToken, {id : admin.id})).data.message;
                 let previousBalance = app.wallet.find( w => new String(w.currency.ticker).toLowerCase() == new String(ticker).toLowerCase()).playBalance;
                 
                 app_withdraw = await requestAppWithdraw({
@@ -32,10 +32,10 @@ context('Withdraw All Amount', async () => {
                     nonce  : 235934,
                     currency : currency._id,
                     admin: admin.id
-                }, admin.security.bearerToken , {id : admin.id});
+                }, admin.bearerToken , {id : admin.id});
                 const { status } = app_withdraw.data;
 
-                app = (await getAppAuth({app : app.id, admin: admin.id}, admin.security.bearerToken, {id : admin.id})).data.message;
+                app = (await getAppAuth({app : app.id, admin: admin.id}, admin.bearerToken, {id : admin.id})).data.message;
                 let balance = app.wallet.find( w => new String(w.currency.ticker).toLowerCase() == new String(ticker).toLowerCase()).playBalance;
     
                 // Verify if middle states are met
@@ -51,7 +51,7 @@ context('Withdraw All Amount', async () => {
                     withdraw_id : app_withdraw.data.message._id,
                     currency : currency._id,
                     admin : admin.id
-                }, admin.security.bearerToken , {id : admin.id});
+                }, admin.bearerToken , {id : admin.id});
 
                 expect(res.data.status).to.equal(200);
                 expect(res.data.message.transactionHash).to.not.be.null;

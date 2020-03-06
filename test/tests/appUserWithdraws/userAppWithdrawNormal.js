@@ -19,7 +19,7 @@ context('Get App Users Withdraw Normal', async () => {
         let res = await getAppUserWithdraws({
             app : app.id,
             admin: admin.id,
-        }, admin.security.bearerToken , {id : admin.id});
+        }, admin.bearerToken , {id : admin.id});
 
         expect(detectValidationErrors(res)).to.be.equal(false);
         const { status, message } = res.data;
@@ -32,7 +32,7 @@ context('Get App Users Withdraw Normal', async () => {
             app : app.id,
             admin: admin.id,
             status : 'Queue'
-        }, admin.security.bearerToken , {id : admin.id});
+        }, admin.bearerToken , {id : admin.id});
 
         expect(detectValidationErrors(res)).to.be.equal(false);
         const { status, message } = res.data;
@@ -46,7 +46,7 @@ context('Get App Users Withdraw Normal', async () => {
             app : app.id,
             admin: admin.id,
             status : 'Processed'
-        }, admin.security.bearerToken , {id : admin.id});
+        }, admin.bearerToken , {id : admin.id});
         expect(detectValidationErrors(res)).to.be.equal(false);
         const { status, message } = res.data;
         expect(status).to.be.equal(200);

@@ -57,7 +57,7 @@ context('Withdraw Some Amount', async () => {
 
             it('should be able withdraw some Amount', mochaAsync(async () => {
 
-                let withdraws_res = await getAppUserWithdraws({app : app.id, user : user.id, admin: admin.id}, admin.security.bearerToken , {id : admin.id});
+                let withdraws_res = await getAppUserWithdraws({app : app.id, user : user.id, admin: admin.id}, admin.bearerToken , {id : admin.id});
                 const { message } = withdraws_res.data;
 
                 let res = await finalizeUserWithdraw({
@@ -66,7 +66,7 @@ context('Withdraw Some Amount', async () => {
                     user : user.id,
                     withdraw_id : message[0]._id,
                     currency : currency._id
-                }, admin.security.bearerToken , {id : admin.id});
+                }, admin.bearerToken , {id : admin.id});
 
                 expect(res.data.status).to.equal(200);
             }));
