@@ -7,12 +7,13 @@ import { throwError } from "../../controllers/Errors/ErrorManager";
 class Mailer{
     constructor(){}
     
-    setTextDeposit ({amount, ticker, isDeposit}){
-        if(isDeposit){
-            let textDeposit = `There is a deposit of ${amount} ${ticker} in your account`
-            return textDeposit;
-        } else {
-            let textWithdraw = `There is a withdraw of ${amount} ${ticker} in your account`
+    setTextNotification(TYPE_NOTIFICATION, AMOUNT = '', TICKER = '') {
+        switch (TYPE_NOTIFICATION) {
+            case 'DEPOSIT':
+                let textDeposit = `There is a deposit of ${AMOUNT} ${TICKER} in your account`
+                return textDeposit;
+            case 'WITHDRAW':
+                let textWithdraw = `There is a withdraw of ${AMOUNT} ${TICKER} in your account`
             return textWithdraw;
         }
     };

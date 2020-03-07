@@ -77,12 +77,6 @@ const processActions = {
             throw err;
         }
     },
-    __editMailSenderIntegration : async (params) => {
-        let { app } = params;
-        app = await AppRepository.prototype.findAppById(app);
-        if(!app){throwError('APP_NOT_EXISTENT')};
-        return params;
-    },
     __finalizeWithdraw : async (params) => {
 
         var params_input = params;
@@ -163,31 +157,6 @@ const progressActions = {
 
         return withdrawSaveObject;
         
-    },
-    __editMailSenderIntegration : async (params) => {
-        let { apiKey, templateIds } = params;
-        let encryptedAPIKey = await Security.prototype.encryptData(apiKey);
-        let mailSender = await MailSenderRepository.prototype.findApiKeyByAppId(params.app);
-        let sendinBlueClient = new SendInBlue({key : apiKey});
-
-        /* Test functioning of Client */
-        await sendinBlueClient.getContacts();
-
-        if(!mailSender){ throwError();}
-
-        await MailSenderRepository.prototype.findByIdAndUpdate(mailSender._id, {
-            apiKey : encryptedAPIKey,
-            templateIds
-        });
-        
-        for (let attribute of SendInBlueAttributes){
-            await sendinBlueClient.createAttribute(attribute).catch((e)=>{
-                if(e.response.body.message !== "Attribute name must be unique") {
-                    // throwError();
-                }
-            });
-        }
-        return params;
     },
     __finalizeWithdraw : async (params) => {
 

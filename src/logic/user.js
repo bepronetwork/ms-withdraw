@@ -262,9 +262,9 @@ const progressActions = {
             /* Send Email */
             let mail = new Mailer();
             let attributes = {
-                TEXT: mail.setTextDeposit({amount : params.amount, ticker : params.currency.ticker, isDeposit : false})
+                TEXT: mail.setTextNotification('WITHDRAW', params.amount, params.currency.ticker)
             };
-            mail.sendEmail({app_id : params.app._id, user : params.user, action : 'USER_TEXT_DEPOSIT_AND_WITHDRAW', attributes});
+            mail.sendEmail({app_id : params.app.id, user : params.user, action : 'USER_NOTIFICATION', attributes});
             return {
                 tx : bitgo_tx.txid
             };

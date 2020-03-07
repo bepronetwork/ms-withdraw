@@ -139,37 +139,6 @@ paths:
           schema:
             $ref: "#/definitions/ErrorResponse"
 
-  /app/integrations/mailSender/edit:
-    x-swagger-router-controller: app
-    post:
-      tags:
-      - app
-      summary: Edit Mail Sender Integration
-      operationId: editMailSenderIntegration
-      description: Change Mail Sender API Key and templates
-      consumes:
-        - application/json
-      produces:
-        - application/json
-      parameters:
-        - in: body
-          name: app
-          description: App Information
-          required: true
-          schema:
-            $ref: '#/definitions/AppEditMailSenderIntegration'
-      responses:
-        "200":
-          description: Success
-          schema:
-            # a pointer to a definition
-            $ref: "#/definitions/GeneralResponse"
-        # responses may fall through to errors
-        default:
-          description: Error
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-
   /users/affiliate/requestWithdraw:
     x-swagger-router-controller: user
     post:
@@ -423,34 +392,6 @@ definitions:
         example: "0xe8rghwe8rghwe9r87ynw987eyncwre"
         description: |
           User Address
-
-  AppEditMailSenderIntegration : 
-    type: object
-    required:
-      - app
-      - apiKey
-      - templateIds
-    properties:
-      app:
-        type : string
-        format: name
-        example: "wertwertwertwert"
-        description: |
-          App id
-      apiKey:
-        type : string
-        format: name
-        example: "gw293847ncv2"
-      templateIds:
-        type : array
-        items:
-          type: object
-          properties:
-            functionName:
-              type: string
-            template_id:
-              type: number
-
   GetAllUsersAppWithdraws : 
     type: object
     required:
