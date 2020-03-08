@@ -7,17 +7,19 @@ const expect = chai.expect;
 const TOTAL_WITHDRAWS = 6;
 
 context('Get App Users Withdraw Normal', async () => {
-    var app, totalWithdraws;
+    var app, admin, totalWithdraws;
     
     before( async () =>  {
         app = global.test.app;
+        admin = global.test.admin;
     });
 
 
     it('should be able to get withdraws', mochaAsync(async () => {
         let res = await getAppUserWithdraws({
             app : app.id,
-        }, app.bearerToken , {id : app.id});
+            admin: admin.id,
+        }, admin.bearerToken , {id : admin.id});
 
         expect(detectValidationErrors(res)).to.be.equal(false);
         const { status, message } = res.data;
@@ -28,8 +30,9 @@ context('Get App Users Withdraw Normal', async () => {
     it('should be able to get withdraws - filtered by in Queue', mochaAsync(async () => {
         let res = await getAppUserWithdraws({
             app : app.id,
+            admin: admin.id,
             status : 'Queue'
-        }, app.bearerToken , {id : app.id});
+        }, admin.bearerToken , {id : admin.id});
 
         expect(detectValidationErrors(res)).to.be.equal(false);
         const { status, message } = res.data;
@@ -41,8 +44,9 @@ context('Get App Users Withdraw Normal', async () => {
     it('should be able to get withdraws - filtered by Processed', mochaAsync(async () => {
         let res = await getAppUserWithdraws({
             app : app.id,
+            admin: admin.id,
             status : 'Processed'
-        }, app.bearerToken , {id : app.id});
+        }, admin.bearerToken , {id : admin.id});
         expect(detectValidationErrors(res)).to.be.equal(false);
         const { status, message } = res.data;
         expect(status).to.be.equal(200);

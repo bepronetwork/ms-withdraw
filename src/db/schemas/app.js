@@ -24,7 +24,6 @@ AppSchema.prototype.schema =  {
     withdraws           : [{ type: mongoose.Schema.Types.ObjectId, ref: 'Withdraw'}],
     affiliateSetup      : { type: mongoose.Schema.Types.ObjectId, ref: 'AffiliateSetup', required : true},
     countriesAvailable  : [{ type: Number}],
-    bearerToken         : { type: String },
     platformAddress     : { type : String },
     platformBlockchain  : { type : String },
     platformTokenAddress: { type : String },
@@ -35,7 +34,6 @@ AppSchema.prototype.schema =  {
 
 
 AppSchema.prototype.model = db.model(AppSchema.prototype.name, new db.Schema(AppSchema.prototype.schema));
-      
 export {
     AppSchema
 }

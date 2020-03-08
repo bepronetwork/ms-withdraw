@@ -110,20 +110,6 @@ class AppRepository extends MongoComponent{
         });
     }
 
-    createAPIToken(app_id, bearerToken){
-        return new Promise( (resolve,reject) => {
-            AppRepository.prototype.schema.model.findByIdAndUpdate(
-                app_id, 
-                { $set: { "bearerToken" : new String(bearerToken) } },
-                { 'new': true })
-                .exec( (err, item) => {
-                    if(err){reject(err)}
-                    resolve(item);
-                }
-            )
-        });
-    }
-
     getLastBets({id, size=15}){ 
         try{
             return new Promise( (resolve, reject) => {

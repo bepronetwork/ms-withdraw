@@ -22,7 +22,6 @@ let outputs = {
                 "id"          : object.app._id,
                 "name"        : object.app.name,
                 "description" : object.app.description,
-                "bearerToken" : object.app.bearerToken,
                 "withdraws"   : object.app.withdraws,
                 "isValid"     : object.app.isValid,
                 "services"    : object.app.services,
