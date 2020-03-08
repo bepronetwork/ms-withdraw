@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { ErrorManager } from '../controllers/Errors';
-import { AppRepository,  WalletsRepository,  UsersRepository, WithdrawRepository } from '../db/repos';
+import { AppRepository,  WalletsRepository,  UsersRepository, WithdrawRepository, MailSenderRepository } from '../db/repos';
 import LogicComponent from './logicComponent';
 import { Withdraw } from '../models';
 import CasinoContract from './eth/CasinoContract';
@@ -11,6 +11,8 @@ import { verifytransactionHashWithdrawApp } from './services/services';
 import {  detectCurrencyAmountToSmartContractAmount } from './utils/currencies';
 import BitGoSingleton from './third-parties/bitgo';
 import { Security } from '../controllers/Security';
+import { SendInBlueAttributes } from './third-parties';
+import { SendinBlueSingleton, SendInBlue } from './third-parties/sendInBlue';
 import { setLinkUrl } from '../helpers/linkUrl';
 let error = new ErrorManager();
 
