@@ -14,16 +14,16 @@ ErrorHandler.prototype.errors = require('./codes.json');
  ****************************/
 
 ErrorHandler.prototype.KEYS =  {
-    'UNKNOWN'                   : "000",
-    'INSUFFICIENT_FUNDS'        : "001",
-    'INVALID_AMOUNT'            : "002",
-    'INVALID_ODD'               : "003",
-    'USER_NOT_EXISTENT'         : "004",
-    'WRONG_PASSWORD'            : "005",
-    'INVALID_BET_QUANTITY'      : "006",
-    'ALREADY_EXISTING_USER'     : "007",
-    'ALREADY_EXISTING_EMAIL'    : "008",
-    'INSUFFICIENT_LIQUIDITY'    : "009",
+    'UNKNOWN'                               : "000",
+    'INSUFFICIENT_FUNDS'                    : "001",
+    'INVALID_AMOUNT'                        : "002",
+    'INVALID_ODD'                           : "003",
+    'USER_NOT_EXISTENT'                     : "004",
+    'WRONG_PASSWORD'                        : "005",
+    'INVALID_BET_QUANTITY'                  : "006",
+    'ALREADY_EXISTING_USER'                 : "007",
+    'ALREADY_EXISTING_EMAIL'                : "008",
+    'INSUFFICIENT_LIQUIDITY'                : "009",
     'DEPOSIT_TRANSACTION_NOT_VALID'         : "010",
     'ALREADY_EXISTING_DEPOSIT_TRANSACTION'  : "011",
     'APP_NOT_EXISTENT'                      : "012",
@@ -56,8 +56,9 @@ ErrorHandler.prototype.KEYS =  {
     'ERROR_TRANSACTION'                     : "039",
     'MIN_WITHDRAW_NOT_PASSED'               : "040",
     'CURRENCY_NOT_EXISTENT'                 : "045",
-    'MAX_WITHDRAW'                          : "046"
-}; 
+    'MAX_WITHDRAW'                          : "046",
+    'EMAIL_NOT_CONFIRMED'                   : "047"
+};
 
 
   /***************************

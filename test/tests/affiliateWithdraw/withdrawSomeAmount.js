@@ -17,10 +17,11 @@ context('Withdraw Some Amount', async () => {
     global.test.currencies.forEach( async ticker => {
 
         describe(`${ticker}`, async () => {
-            var user, app, user_eth_account, contract, currency, appWallet;
+            var user, admin, app, user_eth_account, contract, currency, appWallet;
             before( async () =>  {
 
                 app = global.test.app;
+                admin = global.test.admin;
                 contract = global.test.contract;
                 appWallet = app.wallet.find( w => new String(w.currency.ticker).toLowerCase() == new String(ticker).toLowerCase());
                 currency = appWallet.currency;
@@ -57,15 +58,16 @@ context('Withdraw Some Amount', async () => {
 
             it('should be able withdraw some Amount', mochaAsync(async () => {
 
-                let res = await getAppUserWithdraws({app : app.id, user : user.id}, app.bearerToken , {id : app.id});
+                let res = await getAppUserWithdraws({app : app.id, user : user.id, admin: admin.id}, admin.bearerToken , {id : admin.id});
                 const { status, message } = res.data;
 
                 res = await finalizeUserWithdraw({
+                    admin: admin.id,
                     app : app.id,
                     user : user.id,
                     withdraw_id : message[0]._id,
                     currency : currency._id
-                }, app.bearerToken , {id : app.id});
+                }, admin.bearerToken , {id : admin.id});
 
                 expect(res.data.status).to.equal(200);
             }));

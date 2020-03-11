@@ -138,6 +138,7 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+
   /users/affiliate/requestWithdraw:
     x-swagger-router-controller: user
     post:

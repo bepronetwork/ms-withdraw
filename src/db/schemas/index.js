@@ -11,6 +11,9 @@ import { WalletSchema } from './wallet';
 import { SecuritySchema } from './security';
 import { AffiliateStructureSchema } from './affiliateStructure';
 import { CurrencySchema } from './currency';
+import { MailSenderSchema } from './integrations/mailSender';
+import { IntegrationsSchema } from "./integrations";
+import { ChatSchema } from './integrations/chat';
 
 export {
     UserSchema,
@@ -25,5 +28,8 @@ export {
     BetResultSpaceSchema,
     WithdrawSchema,
     AdminSchema,
-    ResultSpaceSchema
+    ResultSpaceSchema,
+    MailSenderSchema,
+    IntegrationsSchema,
+    ChatSchema
 }

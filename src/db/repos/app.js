@@ -110,20 +110,6 @@ class AppRepository extends MongoComponent{
         });
     }
 
-    createAPIToken(app_id, bearerToken){
-        return new Promise( (resolve,reject) => {
-            AppRepository.prototype.schema.model.findByIdAndUpdate(
-                app_id, 
-                { $set: { "bearerToken" : new String(bearerToken) } },
-                { 'new': true })
-                .exec( (err, item) => {
-                    if(err){reject(err)}
-                    resolve(item);
-                }
-            )
-        });
-    }
-
     getLastBets({id, size=15}){ 
         try{
             return new Promise( (resolve, reject) => {
@@ -288,6 +274,22 @@ class AppRepository extends MongoComponent{
                 }
             )
         });
+    }
+
+    async setIntegrationsId(app_id, integrations_id){
+        try{
+            await AppRepository.prototype.schema.model.findOneAndUpdate(
+                { _id: app_id }, 
+                { $set : { "integrations" : integrations_id } },
+                { 'new': true })
+                .exec( (err, item) => {
+                    if(err){throw(err)}
+                    return (item);
+                }
+            )
+        }catch(err){
+            throw err;
+        }
     }
 
 

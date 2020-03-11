@@ -27,7 +27,8 @@ UserSchema.prototype.schema = {
     affiliateLink      : { type: mongoose.Schema.Types.ObjectId, ref: 'AffiliateLink'}, // UserAffiliated that is parent based
     register_timestamp  : { type: Date, required : true},
     metadata            : { type : JSON },
-    isWithdrawing       : { type : Boolean, default : false, required : true }
+    isWithdrawing       : { type : Boolean, default : false, required : true },
+    email_confirmed     : { type : Boolean, default : false, required : true }
 }
 
 

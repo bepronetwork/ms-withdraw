@@ -170,5 +170,9 @@
     "046" : {
         "key": "MAX_WITHDRAW",
         "message"   : "Withdrawal amount greater than the maximum allowed"
+    },
+    "047" : {
+        "key": "EMAIL_NOT_CONFIRMED",
+        "message"   : "Unconfirmed Email"
     }
 }

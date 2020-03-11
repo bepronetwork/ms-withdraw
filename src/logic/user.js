@@ -13,6 +13,7 @@ import { verifytransactionHashWithdrawUser } from './services/services';
 import { detectCurrencyAmountToSmartContractAmount } from './utils/currencies';
 import BitGoSingleton from './third-parties/bitgo';
 import { Security } from '../controllers/Security';
+import Mailer from './services/mailer';
 import { setLinkUrl } from '../helpers/linkUrl';
 let error = new ErrorManager();
 
@@ -80,10 +81,11 @@ const processActions = {
                 user : user,
                 app : app,
                 nonce : params.nonce,
-                isAlreadyWithdrawingAPI : user.isWithdrawing
+                isAlreadyWithdrawingAPI : user.isWithdrawing,
+                emailConfirmed : (user.email_confirmed != undefined && user.email_confirmed === true )
             }
             return res;
-        }catch(err){ 
+        } catch(err) {
             throw err;
         }
     },
@@ -258,7 +260,12 @@ const progressActions = {
                 last_update_timestamp   :   new Date(),
                 link_url                :   link_url                           
             });
-            
+            /* Send Email */
+            let mail = new Mailer();
+            let attributes = {
+                TEXT: mail.setTextNotification('WITHDRAW', params.amount, params.currency.ticker)
+            };
+            mail.sendEmail({app_id : params.app.id, user : params.user, action : 'USER_NOTIFICATION', attributes});
             return {
                 tx : bitgo_tx.txid
             };

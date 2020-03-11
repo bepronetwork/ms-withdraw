@@ -32,6 +32,8 @@ jobs: # a collection of steps
             echo 'export BITGO_ENTERPRISE_ID=5e2ee3674141b74006f37e0b0fdf6813' >> $BASH_ENV
             echo 'export BITGO_KEY=v2x9c8c188179741a91e4778ae69e76116a2ef3980dacb035737c0feb55b76367c1' >> $BASH_ENV
             echo 'export QUOTA_GUARD_URL=http://1uf1vgmue9ztet:3k1ajq0eev28rmx06uvrj2ox8t@eu-west-static-04.quotaguard.com:9293' >> $BASH_ENV
+            echo 'export SENDINBLUE_API_KEY=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' >> $BASH_ENV
+            echo 'export SENDINBLUE_EMAIL_TO=sandbox.betprotocol.com' >> $BASH_ENV
             source $BASH_ENV
       - run: # run tests
           name: test

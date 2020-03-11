@@ -15,10 +15,11 @@ const initialState = {
 context('Withdraw All Amount', async () => {
     global.test.currencies.forEach( async ticker => {
         describe(`${ticker}`, async () => {
-            var user, app, user_eth_account, contract, withdrawTxResponse, appWallet, currency, withdraws_res;
+            var user, admin, app, user_eth_account, contract, withdrawTxResponse, appWallet, currency, withdraws_res;
             before( async () =>  {
 
                 app = global.test.app;
+                admin = global.test.admin;
                 contract = global.test.contract;
                 appWallet = app.wallet.find( w => new String(w.currency.ticker).toLowerCase() == new String(global.test.ticker).toLowerCase());
                 currency = appWallet.currency;
@@ -34,10 +35,12 @@ context('Withdraw All Amount', async () => {
 
 
             it('should be able to ask to withdraw all amount', mochaAsync(async () => {
+                console.log(user);
                 let res = await requestUserAffiliateWithdraw({
                     tokenAmount : global.test.depositAmounts[global.test.ticker]/4,
                     nonce : 3456365756,
                     app : app.id,
+                    admin: admin.id,
                     address : user_eth_account.getAddress(),
                     user : user.id,
                     currency : currency._id
@@ -50,15 +53,16 @@ context('Withdraw All Amount', async () => {
 
             it('should be able withdraw all Amount', mochaAsync(async () => {
 
-                let withdraws_res = await getAppUserWithdraws({app : app.id }, app.bearerToken , {id : app.id});
+                let withdraws_res = await getAppUserWithdraws({app : app.id, admin: admin.id }, admin.bearerToken , {id : admin.id});
                 const { message } = withdraws_res.data;
 
                 let res = await finalizeUserWithdraw({
+                    admin: admin.id,
                     app : app.id,
                     user : user.id,
                     withdraw_id : message[0]._id,
                     currency : currency._id
-                }, app.bearerToken , {id : app.id});
+                }, admin.bearerToken , {id : admin.id});
 
                 expect(res.data.status).to.equal(200);
                 expect(res.data.message.tx).to.not.be.null;
