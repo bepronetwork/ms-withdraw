@@ -3,7 +3,12 @@ import {
     FinalizeWithdrawUserSingleton
 } from "./User";
 
+import {
+    FinalizeWithdrawAppSingleton
+} from "./App";
+
 export {
     Mapper,
-    FinalizeWithdrawUserSingleton
+    FinalizeWithdrawUserSingleton,
+    FinalizeWithdrawAppSingleton
 }

@@ -1,6 +1,8 @@
 import {AppLogic} from '../logic';
 import ModelComponent from './modelComponent';
 import {AppRepository} from '../db/repos';
+import { FinalizeWithdrawAppSingleton } from '../controllers/Mapper';
+// const saveOutputTest = require('../../test/outputTest/configOutput')
 
 class App extends ModelComponent{
 
@@ -35,6 +37,7 @@ class App extends ModelComponent{
             let res = await this.process('RequestWithdraw');
             /* Open Mutex */
             await AppRepository.prototype.changeWithdrawPosition(app, false);
+            // saveOutputTest.saveOutputTest(`APPTest`,`requestWithdraw`,res);
             return res;
         }catch(err){
             if(parseInt(err.code) != 14){
@@ -53,7 +56,8 @@ class App extends ModelComponent{
 
     async finalizeWithdraw(){
         try{
-            return await this.process('FinalizeWithdraw');
+            let res = await this.process('FinalizeWithdraw');
+            return FinalizeWithdrawAppSingleton.output('FinalizeWithdrawApp', res);
         }catch(err){
             throw err;
         }
@@ -61,7 +65,9 @@ class App extends ModelComponent{
 
     async getUserWithdraws(){
         try{
-            return await this.process('GetUsersWithdraws');
+            let res = await this.process('GetUsersWithdraws');
+            // saveOutputTest.saveOutputTest(`APPTest`,`getUserWithdraws`,res);
+            return res;
         }catch(err){
             throw err;
         }
