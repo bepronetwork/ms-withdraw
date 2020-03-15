@@ -1,6 +1,7 @@
 import {UserLogic} from '../logic';
 import ModelComponent from './modelComponent';
 import {UsersRepository} from '../db/repos';
+import { FinalizeWithdrawUserSingleton } from '../controllers/Mapper';
 
 class User extends ModelComponent{
 
@@ -65,7 +66,8 @@ class User extends ModelComponent{
     
     async finalizeWithdraw(){
         try{
-            return await this.process('FinalizeWithdraw');
+            let res = await this.process('FinalizeWithdraw');
+            return FinalizeWithdrawUserSingleton.output('FinalizeWithdrawUser', res);
         }catch(err){
             throw err;
         }
