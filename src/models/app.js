@@ -1,7 +1,7 @@
 import {AppLogic} from '../logic';
 import ModelComponent from './modelComponent';
 import {AppRepository} from '../db/repos';
-import { FinalizeWithdrawAppSingleton } from '../controllers/Mapper';
+import { FinalizeWithdrawAppSingleton, RequestWithdrawAppSingleton } from '../controllers/Mapper';
 // const saveOutputTest = require('../../test/outputTest/configOutput')
 
 class App extends ModelComponent{
@@ -37,8 +37,7 @@ class App extends ModelComponent{
             let res = await this.process('RequestWithdraw');
             /* Open Mutex */
             await AppRepository.prototype.changeWithdrawPosition(app, false);
-            // saveOutputTest.saveOutputTest(`APPTest`,`requestWithdraw`,res);
-            return res;
+            return RequestWithdrawAppSingleton.output('RequestWithdrawApp', res);
         }catch(err){
             if(parseInt(err.code) != 14){
                 /* If not withdrawing atm */

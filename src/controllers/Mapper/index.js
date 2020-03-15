@@ -4,11 +4,13 @@ import {
 } from "./User";
 
 import {
-    FinalizeWithdrawAppSingleton
+    FinalizeWithdrawAppSingleton,
+    RequestWithdrawAppSingleton
 } from "./App";
 
 export {
     Mapper,
     FinalizeWithdrawUserSingleton,
-    FinalizeWithdrawAppSingleton
+    FinalizeWithdrawAppSingleton,
+    RequestWithdrawAppSingleton
 }
