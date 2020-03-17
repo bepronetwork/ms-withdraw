@@ -16,30 +16,18 @@ let outputs = {
             "__v": object.__v,
             "app": {
                 "_id": object.app._id,
-                "currencies": object.app.currencies ? object.app.currencies.map(currencies => {
-                    return ({
-                        "_id": currencies
-                    })
-                }) : object.app.currencies,
-                "typography": object.app.typography ? object.app.typography.map(typography => {
-                    return ({
-                        "_id": typography
-                    })
-                }) : object.app.typography,
+                "currencies": object.app.currencies ? object.app.currencies.map(currency_id => currency_id) : object.app.currencies,
+                "typography": object.app.typography ? object.app.typography.map(typography_id => typography_id) : object.app.typography,
                 "name": object.app.name,
                 "affiliateSetup": {
                     "_id": object.app.affiliateSetup._id,
-                    "customAffiliateStructures": object.app.affiliateSetup.customAffiliateStructures ? object.app.affiliateSetup.customAffiliateStructures.map(customAffiliateStructures => {
+                    "customAffiliateStructures": object.app.affiliateSetup.customAffiliateStructures ? object.app.affiliateSetup.customAffiliateStructures.map(customAffiliateStructure_id => customAffiliateStructure_id) : object.app.affiliateSetup.customAffiliateStructures,
+                    "affiliateStructures": object.app.affiliateSetup.affiliateStructures ? object.app.affiliateSetup.affiliateStructures.map(affiliateStructure => {
                         return ({
-                            "_id": customAffiliateStructures
-                        })
-                    }) : object.app.affiliateSetup.customAffiliateStructures,
-                    "affiliateStructures": object.app.affiliateSetup.affiliateStructures ? object.app.affiliateSetup.affiliateStructures.map(affiliateStructures => {
-                        return ({
-                            "_id": affiliateStructures._id,
-                            "level": affiliateStructures.level,
-                            "percentageOnLoss": affiliateStructures.percentageOnLoss,
-                            "isActive": affiliateStructures.isActive,
+                            "_id": affiliateStructure._id,
+                            "level": affiliateStructure.level,
+                            "percentageOnLoss": affiliateStructure.percentageOnLoss,
+                            "isActive": affiliateStructure.isActive,
                         })
                     }) : object.app.affiliateSetup.affiliateStructures,
                     "isActive": object.app.affiliateSetup.isActive
@@ -71,62 +59,50 @@ let outputs = {
                 "description": object.app.description,
                 "__v": object.app.__v,
                 "isWithdrawing": object.app.isWithdrawing,
-                "licensesId": object.app.licensesId ? object.app.licensesId.map(licensesId => {
+                "licensesId": object.app.licensesId ? object.app.licensesId.map(license_id => license_id) : object.app.licensesId,
+                "countriesAvailable": object.app.countriesAvailable ? object.app.countriesAvailable.map(countrieAvailable_id => countrieAvailable_id) : object.app.countriesAvailable,
+                "withdraws": object.app.withdraws ? object.app.withdraws.map(withdraw => {
                     return ({
-                        "_id": licensesId
-                    })
-                }) : object.app.licensesId,
-                "countriesAvailable": object.app.countriesAvailable ? object.app.countriesAvailable.map(countriesAvailable => {
-                    return ({
-                        "_id": countriesAvailable
-                    })
-                }) : object.app.countriesAvailable,
-                "withdraws": object.app.withdraws ? object.app.withdraws.map(withdraws => {
-                    return ({
-                        "_id": withdraws._id,
-                        "app": withdraws.app,
-                        "creation_timestamp": withdraws.creation_timestamp,
-                        "address": withdraws.address,
-                        "currency": withdraws.currency,
-                        "amount": withdraws.amount,
-                        "nonce": withdraws.nonce,
-                        "bitgo_id": withdraws.bitgo_id,
-                        "last_update_timestamp": withdraws.last_update_timestamp,
-                        "logId": withdraws.logId,
-                        "transactionHash": withdraws.transactionHash,
-                        "link_url": withdraws.link_url,
-                        "isAffiliate": withdraws.isAffiliate,
-                        "status": withdraws.status,
-                        "done": withdraws.done,
-                        "confirmed": withdraws.confirmed,
-                        "maxConfirmations": withdraws.maxConfirmations,
-                        "confirmations": withdraws.confirmations,
+                        "_id": withdraw._id,
+                        "app": withdraw.app,
+                        "creation_timestamp": withdraw.creation_timestamp,
+                        "address": withdraw.address,
+                        "currency": withdraw.currency,
+                        "amount": withdraw.amount,
+                        "nonce": withdraw.nonce,
+                        "bitgo_id": withdraw.bitgo_id,
+                        "last_update_timestamp": withdraw.last_update_timestamp,
+                        "logId": withdraw.logId,
+                        "transactionHash": withdraw.transactionHash,
+                        "link_url": withdraw.link_url,
+                        "isAffiliate": withdraw.isAffiliate,
+                        "status": withdraw.status,
+                        "done": withdraw.done,
+                        "confirmed": withdraw.confirmed,
+                        "maxConfirmations": withdraw.maxConfirmations,
+                        "confirmations": withdraw.confirmations,
                     })
                 }) : object.app.withdraws,
-                "deposits": object.app.deposits ? object.app.deposits.map(deposits => {
+                "deposits": object.app.deposits ? object.app.deposits.map(deposit => {
                     return ({
-                        "_id": deposits._id,
-                        "link_url": deposits.link_url,
-                        "app": deposits.app,
-                        "creation_timestamp": deposits.creation_timestamp,
-                        "last_update_timestamp": deposits.last_update_timestamp,
-                        "address": deposits.address,
-                        "currency": deposits.currency,
-                        "transactionHash": deposits.transactionHash,
-                        "amount": deposits.amount,
-                        "confirmed": deposits.confirmed,
-                        "maxConfirmations": deposits.maxConfirmations,
-                        "confirmations": deposits.confirmations,
+                        "_id": deposit._id,
+                        "link_url": deposit.link_url,
+                        "app": deposit.app,
+                        "creation_timestamp": deposit.creation_timestamp,
+                        "last_update_timestamp": deposit.last_update_timestamp,
+                        "address": deposit.address,
+                        "currency": deposit.currency,
+                        "transactionHash": deposit.transactionHash,
+                        "amount": deposit.amount,
+                        "confirmed": deposit.confirmed,
+                        "maxConfirmations": deposit.maxConfirmations,
+                        "confirmations": deposit.confirmations,
                     })
                 }) : object.app.deposits,
                 "wallet": object.app.wallet ? object.app.wallet.map(wallet => {
                     return ({
-                        "_id": wallet,
-                        "depositAddresses": wallet.depositAddresses ? wallet.depositAddresses.map(depositAddresses => {
-                            return ({
-                                "_id": depositAddresses
-                            })
-                        }) : wallet.depositAddresses,
+                        "_id": wallet._id,
+                        "depositAddresses": wallet.depositAddresses ? wallet.depositAddresses.map(depositAddress_id => depositAddress_id) : wallet.depositAddresses,
                         "currency": {
                             "_id": wallet.currency._id,
                             "image": wallet.currency.image,
@@ -144,64 +120,32 @@ let outputs = {
                         "playBalance": wallet.playBalance,
                     })
                 }) : object.app.wallet,
-                "external_users": object.app.external_users ? object.app.external_users.map(external_users => {
+                "external_users": object.app.external_users ? object.app.external_users.map(externalUser_id => externalUser_id) : object.app.external_users,
+                "users": object.app.users ? object.app.users.map(user => {
                     return ({
-                        "_id": external_users
-                    })
-                }) : object.app.external_users,
-                "users": object.app.users ? object.app.users.map(users => {
-                    return ({
-                        "_id": users._id,
-                        "username": users.username,
-                        "affiliate": users.affiliate,
-                        "name": users.name,
-                        "hash_password": users.hash_password,
-                        "register_timestamp": users.register_timestamp,
-                        "security": users.security,
-                        "email": users.email,
-                        "app_id": users.app_id,
-                        "external_user": users.external_user,
-                        "affiliateLink": users.affiliateLink,
-                        "bearerToken": users.bearerToken,
-                        "email_confirmed": users.email_confirmed,
-                        "isWithdrawing": users.isWithdrawing,
-                        "wallet": users.wallet ? users.wallet.map(wallet => {
-                            return ({
-                                "_id": wallet
-                            })
-                        }) : users.wallet,
-                        "withdraws": users.withdraws ? users.withdraws.map(withdraws => {
-                            return ({
-                                "_id": withdraws
-                            })
-                        }) : users.withdraws,
-                        "deposits": users.deposits ? users.deposits.map(deposits => {
-                            return ({
-                                "_id": deposits
-                            })
-                        }) : users.deposits,
-                        "bets": users.bets ? users.bets.map(bets => {
-                            return ({
-                                "_id": bets
-                            })
-                        }) : users.bets,
+                        "_id": user._id,
+                        "username": user.username,
+                        "affiliate": user.affiliate,
+                        "name": user.name,
+                        "hash_password": user.hash_password,
+                        "register_timestamp": user.register_timestamp,
+                        "security": user.security,
+                        "email": user.email,
+                        "app_id": user.app_id,
+                        "external_user": user.external_user,
+                        "affiliateLink": user.affiliateLink,
+                        "bearerToken": user.bearerToken,
+                        "email_confirmed": user.email_confirmed,
+                        "isWithdrawing": user.isWithdrawing,
+                        "wallet": user.wallet ? user.wallet.map(wallet_id => wallet_id) : user.wallet,
+                        "withdraws": user.withdraws ? user.withdraws.map(withdraw_id => withdraw_id) : user.withdraws,
+                        "deposits": user.deposits ? user.deposits.map(deposit_id => deposit_id) : user.deposits,
+                        "bets": user.bets ? user.bets.map(bet_id => bet_id) : user.bets,
                     })
                 }) : object.app.users,
-                "services": object.app.services ? object.app.services.map(services => {
-                    return ({
-                        "_id": services
-                    })
-                }) : object.app.services,
-                "listAdmins": object.app.listAdmins ? object.app.listAdmins.map(listAdmins => {
-                    return ({
-                        "_id": listAdmins
-                    })
-                }) : object.app.listAdmins,
-                "games": object.app.games ? object.app.games.map(games => {
-                    return ({
-                        "_id": games
-                    })
-                }) : object.app.games,
+                "services": object.app.services ? object.app.services.map(service_id => service_id) : object.app.services,
+                "listAdmins": object.app.listAdmins ? object.app.listAdmins.map(listAdmins_id => listAdmins_id) : object.app.listAdmins,
+                "games": object.app.games ? object.app.games.map(game_id => game_id): object.app.games,
                 "authorizedAddress": object.app.authorizedAddress,
                 "ownerAddress": object.app.ownerAddress,
                 "isValid": object.app.isValid,
