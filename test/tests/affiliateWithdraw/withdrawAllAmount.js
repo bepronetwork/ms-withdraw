@@ -35,7 +35,6 @@ context('Withdraw All Amount', async () => {
 
 
             it('should be able to ask to withdraw all amount', mochaAsync(async () => {
-                console.log(user);
                 let res = await requestUserAffiliateWithdraw({
                     tokenAmount : global.test.depositAmounts[global.test.ticker]/4,
                     nonce : 3456365756,
