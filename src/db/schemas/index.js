@@ -14,6 +14,7 @@ import { CurrencySchema } from './currency';
 import { MailSenderSchema } from './integrations/mailSender';
 import { IntegrationsSchema } from "./integrations";
 import { ChatSchema } from './integrations/chat';
+import { PermissionSchema } from "./permission";
 
 export {
     UserSchema,
@@ -31,5 +32,6 @@ export {
     ResultSpaceSchema,
     MailSenderSchema,
     IntegrationsSchema,
-    ChatSchema
+    ChatSchema,
+    PermissionSchema
 }
