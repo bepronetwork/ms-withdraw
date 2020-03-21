@@ -6,6 +6,11 @@ let populate_admin = [
         model : 'Security',
         select : { '__v': 0},
     },
+    {
+        path : 'permission',
+        model : 'Permission',
+        select : { '__v': 0},
+    },
     {   
         path : 'app',
         model : 'App',

@@ -31,7 +31,7 @@ async function requestAffiliateWithdraw (req, res) {
 
 async function finalizeWithdraw (req, res) {
     try{
-        SecuritySingleton.verify({type : 'admin', req});
+        SecuritySingleton.verify({type : 'admin', req, permissions: ["super_admin", "user_withdraw"]});
         let params = req.body;
 		let user = new User(params);
         let data = await user.finalizeWithdraw();
