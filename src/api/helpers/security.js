@@ -1,12 +1,30 @@
 import MiddlewareSingleton from "./middleware";
+import { AdminsRepository, PermissionRepository } from "../../db/repos";
 
 class Security{
 
-    constructor(){}
+    constructor() {}
 
-    verify = ({type, req}) => {
+    checkPermission = async (permissions = [], admin) => {
+        if(permissions.includes("all")) {
+            return true;
+        }
+        let adminObject         = await AdminsRepository.prototype.findAdminById(admin);
+        let permissionsObject   = await PermissionRepository.prototype.findById(adminObject.permission);
+        for(let permission of permissions) {
+            if(permissionsObject[permission]) {
+                return true;
+            }
+        }
+        throw new Error();
+    };
+
+    verify = ({type, req, permissions=[]}) => {
         try{
             let id = req.body[type];
+            if(type=="admin") {
+                this.checkPermission(permissions, id);
+            }
             var bearerHeader = req.headers['x-access-token'] || req.headers['authorization']; // Express headers are auto converted to lowercase
             var payload = JSON.parse(req.headers['payload']); // Payload with Id
             if(typeof bearerHeader !== 'undefined'){

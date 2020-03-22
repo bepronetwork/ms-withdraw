@@ -14,7 +14,8 @@ AdminSchema.prototype.schema = {
     hash_password       : { type: String, required : true},
     app                 : { type: mongoose.Schema.Types.ObjectId, ref: 'App'},
     security            : { type: mongoose.Schema.Types.ObjectId, ref: 'Security'},
-    metadata            : { type : JSON}
+    metadata            : { type : JSON},
+    permission          : { type: mongoose.Schema.Types.ObjectId, ref: 'Permission'}
 };
 
 AdminSchema.prototype.modelSet = false;

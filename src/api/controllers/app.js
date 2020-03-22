@@ -18,7 +18,7 @@ import MiddlewareSingleton from '../helpers/middleware';
 
 async function requestAppWithdraw(req, res) {
     try{
-        SecuritySingleton.verify({type : 'admin', req});
+        SecuritySingleton.verify({type : 'admin', req, permissions: ["super_admin"]});
         let params = req.body;
 		let app = new App(params);
         let data = await app.requestWithdraw();
@@ -30,7 +30,7 @@ async function requestAppWithdraw(req, res) {
 
 async function setMaxWithdraw(req, res) {
     try{
-        SecuritySingleton.verify({type : 'admin', req});
+        SecuritySingleton.verify({type : 'admin', req, permissions: ["super_admin"]});
         let params = req.body;
         let wallet = new Wallet(params);
         let data = await wallet.setMaxWithdraw();
@@ -42,7 +42,7 @@ async function setMaxWithdraw(req, res) {
 
 async function finalizeAppWithdraw(req, res) {
     try{
-        SecuritySingleton.verify({type : 'admin', req});
+        SecuritySingleton.verify({type : 'admin', req, permissions: ["super_admin"]});
         let params = req.body;
 		let app = new App(params);
 		let data = await app.finalizeWithdraw();
@@ -54,7 +54,7 @@ async function finalizeAppWithdraw(req, res) {
 
 async function getUserWithdraws(req, res) {
     try{
-        SecuritySingleton.verify({type : 'admin', req});
+        SecuritySingleton.verify({type : 'admin', req, permissions: ["super_admin", "withdraw"]});
         let params = req.body;
 		let app = new App(params);
 		let data = await app.getUserWithdraws();

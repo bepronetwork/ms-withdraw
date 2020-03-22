@@ -21,6 +21,7 @@ import AffiliateSetupRepository from './affiliateSetup';
 import MailSenderRepository from "./mailSender";
 import IntegrationsRepository from './integrations';
 import ChatRepository from "./chat";
+import PermissionRepository from "./permission";
 
 export{
     AffiliateLinkRepository,
@@ -45,5 +46,6 @@ export{
     AdminsRepository,
     MailSenderRepository,
     IntegrationsRepository,
-    ChatRepository
+    ChatRepository,
+    PermissionRepository
 }  
