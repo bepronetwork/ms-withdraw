@@ -1,7 +1,8 @@
 import {AppLogic} from '../logic';
 import ModelComponent from './modelComponent';
 import {AppRepository} from '../db/repos';
-import { FinalizeWithdrawAppSingleton, RequestWithdrawAppSingleton } from '../controllers/Mapper';
+import { FinalizeWithdrawAppSingleton, RequestWithdrawAppSingleton, GetUsersWithdrawsSingleton } from '../controllers/Mapper';
+const saveOutputTest = require('../../test/outputTest/configOutput')
 
 class App extends ModelComponent{
 
@@ -64,7 +65,9 @@ class App extends ModelComponent{
     async getUserWithdraws(){
         try{
             let res = await this.process('GetUsersWithdraws');
-            return res;
+            let test = GetUsersWithdrawsSingleton.output('GetUsersWithdraws', res);
+            saveOutputTest.saveOutputTest(`AdminTesting`,`APP_GetUsersWithdraws`,test);
+            return GetUsersWithdrawsSingleton.output('GetUsersWithdraws', res);
         }catch(err){
             throw err;
         }

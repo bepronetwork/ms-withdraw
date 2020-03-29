@@ -5,12 +5,19 @@ import {
 
 import {
     FinalizeWithdrawAppSingleton,
-    RequestWithdrawAppSingleton
+    RequestWithdrawAppSingleton,
+    GetUsersWithdrawsSingleton
 } from "./App";
+
+import {
+    UpdateMaxWithdrawSingleton
+} from "./Wallet";
 
 export {
     Mapper,
     FinalizeWithdrawUserSingleton,
     FinalizeWithdrawAppSingleton,
-    RequestWithdrawAppSingleton
+    RequestWithdrawAppSingleton,
+    UpdateMaxWithdrawSingleton,
+    GetUsersWithdrawsSingleton
 }
