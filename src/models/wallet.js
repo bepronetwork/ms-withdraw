@@ -2,7 +2,6 @@ import {WalletLogic} from '../logic';
 import {WalletsRepository} from '../db/repos';
 import ModelComponent from './modelComponent';
 import { UpdateMaxWithdrawSingleton } from "../controllers/Mapper";
-const saveOutputTest = require('../../test/outputTest/configOutput')
 
 class Wallet extends ModelComponent{
 
@@ -33,8 +32,6 @@ class Wallet extends ModelComponent{
     async setMaxWithdraw(){
         try {
             let res = await this.process('UpdateMaxWithdraw');
-            let test = UpdateMaxWithdrawSingleton.output('UpdateMaxWithdraw', res);
-            saveOutputTest.saveOutputTest(`AdminTesting`,`Wallet_UpdateMaxWithdraw`,test);
             return UpdateMaxWithdrawSingleton.output('UpdateMaxWithdraw', res);
         }catch(err){
             throw err;
