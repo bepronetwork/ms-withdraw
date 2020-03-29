@@ -26,6 +26,7 @@ class User extends ModelComponent{
     
 
     async requestWithdraw(){
+        // Output = Null
         const { user } = this.self.params;
         try{
             /* Close Mutex */
@@ -45,6 +46,7 @@ class User extends ModelComponent{
     }
 
     async requesAffiliatetWithdraw(){
+        // Output = Null
         const { user } = this.self.params;
         try{
             /* Close Mutex */

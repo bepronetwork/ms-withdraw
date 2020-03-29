@@ -1,7 +1,7 @@
 import {AppLogic} from '../logic';
 import ModelComponent from './modelComponent';
 import {AppRepository} from '../db/repos';
-import { FinalizeWithdrawAppSingleton, RequestWithdrawAppSingleton } from '../controllers/Mapper';
+import { FinalizeWithdrawAppSingleton, RequestWithdrawAppSingleton, GetUsersWithdrawsSingleton } from '../controllers/Mapper';
 
 class App extends ModelComponent{
 
@@ -64,7 +64,7 @@ class App extends ModelComponent{
     async getUserWithdraws(){
         try{
             let res = await this.process('GetUsersWithdraws');
-            return res;
+            return GetUsersWithdrawsSingleton.output('GetUsersWithdraws', res);
         }catch(err){
             throw err;
         }
