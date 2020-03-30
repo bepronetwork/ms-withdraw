@@ -16,7 +16,11 @@ let outputs = {
             "__v": object.__v,
             "app": {
                 "_id": object.app._id,
-                "currencies": object.app.currencies ? object.app.currencies.map(currency_id => currency_id) : object.app.currencies,
+                "currencies": object.app.currencies ? object.app.currencies.map(currency_id => {
+                    return({
+                        "_id": currency_id
+                    })
+                }) : object.app.currencies,
                 "typography": object.app.typography ? object.app.typography.map(typography_id => typography_id) : object.app.typography,
                 "name": object.app.name,
                 "affiliateSetup": {
@@ -102,7 +106,11 @@ let outputs = {
                 "wallet": object.app.wallet ? object.app.wallet.map(wallet => {
                     return ({
                         "_id": wallet._id,
-                        "depositAddresses": wallet.depositAddresses ? wallet.depositAddresses.map(depositAddress_id => depositAddress_id) : wallet.depositAddresses,
+                        "depositAddresses": wallet.depositAddresses ? wallet.depositAddresses.map(depositAddress_id => {
+                            return({
+                                "_id": depositAddress_id
+                            })
+                        }) : wallet.depositAddresses,
                         "currency": {
                             "_id": wallet.currency._id,
                             "image": wallet.currency.image,
@@ -137,15 +145,39 @@ let outputs = {
                         "bearerToken": user.bearerToken,
                         "email_confirmed": user.email_confirmed,
                         "isWithdrawing": user.isWithdrawing,
-                        "wallet": user.wallet ? user.wallet.map(wallet_id => wallet_id) : user.wallet,
-                        "withdraws": user.withdraws ? user.withdraws.map(withdraw_id => withdraw_id) : user.withdraws,
-                        "deposits": user.deposits ? user.deposits.map(deposit_id => deposit_id) : user.deposits,
-                        "bets": user.bets ? user.bets.map(bet_id => bet_id) : user.bets,
+                        "wallet": user.wallet ? user.wallet.map(wallet_id => {
+                            return({
+                                "_id": wallet_id
+                            })
+                        }) : user.wallet,
+                        "withdraws": user.withdraws ? user.withdraws.map(withdraw_id => {
+                            return({
+                                "_id": withdraw_id
+                            })
+                        }) : user.withdraws,
+                        "deposits": user.deposits ? user.deposits.map(deposit_id => {
+                            return({
+                                "_id": deposit_id
+                            })
+                        }) : user.deposits,
+                        "bets": user.bets ? user.bets.map(bet_id => {
+                            return({
+                                "_id": bet_id
+                            })
+                        }) : user.bets,
                     })
                 }) : object.app.users,
                 "services": object.app.services ? object.app.services.map(service_id => service_id) : object.app.services,
-                "listAdmins": object.app.listAdmins ? object.app.listAdmins.map(listAdmins_id => listAdmins_id) : object.app.listAdmins,
-                "games": object.app.games ? object.app.games.map(game_id => game_id): object.app.games,
+                "listAdmins": object.app.listAdmins ? object.app.listAdmins.map(listAdmins_id => {
+                    return({
+                        "_id": listAdmins_id
+                    })
+                }) : object.app.listAdmins,
+                "games": object.app.games ? object.app.games.map(game_id => {
+                    return({
+                        "_id": game_id
+                    })
+                }): object.app.games,
                 "authorizedAddress": object.app.authorizedAddress,
                 "ownerAddress": object.app.ownerAddress,
                 "isValid": object.app.isValid,
