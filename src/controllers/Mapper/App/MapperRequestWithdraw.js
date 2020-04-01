@@ -180,6 +180,7 @@ let outputs = {
                 }): object.app.games,
                 "authorizedAddress": object.app.authorizedAddress,
                 "ownerAddress": object.app.ownerAddress,
+                "authorizedListAddress": object.app.authorizedListAddress,
                 "isValid": object.app.isValid,
             },
             "creation_timestamp": object.creation_timestamp,

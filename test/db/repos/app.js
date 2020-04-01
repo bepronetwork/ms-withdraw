@@ -74,14 +74,14 @@ class AppRepository extends MongoComponent{
         });
     }
 
-    setOwnerAddress(app_id, ownerAddress){
+    setOwnerAddress(app_id, ownerAddress, currency){
         return new Promise( (resolve,reject) => {
             AppRepository.prototype.schema.model.findByIdAndUpdate(
-                app_id, 
-                { $set: { 
-                    "ownerAddress"   : new String(ownerAddress).trim(),
-                } },
-                { 'new': true })
+                app_id, {"authorizedListAddress.currency": currency},
+                { $push: {
+                    "authorizedListAddress.$.ownerAddress"   : new String(ownerAddress).trim(),
+                } }
+                /*,{ 'new': true }*/ )
                 .exec( (err, item) => {
                     if(err){reject(err)}
                     resolve(item);
@@ -97,6 +97,7 @@ class AppRepository extends MongoComponent{
                     "currencyTicker" : params.currencyTicker,
                     "decimals"      : params.decimals,
                     "ownerAddress"   : new String(params.ownerAddress).trim(),
+                    "authorizedListAddress":params.authorizedListAddress,
                     "authorizedAddress"   : new String(params.authorizedAddress).trim(),
                     "platformAddress" : new String(params.platformAddress).trim(),
                     "platformBlockchain" :  new String(params.platformBlockchain).trim(),

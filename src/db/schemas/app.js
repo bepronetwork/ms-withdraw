@@ -10,7 +10,6 @@ AppSchema.prototype.schema =  {
     name                : {  type: String, required : true},
     description         : {  type: String, required : true},
     isValid             : {  type: Boolean, required : true, default : false},
-    ownerAddress        : { type: String, required : true, default : 'N/A'},
     authorizedListAddress   : [{
         currency                : { type: mongoose.Schema.Types.ObjectId, ref: 'Currency' },
         ownerAddress            : [{ type: String, required : true, default : 'N/A' }]

@@ -103,8 +103,8 @@ const processActions = {
 		return res;
     },
     __addBlockchainInformation : async (params) => {
-
         let res = {
+            authorizedListAddress: params.authorizedListAddress,
             app : params.app,
             ownerAddress : params.address,
             decimals : params.decimals,

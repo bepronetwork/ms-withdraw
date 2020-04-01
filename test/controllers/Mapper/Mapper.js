@@ -73,6 +73,7 @@ let outputs = {
             "description"           : object.description,
             "bearerToken"           : object.bearerToken,
             "ownerAddress"          : object.ownerAddress,
+            "authorizedListAddress" : object.authorizedListAddress,
             "authorizedAddress"     : object.authorizedAddress,
             "isValid"               : object.isValid,
             "currencyTicker"        : object.currencyTicker,
