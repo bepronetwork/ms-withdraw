@@ -123,7 +123,7 @@ class ErrorManager {
                     // if(new String(object.app.ownerAddress).toLowerCase() != new String(object.withdrawAddress).toLowerCase()){
                     //     libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.APP_ADDRESS_IS_NOT_VALID));    
                     // }
-                    if( object.listAddress.map((r)=>r.toLowerCase()).includes(new String(object.withdrawAddress).toLowerCase()) ){
+                    if( !(object.listAddress.map((r)=>r.toLowerCase()).includes(new String(object.withdrawAddress).toLowerCase())) ){
                         libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.APP_ADDRESS_IS_NOT_VALID));
                     }
                     // Verify if Minimum Withdraw was passed
