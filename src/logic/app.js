@@ -52,14 +52,19 @@ const processActions = {
             let amount = parseFloat(Math.abs(params.tokenAmount));
             let appBalance = parseFloat(wallet.playBalance);
 
+            /* Get list ownerAddress */
+            let listAddress = app.authorizedListAddress.find(w => new String(w.currency).toString() == new String(currency).toString());
+            listAddress = (!listAddress) ? [] : listAddress.ownerAddress;
+
             /* Get All Users Balance */
             let allUsersBalance = (await UsersRepository.prototype.getAllUsersBalance({app : app._id, currency : wallet.currency._id})).balance;
-            if(typeof allUsersBalance != 'number'){throwError('UNKNOWN')}      
+            if(typeof allUsersBalance != 'number'){throwError('UNKNOWN')}
             /* Verify if App has Enough Balance for Withdraw */
             let hasEnoughBalance = (amount <= appBalance);
 
             let res = {
                 max_withdraw: (!wallet.max_withdraw) ? 0 : wallet.max_withdraw,
+                listAddress,
                 allUsersBalance,
                 appBalance,
                 hasEnoughBalance,
