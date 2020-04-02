@@ -75,13 +75,17 @@ class AppRepository extends MongoComponent{
     }
 
     setOwnerAddress(app_id, ownerAddress, currency){
+        console.log(app_id);
         return new Promise( (resolve,reject) => {
             AppRepository.prototype.schema.model.findByIdAndUpdate(
-                app_id, {"authorizedListAddress.currency": currency},
+                app_id,
                 { $push: {
-                    "authorizedListAddress.$.ownerAddress"   : new String(ownerAddress).trim(),
+                    "authorizedListAddress" : {
+                        "currency"      : currency,
+                        "ownerAddress"  : [new String(ownerAddress).trim()]
+                    },
                 } }
-                /*,{ 'new': true }*/ )
+                ,{ 'new': true })
                 .exec( (err, item) => {
                     if(err){reject(err)}
                     resolve(item);

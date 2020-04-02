@@ -12,7 +12,7 @@ AppSchema.prototype.schema =  {
     isValid                 : {  type: Boolean, required : true, default : false},
     authorizedListAddress   : [{
         currency                : { type: mongoose.Schema.Types.ObjectId, ref: 'Currency' },
-        address                 : { type: String, required : true, default : 'N/A' }
+        ownerAddress            : { type: String, required : true, default : 'N/A' }
     }],
     authorizedAddress   : { type: String, required : true, default : 'N/A'},
     games                   : [{ type: mongoose.Schema.Types.ObjectId, ref: 'Game'}],
