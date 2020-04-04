@@ -22,6 +22,8 @@ import MailSenderRepository from "./mailSender";
 import IntegrationsRepository from './integrations';
 import ChatRepository from "./chat";
 import PermissionRepository from "./permission";
+import AutoWithdrawRepository from "./autoWithdraw";
+import AddOnRepository from "./addOn";
 
 export{
     AffiliateLinkRepository,
@@ -47,5 +49,7 @@ export{
     MailSenderRepository,
     IntegrationsRepository,
     ChatRepository,
-    PermissionRepository
+    PermissionRepository,
+    AutoWithdrawRepository,
+    AddOnRepository
 }  
