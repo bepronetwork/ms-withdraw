@@ -91,7 +91,7 @@ const processActions = {
     },
     __verifyEmailConfirmed : async (params) => {
         let user = await UsersRepository.prototype.findUserById(params.user);
-        return user.email_confirmed;
+        return {verify : user.email_confirmed, textError : user.email_confirmed ? "success" : "Email Not Verified" };
     },
     __verifyIfIsAutoWithdraw : async (params) => {
         var isAutomaticWithdraw;
@@ -100,17 +100,14 @@ const processActions = {
             let addOn = await AddOnRepository.prototype.findById(app.addOn);
             if (addOn.autoWithdraw){
                 isAutomaticWithdraw = await AutoWithdrawRepository.prototype.findById(addOn.autoWithdraw);
+                isAutomaticWithdraw = isAutomaticWithdraw.isAutoWithdraw
+                return {verify : isAutomaticWithdraw, textError : isAutomaticWithdraw ? "success" : "Automatic withdrawal set to false" };
             } else {
-                isAutomaticWithdraw = false
+                return {verify : false, textError : "AutoWithdraw as Undefined"};
             }
         } else {
-            isAutomaticWithdraw = false;
+            return {verify : false, textError : "AddOn as Undefined"};
         }
-        
-        let normalized = {
-            isAutomaticWithdraw
-        };
-        return normalized
     },
     __verifyMaxWithdrawAmountCumulative : async (params) => {
         let app = await AppRepository.prototype.findAppById(params.app);
@@ -125,9 +122,9 @@ const processActions = {
         withdrawAcumulative = parseFloat(params.tokenAmount + withdrawAcumulative).toFixed(6);
         let maxWithdrawAmountCumulativePerCurrency = maxWithdrawAmountCumulativeObject.maxWithdrawAmountCumulative.find(c => c.currency.toString() == params.currency.toString())
         if(withdrawAcumulative <= maxWithdrawAmountCumulativePerCurrency.amount){
-            return true;
+            return {verify : true, textError : "success"};
         } else {
-            return false;
+            return {verify : false, textError : "Amount accumulated withdrawal greater than the maximum allowed"};
         }
     },
     __verifyMaxWithdrawAmountPerTransaction : async (params) => {
@@ -136,9 +133,9 @@ const processActions = {
         let maxWithdrawAmountPerTransactionObject = await AutoWithdrawRepository.prototype.findById(addOn.autoWithdraw)
         let maxWithdrawAmountPerTransactionPerCurrency = maxWithdrawAmountPerTransactionObject.maxWithdrawAmountPerTransaction.find(c => c.currency.toString() == params.currency.toString())
         if(params.tokenAmount <= maxWithdrawAmountPerTransactionPerCurrency.amount){
-            return true;
+            return {verify : true, textError : "success"};
         } else {
-            return false;
+            return {verify : false, textError : "Amount withdrawal greater than the maximum allowed"};
         }
     },
     __requestAffiliateWithdraw : async (params) => {
@@ -271,11 +268,10 @@ const progressActions = {
         return withdrawSaveObject._id;
     },
     __verifyEmailConfirmed : async (params) => {
-        return params
+        return params;
     },
     __verifyIfIsAutoWithdraw : async (params) => {
-        const { isAutomaticWithdraw } = params;
-        return isAutomaticWithdraw.isAutoWithdraw;
+        return params;
     },
     __verifyMaxWithdrawAmountCumulative : async (params) => {
         return params;
