@@ -100,7 +100,6 @@ const processActions = {
             let addOn = await AddOnRepository.prototype.findById(app.addOn);
             if (addOn.autoWithdraw){
                 isAutomaticWithdraw = await AutoWithdrawRepository.prototype.findById(addOn.autoWithdraw);
-                if(!isAutomaticWithdraw){throwError()}
             } else {
                 isAutomaticWithdraw = false
             }
@@ -269,7 +268,7 @@ const progressActions = {
         
         /* Add Deposit to user */
         await UsersRepository.prototype.addWithdraw(params.user._id, withdrawSaveObject._id);
-        return null;
+        return withdrawSaveObject._id;
     },
     __verifyEmailConfirmed : async (params) => {
         return params

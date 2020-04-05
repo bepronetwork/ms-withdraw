@@ -72,6 +72,15 @@ class User extends ModelComponent{
         }
     }
 
+    async verifyEmailConfirmed(){
+        try{
+            let res = await this.process('VerifyEmailConfirmed');
+            return res;
+        }catch(err){
+            throw err;
+        }
+    }
+
     async requesAffiliatetWithdraw(){
         // Output = Null
         const { user } = this.self.params;
