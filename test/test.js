@@ -142,7 +142,7 @@ const test = async () => {
             await delay(30*1000);
             global.test.ticker = global.test.currencies[0];
 
-            await AppRepository.prototype.setOwnerAddress(admin.app.id, admin_eth_account.getAddress());
+            await AppRepository.prototype.setOwnerAddress(admin.app.id, admin_eth_account.getAddress(), currencyETH._id);
             expect(true).to.equal(true);      
         })
         it('Unit Testing', async () => {

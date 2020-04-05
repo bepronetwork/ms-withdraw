@@ -120,8 +120,11 @@ class ErrorManager {
                     if(!object.app || _.isEmpty(object.app)){
                         libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.APP_NOT_EXISTENT)); break;   
                     }
-                    if(new String(object.app.ownerAddress).toLowerCase() != new String(object.withdrawAddress).toLowerCase()){
-                        libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.APP_ADDRESS_IS_NOT_VALID));    
+                    // if(new String(object.app.ownerAddress).toLowerCase() != new String(object.withdrawAddress).toLowerCase()){
+                    //     libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.APP_ADDRESS_IS_NOT_VALID));    
+                    // }
+                    if( !(object.listAddress.map((r)=>r.toLowerCase()).includes(new String(object.withdrawAddress).toLowerCase())) ){
+                        libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.APP_ADDRESS_IS_NOT_VALID));
                     }
                     // Verify if Minimum Withdraw was passed
                     /*if(parseFloat(object.amount) < MIN_WITHDRAW){
