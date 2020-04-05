@@ -31,6 +31,7 @@ AppSchema.prototype.schema =  {
     metadataJSON        : {  type: JSON},
     isWithdrawing       : { type : Boolean, default : false, required : true },
     integrations        : { type: mongoose.Schema.Types.ObjectId, ref: 'Integrations'},
+    addOn               : { type: mongoose.Schema.Types.ObjectId, ref: 'AddOn'}
 }
 
 

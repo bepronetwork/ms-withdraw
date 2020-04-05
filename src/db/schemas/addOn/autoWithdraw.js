@@ -17,7 +17,6 @@ AutoWithdrawSchema.prototype.schema =  {
         amount               : { type: Number, required : true, default : 0},
     }],
     withdrawAmount        : { type : Number, required : true, default : 0},
-    verifiedEmail         : { type: Boolean, required : true, default : false},
     verifiedKYC           : { type: Boolean, required : true, default : false},
 }
 

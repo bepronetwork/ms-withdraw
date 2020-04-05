@@ -4,7 +4,7 @@
 const _ = require('lodash');
 import { ErrorManager } from '../controllers/Errors';
 import LogicComponent from './logicComponent';
-import { UsersRepository, AppRepository, WalletsRepository, WithdrawRepository } from '../db/repos';
+import { UsersRepository, AppRepository, WalletsRepository, WithdrawRepository, AddOnRepository, AutoWithdrawRepository } from '../db/repos';
 import Numbers from './services/numbers';
 import { Withdraw } from '../models';
 import { globals } from '../Globals';
@@ -68,7 +68,7 @@ const processActions = {
             let user_in_app = (app.users.findIndex(x => (x._id.toString() == user._id.toString())) > -1);
 
             /* Verify if Withdraw position is already opened in the Smart-Contract */
-            let res = {
+            var res = {
                 // max_withdraw: (!userWallet.max_withdraw) ? 0 : userWallet.max_withdraw,
                 max_withdraw: (!wallet.max_withdraw) ? 0 : wallet.max_withdraw,
                 hasEnoughBalance,
@@ -87,6 +87,55 @@ const processActions = {
             return res;
         } catch(err) {
             throw err;
+        }
+    },
+    __verifyIfIsAutoWithdraw : async (params) => {
+        var isAutomaticWithdraw;
+        let app = await AppRepository.prototype.findAppById(params.app);
+        if (app.addOn){
+            let addOn = await AddOnRepository.prototype.findById(app.addOn);
+            if (addOn.autoWithdraw){
+                isAutomaticWithdraw = await AutoWithdrawRepository.prototype.findById(addOn.autoWithdraw);
+                if(!isAutomaticWithdraw){throwError()}
+            } else {
+                isAutomaticWithdraw = false
+            }
+        } else {
+            isAutomaticWithdraw = false;
+        }
+        
+        let normalized = {
+            isAutomaticWithdraw
+        };
+        return normalized
+    },
+    __verifyMaxWithdrawAmountCumulative : async (params) => {
+        let app = await AppRepository.prototype.findAppById(params.app);
+        let addOn = await AddOnRepository.prototype.findById(app.addOn);
+        let maxWithdrawAmountCumulativeObject = await AutoWithdrawRepository.prototype.findById(addOn.autoWithdraw)
+        let user = await UsersRepository.prototype.findUserById(params.user);
+        let withdrawPerCurrency = user.withdraws.filter(c => c.currency.toString() == params.currency.toString())
+        let withdrawAcumulative = withdrawPerCurrency.reduce(
+            (acumulative , withdrawValue) => acumulative + withdrawValue.amount
+            , 0 
+        );
+        withdrawAcumulative = parseFloat(params.tokenAmount + withdrawAcumulative).toFixed(6);
+        let maxWithdrawAmountCumulativePerCurrency = maxWithdrawAmountCumulativeObject.maxWithdrawAmountCumulative.find(c => c.currency.toString() == params.currency.toString())
+        if(withdrawAcumulative <= maxWithdrawAmountCumulativePerCurrency.amount){
+            return true;
+        } else {
+            return false;
+        }
+    },
+    __verifyMaxWithdrawAmountPerTransaction : async (params) => {
+        let app = await AppRepository.prototype.findAppById(params.app);
+        let addOn = await AddOnRepository.prototype.findById(app.addOn);
+        let maxWithdrawAmountPerTransactionObject = await AutoWithdrawRepository.prototype.findById(addOn.autoWithdraw)
+        let maxWithdrawAmountPerTransactionPerCurrency = maxWithdrawAmountPerTransactionObject.maxWithdrawAmountPerTransaction.find(c => c.currency.toString() == params.currency.toString())
+        if(params.tokenAmount <= maxWithdrawAmountPerTransactionPerCurrency.amount){
+            return true;
+        } else {
+            return false;
         }
     },
     __requestAffiliateWithdraw : async (params) => {
@@ -218,6 +267,17 @@ const progressActions = {
         await UsersRepository.prototype.addWithdraw(params.user._id, withdrawSaveObject._id);
         return null;
     },
+
+    __verifyIfIsAutoWithdraw : async (params) => {
+        const { isAutomaticWithdraw } = params;
+        return isAutomaticWithdraw.isAutoWithdraw;
+    },
+    __verifyMaxWithdrawAmountCumulative : async (params) => {
+        return params;
+    },
+    __verifyMaxWithdrawAmountPerTransaction : async (params) => {
+        return params;
+    },
     __requestAffiliateWithdraw :  async (params) => {
         /* Add Withdraw to user */
         var withdraw = new Withdraw({
@@ -326,6 +386,15 @@ class UserLogic extends LogicComponent {
                 case 'RequestWithdraw' : {
 					return await library.process.__requestWithdraw(params); 
                 };
+                case 'VerifyIfIsAutoWithdraw' : {
+					return await library.process.__verifyIfIsAutoWithdraw(params); 
+                };
+                case 'VerifyMaxWithdrawAmountCumulative' : {
+					return await library.process.__verifyMaxWithdrawAmountCumulative(params); 
+                };
+                case 'VerifyMaxWithdrawAmountPerTransaction' : {
+					return await library.process.__verifyMaxWithdrawAmountPerTransaction(params); 
+                };
                 case 'RequestAffiliateWithdraw' : {
                     return await library.process.__requestAffiliateWithdraw(params); 
                 }
@@ -360,6 +429,15 @@ class UserLogic extends LogicComponent {
 			switch(progressAction) {
                 case 'RequestWithdraw' : {
 					return await library.progress.__requestWithdraw(params); 
+                };
+                case 'VerifyIfIsAutoWithdraw' : {
+					return await library.progress.__verifyIfIsAutoWithdraw(params); 
+                };
+                case 'VerifyMaxWithdrawAmountCumulative' : {
+					return await library.progress.__verifyMaxWithdrawAmountCumulative(params); 
+                };
+                case 'VerifyMaxWithdrawAmountPerTransaction' : {
+					return await library.progress.__verifyMaxWithdrawAmountPerTransaction(params); 
                 };
                 case 'RequestAffiliateWithdraw' : {
                     return await library.progress.__requestAffiliateWithdraw(params); 

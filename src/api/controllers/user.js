@@ -9,7 +9,10 @@ async function requestWithdraw (req, res) {
     try{
         SecuritySingleton.verify({type : 'user', req});
         let params = req.body;
-		let user = new User(params);
+        let user = new User(params);
+        let verifyAutoWithdraw = await user.verifyIfIsAutoWithdraw();
+        let verifyMaxWithdrawAmountCumulative = await user.verifyMaxWithdrawAmountCumulative();
+        let verifyMaxWithdrawAmountPerTransaction = await user.verifyMaxWithdrawAmountPerTransaction()
         let data = await user.requestWithdraw();
         MiddlewareSingleton.respond(res, data);
 	}catch(err){
