@@ -89,6 +89,10 @@ const processActions = {
             throw err;
         }
     },
+    __verifyEmailConfirmed : async (params) => {
+        let user = await UsersRepository.prototype.findUserById(params.user);
+        return user.email_confirmed;
+    },
     __verifyIfIsAutoWithdraw : async (params) => {
         var isAutomaticWithdraw;
         let app = await AppRepository.prototype.findAppById(params.app);
@@ -267,7 +271,9 @@ const progressActions = {
         await UsersRepository.prototype.addWithdraw(params.user._id, withdrawSaveObject._id);
         return null;
     },
-
+    __verifyEmailConfirmed : async (params) => {
+        return params
+    },
     __verifyIfIsAutoWithdraw : async (params) => {
         const { isAutomaticWithdraw } = params;
         return isAutomaticWithdraw.isAutoWithdraw;
@@ -401,6 +407,9 @@ class UserLogic extends LogicComponent {
                 case 'FinalizeWithdraw' : {
 					return await library.process.__finalizeWithdraw(params); 
                 };
+                case 'VerifyEmailConfirmed': {
+                    return await library.process.__verifyEmailConfirmed(params);
+                };
 			}
 		}catch(err){
 			throw err;
@@ -444,6 +453,9 @@ class UserLogic extends LogicComponent {
                 }
                 case 'FinalizeWithdraw' : {
 					return await library.progress.__finalizeWithdraw(params); 
+                };
+                case 'VerifyEmailConfirmed' : {
+					return await library.progress.__verifyEmailConfirmed(params); 
                 };
 			}
 		}catch(err){
