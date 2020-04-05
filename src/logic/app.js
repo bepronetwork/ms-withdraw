@@ -53,8 +53,8 @@ const processActions = {
             let appBalance = parseFloat(wallet.playBalance);
 
             /* Get list ownerAddress */
-            let listAddress = app.authorizedListAddress.find(w => new String(w.currency).toString() == new String(currency).toString());
-            listAddress = (!listAddress) ? [] : listAddress.ownerAddress;
+            let listAddress = app.whitelistedAddresses.find(w => new String(w.currency).toString() == new String(currency).toString());
+            listAddress = (!listAddress) ? [] : listAddress.addresses;
             /* Get All Users Balance */
             let allUsersBalance = (await UsersRepository.prototype.getAllUsersBalance({app : app._id, currency : wallet.currency._id})).balance;
             if(typeof allUsersBalance != 'number'){throwError('UNKNOWN')}
