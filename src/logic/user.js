@@ -69,6 +69,7 @@ const processActions = {
 
             /* Verify if Withdraw position is already opened in the Smart-Contract */
             var res = {
+                withdrawNotification: params.textError,
                 // max_withdraw: (!userWallet.max_withdraw) ? 0 : userWallet.max_withdraw,
                 max_withdraw: (!wallet.max_withdraw) ? 0 : wallet.max_withdraw,
                 hasEnoughBalance,
@@ -243,20 +244,20 @@ const processActions = {
  * @param {function} params - Function Params
  **/
 
-  
 const progressActions = {
     __requestWithdraw : async (params) => {
          /* Add Withdraw to user */
          var withdraw = new Withdraw({
             app                     : params.app,
             user                    : params.user._id,
-            creation_timestamp      : new Date(),                    
+            creation_timestamp      : new Date(),
             address                 : params.withdrawAddress,                         // Deposit Address 
             currency                : params.currency,
             amount                  : params.amount,
             nonce                   : params.nonce,
+            withdrawNotification    : withdrawNotification
         })
-    
+
         /* Save Deposit Data */
         var withdrawSaveObject = await withdraw.createWithdraw();
 
