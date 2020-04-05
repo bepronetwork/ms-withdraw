@@ -17,8 +17,8 @@ async function requestWithdraw (req, res) {
         let verifyEmailConfirmed                    = await user.verifyEmailConfirmed();
 
         let textError = [verifyAutoWithdraw, verifyMaxWithdrawAmountCumulative, verifyMaxWithdrawAmountPerTransaction, verifyEmailConfirmed];
-        textError = textError.find( t => t.verify == false ).textError;
-
+        textError = textError.find( t => t.verify == false );
+        textError = (textError == null || textError == undefined) ? "Success" : textError.textError
         let userRequest = new User({...params, textError});
 
         let withdraw_id = await userRequest.requestWithdraw();

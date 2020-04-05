@@ -255,7 +255,7 @@ const progressActions = {
             currency                : params.currency,
             amount                  : params.amount,
             nonce                   : params.nonce,
-            withdrawNotification    : withdrawNotification
+            withdrawNotification    : params.withdrawNotification
         })
 
         /* Save Deposit Data */
