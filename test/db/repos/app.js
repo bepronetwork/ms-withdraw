@@ -74,7 +74,7 @@ class AppRepository extends MongoComponent{
         });
     }
 
-    setOwnerAddress(app_id, addresses, currency){
+    setOwnerAddress(app_id, address, currency){
         console.log(app_id);
         return new Promise( (resolve,reject) => {
             AppRepository.prototype.schema.model.findByIdAndUpdate(
@@ -82,7 +82,7 @@ class AppRepository extends MongoComponent{
                 { $push: {
                     "whitelistedAddresses" : {
                         "currency"      : currency,
-                        "addresses"  : [new String(addresses).trim()]
+                        "addresses"  : [new String(address).trim()]
                     },
                 } }
                 ,{ 'new': true })
