@@ -12,9 +12,9 @@ async function requestWithdraw (req, res) {
         let user = new User(params);
 
         let verifyAutoWithdraw                      = await user.verifyIfIsAutoWithdraw();
-        let verifyMaxWithdrawAmountCumulative       = await user.verifyMaxWithdrawAmountCumulative();
-        let verifyMaxWithdrawAmountPerTransaction   = await user.verifyMaxWithdrawAmountPerTransaction()
-        let verifyEmailConfirmed                    = await user.verifyEmailConfirmed();
+        let verifyMaxWithdrawAmountCumulative       = verifyAutoWithdraw.verify ? await user.verifyMaxWithdrawAmountCumulative() : {verify: false, textError: verifyAutoWithdraw.textError};
+        let verifyMaxWithdrawAmountPerTransaction   = verifyAutoWithdraw.verify ? await user.verifyMaxWithdrawAmountPerTransaction() : {verify: false, textError: verifyAutoWithdraw.textError};
+        let verifyEmailConfirmed                    = verifyAutoWithdraw.verify ? await user.verifyEmailConfirmed() : {verify: false, textError: verifyAutoWithdraw.textError};
 
         let textError = [verifyAutoWithdraw, verifyMaxWithdrawAmountCumulative, verifyMaxWithdrawAmountPerTransaction, verifyEmailConfirmed];
         textError = textError.find( t => t.verify == false );
