@@ -19,12 +19,13 @@ const autoWithdrawParams = {
 }
 
 context('Automatic Withdraw', async () => {
-    var user, app, user_eth_account, contract, appWallet, currency, addAutomaticWithdraw, editAutomaticWithdraw, admin;
+    var user, app, user_eth_account, contract, appWallet, currency, addAutomaticWithdraw, editAutomaticWithdraw, admin, bearerToken;
 
     before( async () =>  {
 
         app = global.test.app;
         admin = global.test.admin;
+        bearerToken = admin.app.bearerToken
         contract = global.test.contract;
         appWallet = app.wallet.find( w => new String(w.currency.ticker).toLowerCase() == new String(global.test.ticker).toLowerCase());
         currency = appWallet.currency;
@@ -35,9 +36,9 @@ context('Automatic Withdraw', async () => {
         /* Gets User Info */
         user = await loginUser({username : user.username, password : user.password, app_id : app.id});
         /* Add AutoWithdraw to App */
-        addAutomaticWithdraw = await addAutoWithdraw({admin_id : admin.id, app_id : app.id, bearerToken: admin.app.bearerToken, payload : {id : admin.id}});
+        addAutomaticWithdraw = await addAutoWithdraw({admin_id : admin.id, app_id : app.id, bearerToken, payload : {id : admin.id}});
         /* Edit AutoWithdraw */
-        editAutomaticWithdraw = await editAutoWithdraw({admin_id : admin.id, app_id : app.id, currency : app.currencies[0]._id, autoWithdrawParams, bearerToken: admin.app.bearerToken, payload : {id : admin.id}});
+        editAutomaticWithdraw = await editAutoWithdraw({admin_id : admin.id, app_id : app.id, currency : app.currencies[0]._id, autoWithdrawParams, bearerToken, payload : {id : admin.id}});
         console.log("editAutomaticWithdraw:: ",editAutomaticWithdraw)
     });
 
