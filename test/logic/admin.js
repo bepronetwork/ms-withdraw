@@ -1,6 +1,3 @@
-
-
-
 const _ = require('lodash');
 import { Security } from '../controllers/Security';
 import LogicComponent from './logicComponent';
@@ -9,7 +6,6 @@ import { SecurityRepository } from '../db/repos';
 // Private fields
 let self; // eslint-disable-line no-unused-vars
 let library;
-let modules;
 
 let __private = {};
 

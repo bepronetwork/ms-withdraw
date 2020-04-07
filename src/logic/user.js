@@ -5,12 +5,8 @@ const _ = require('lodash');
 import { ErrorManager } from '../controllers/Errors';
 import LogicComponent from './logicComponent';
 import { UsersRepository, AppRepository, WalletsRepository, WithdrawRepository } from '../db/repos';
-import Numbers from './services/numbers';
 import { Withdraw } from '../models';
-import { globals } from '../Globals';
 import { throwError } from '../controllers/Errors/ErrorManager';
-import { verifytransactionHashWithdrawUser } from './services/services';
-import { detectCurrencyAmountToSmartContractAmount } from './utils/currencies';
 import BitGoSingleton from './third-parties/bitgo';
 import { Security } from '../controllers/Security';
 import Mailer from './services/mailer';
@@ -135,8 +131,6 @@ const processActions = {
     },
     __finalizeWithdraw : async (params) => {
         try{
-            var tokenAmount;
-
             const { currency } = params;
 
             /* Get User Id */
@@ -254,7 +248,7 @@ const progressActions = {
             });
             let link_url = setLinkUrl({ticker : params.currency.ticker, address : bitgo_tx.txid, isTransactionHash : true })
             /* Add Withdraw to user */
-            let text= await WithdrawRepository.prototype.finalizeWithdraw(params.withdraw_id, {
+            await WithdrawRepository.prototype.finalizeWithdraw(params.withdraw_id, {
                 transactionHash         :   bitgo_tx.txid,
                 bitgo_id                :   bitgo_tx.transfer.id,
                 last_update_timestamp   :   new Date(),

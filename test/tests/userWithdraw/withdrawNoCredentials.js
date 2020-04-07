@@ -5,7 +5,7 @@ import chai from 'chai';
 const expect = chai.expect;
 
 context('Withdraw No Credentials', async () => {
-    var user, app, user_eth_account, appWallet, currency;
+    var user, app, appWallet, currency;
 
     before( async () =>  {
 

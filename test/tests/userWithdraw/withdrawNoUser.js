@@ -3,13 +3,6 @@ import { requestUserWithdraw } from "../../methods";
 import chai from 'chai';
 const expect = chai.expect;
 
-const initialState = {
-    user : {
-        eth_balance : 0.12,
-        token_balance : 5,
-    }
-}
-
 context('Withdraw No User', async () => {
     var  app, currency;
 

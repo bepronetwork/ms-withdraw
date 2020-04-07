@@ -1,18 +1,11 @@
 import _ from 'lodash';
 import { ErrorManager } from '../controllers/Errors';
-import { AppRepository,  WalletsRepository,  UsersRepository, WithdrawRepository, MailSenderRepository } from '../db/repos';
+import { AppRepository,  WalletsRepository,  UsersRepository, WithdrawRepository } from '../db/repos';
 import LogicComponent from './logicComponent';
 import { Withdraw } from '../models';
-import CasinoContract from './eth/CasinoContract';
-import { globals } from '../Globals';
-import Numbers from './services/numbers';
 import { throwError } from '../controllers/Errors/ErrorManager';
-import { verifytransactionHashWithdrawApp } from './services/services';
-import {  detectCurrencyAmountToSmartContractAmount } from './utils/currencies';
 import BitGoSingleton from './third-parties/bitgo';
 import { Security } from '../controllers/Security';
-import { SendInBlueAttributes } from './third-parties';
-import { SendinBlueSingleton, SendInBlue } from './third-parties/sendInBlue';
 import { setLinkUrl } from '../helpers/linkUrl';
 let error = new ErrorManager();
 
@@ -21,7 +14,6 @@ let error = new ErrorManager();
 // Private fields
 let self; // eslint-disable-line no-unused-vars
 let library;
-let modules;
 
 let __private = {};
 
@@ -83,7 +75,6 @@ const processActions = {
     },
     __finalizeWithdraw : async (params) => {
 
-        var params_input = params;
         const { currency } = params;
 
         /* Get App By Id */
