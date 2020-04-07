@@ -1,8 +1,6 @@
-import { mochaAsync, detectValidationErrors } from "../../utils/testing";
-import { requestAppWithdraw, getAppAuth, setAppMaxWithdraw } from "../../methods";
+import { mochaAsync } from "../../utils/testing";
+import { getAppAuth, setAppMaxWithdraw } from "../../methods";
 import chai from 'chai';
-import {  appWalletInfo } from "../../utils/env";
-import Numbers from "../../logic/services/numbers";
 const expect = chai.expect;
 
 var appWallet;

@@ -1,5 +1,4 @@
 import { mochaAsync, detectValidationErrors } from "../../utils/testing";
-import { loginUser } from "../../utils/env";
 import { requestUserWithdraw } from "../../methods";
 import chai from 'chai';
 const expect = chai.expect;

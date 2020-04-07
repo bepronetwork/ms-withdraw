@@ -2,15 +2,8 @@
 
 
 const _ = require('lodash');
-import { Security } from '../controllers/Security';
 import { ErrorManager } from '../controllers/Errors';
 import LogicComponent from './logicComponent';
-import ConverterSingleton from './utils/converter';
-import { Withdraw, User } from '../models';
-import { WithdrawRepository, AppRepository, UsersRepository, WalletsRepository } from '../db/repos';
-import { globals } from '../Globals';
-import MathSingleton from './utils/math';
-import axios from 'axios';
 
 let error = new ErrorManager();
 
@@ -23,7 +16,6 @@ const config = {
 // Private fields
 let self; // eslint-disable-line no-unused-vars
 let library;
-let modules;
 
 let __private = {};
 

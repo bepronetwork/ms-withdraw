@@ -3,7 +3,6 @@
 const _ = require('lodash');
 import LogicComponent from './logicComponent';
 import { WalletsRepository, UsersRepository, AppRepository } from '../db/repos';
-import DepositsRepository from '../db/repos/deposit';
 
 
 // Private fields

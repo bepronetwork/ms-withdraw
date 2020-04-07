@@ -1,19 +1,11 @@
 import { mochaAsync, detectValidationErrors } from "../../utils/testing";
-import { Logger } from "../../utils/logger";
-import { createEthAccount, registerUser, loginUser } from "../../utils/env";
+import { registerUser, loginUser } from "../../utils/env";
 import { requestUserWithdraw } from "../../methods";
 import chai from 'chai';
 const expect = chai.expect;
 
-const initialState = {
-    user : {
-        eth_balance : 0.12,
-        token_balance : 5,
-    }
-}
-
 context('Withdraw No App Present', async () => {
-    var user, app, user_eth_account, contract, currency, appWallet;
+    var user, app, contract, currency, appWallet;
 
     before( async () =>  {
 
