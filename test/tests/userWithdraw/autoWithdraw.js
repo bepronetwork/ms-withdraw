@@ -66,12 +66,17 @@ context('Automatic Withdraw', async () => {
     }));
 
     it('should be edit automatic withdraw to false', mochaAsync(async () => {
-        autoWithdrawParams = {
+        let autoWithdrawParams = {
             isAutoWithdraw : false,
             verifiedKYC : true,
             maxWithdrawAmountCumulative : 1,
             maxWithdrawAmountPerTransaction : 0.5 
         }
+        console.log(admin.id)
+        console.log(app.id)
+        console.log(app.currencies[0]._id)
+        console.log(autoWithdrawParams)
+        console.log(bearerToken)
         let res = await editAutoWithdraw({
             admin_id : admin.id, 
             app_id : app.id, 
