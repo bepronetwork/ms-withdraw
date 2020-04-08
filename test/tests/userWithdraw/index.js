@@ -3,8 +3,8 @@ context('User Testing', async () => {
     require('./withdrawNoUser');
     require('./withdrawNoApp');
     require('./withdrawNoCredentials');
-    require('./withdraw0');
     require('./autoWithdraw');
+    require('./withdraw0');
     require('./withdrawMax');
     require('./withdrawEmailNoConfirmed');
     require('./withdrawNoFunds');

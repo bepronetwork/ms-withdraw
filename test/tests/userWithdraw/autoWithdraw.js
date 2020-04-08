@@ -25,7 +25,7 @@ context('Automatic Withdraw', async () => {
 
         app = global.test.app;
         admin = global.test.admin;
-        bearerToken = admin.app.bearerToken
+        bearerToken = admin.bearerToken;
         contract = global.test.contract;
         appWallet = app.wallet.find( w => new String(w.currency.ticker).toLowerCase() == new String(global.test.ticker).toLowerCase());
         currency = appWallet.currency;
@@ -39,7 +39,7 @@ context('Automatic Withdraw', async () => {
         addAutomaticWithdraw = await addAutoWithdraw({admin_id : admin.id, app_id : app.id, bearerToken, payload : {id : admin.id}});
         /* Edit AutoWithdraw */
         editAutomaticWithdraw = await editAutoWithdraw({admin_id : admin.id, app_id : app.id, currency : app.currencies[0]._id, autoWithdrawParams, bearerToken, payload : {id : admin.id}});
-        console.log("editAutomaticWithdraw:: ",editAutomaticWithdraw)
+        
     });
 
 
@@ -47,12 +47,13 @@ context('Automatic Withdraw', async () => {
 
         let res = await requestUserWithdraw({
             app : app.id,
-            tokenAmount : 0.0000001,
+            tokenAmount : 0.0001,
             nonce : 2334539,
             address : user_eth_account.getAddress(),
             user : user.id,
             currency : currency._id
         }, user.bearerToken , {id : user.id});
+        console.log(res.data)
 
         expect(detectValidationErrors(res)).to.be.equal(false);
         const { status } = res.data;
