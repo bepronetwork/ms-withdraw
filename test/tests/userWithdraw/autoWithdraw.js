@@ -51,7 +51,7 @@ context('Automatic Withdraw', async () => {
     it('should be able to make automatic withdraw', mochaAsync(async () => {
         let res = await requestUserWithdraw({
             tokenAmount : global.test.depositAmounts[ticker]/2,
-            nonce : 3456365756,
+            nonce : 3456365755,
             app : app.id,
             address : user_eth_account.getAddress(),
             user : user.id,
