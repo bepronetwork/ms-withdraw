@@ -2,6 +2,7 @@ import { mochaAsync, detectValidationErrors } from "../../utils/testing";
 import { createEthAccount, registerUser, loginUser, addAutoWithdraw, editAutoWithdraw, depositWallet } from "../../utils/env";
 import { requestUserWithdraw } from "../../methods";
 import chai from 'chai';
+import { WithdrawRepository } from "../../../test/db/repos";
 const expect = chai.expect;
 
 const initialState = {
@@ -45,7 +46,6 @@ context('Automatic Withdraw', async () => {
         addAutomaticWithdraw = await addAutoWithdraw({admin_id : admin.id, app_id : app.id, bearerToken, payload : {id : admin.id}});
         /* Edit AutoWithdraw */
         editAutomaticWithdraw = await editAutoWithdraw({admin_id : admin.id, app_id : app.id, currency : app.currencies[0]._id, autoWithdrawParams, bearerToken, payload : {id : admin.id}});
-        
     });
 
     it('should be able to make automatic withdraw', mochaAsync(async () => {
@@ -57,7 +57,10 @@ context('Automatic Withdraw', async () => {
             user : user.id,
             currency : currency._id
         }, user.bearerToken , {id : user.id});
-        console.log(res.data)
+        let withdrawObject = await WithdrawRepository.prototype.findWithdrawById(res.data.message)
+        console.log(withdrawObject);
+        expect(withdrawObject).to.be.not.null;
+        expect(withdrawObject.confirmed).to.be.true;
         expect(detectValidationErrors(res)).to.be.equal(false);
         const { status } = res.data;
         expect(status).to.be.equal(200)
