@@ -72,11 +72,6 @@ context('Automatic Withdraw', async () => {
             maxWithdrawAmountCumulative : 1,
             maxWithdrawAmountPerTransaction : 0.5 
         }
-        console.log(admin.id)
-        console.log(app.id)
-        console.log(app.currencies[0]._id)
-        console.log(autoWithdrawParams)
-        console.log(bearerToken)
         let res = await editAutoWithdraw({
             admin_id : admin.id, 
             app_id : app.id, 
@@ -85,7 +80,7 @@ context('Automatic Withdraw', async () => {
             bearerToken, 
             payload : {id : admin.id}
         });
-        console.log(res.data)
+        console.log(res)
         expect(detectValidationErrors(res)).to.be.equal(false);
         const { status } = res.data;
         expect(status).to.be.equal(200)

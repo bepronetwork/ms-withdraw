@@ -175,6 +175,9 @@ export async function addAutowithdraw(params, bearerToken, payload){
 }
 
 export async function editAutowithdraw(params, bearerToken, payload){
+    console.log(params)
+    console.log(bearerToken)
+    console.log(payload)
     return (await axios.post(`${MS_MASTER_URL}/api/app/autoWithdraw/editAutoWithdraw`, params, {
         headers : {
             "authorization" : `Bearer ${bearerToken}`,
