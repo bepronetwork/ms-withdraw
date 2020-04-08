@@ -12,7 +12,7 @@ const initialState = {
     }
 }
 
-const autoWithdrawParams = {
+var autoWithdrawParams = {
     isAutoWithdraw : true,
     verifiedKYC : true,
     maxWithdrawAmountCumulative : 1,
@@ -60,6 +60,27 @@ context('Automatic Withdraw', async () => {
         let withdrawObject = await WithdrawRepository.prototype.findWithdrawById(res.data.message);
         expect(withdrawObject).to.be.not.null;
         expect(withdrawObject.confirmed).to.be.true;
+        expect(detectValidationErrors(res)).to.be.equal(false);
+        const { status } = res.data;
+        expect(status).to.be.equal(200)
+    }));
+
+    it('should be edit automatic withdraw to false', mochaAsync(async () => {
+        autoWithdrawParams = {
+            isAutoWithdraw : false,
+            verifiedKYC : true,
+            maxWithdrawAmountCumulative : 1,
+            maxWithdrawAmountPerTransaction : 0.5 
+        }
+        let res = await editAutoWithdraw({
+            admin_id : admin.id, 
+            app_id : app.id, 
+            currency : app.currencies[0]._id, 
+            autoWithdrawParams, 
+            bearerToken, 
+            payload : {id : admin.id}
+        });
+        console.log(res.data)
         expect(detectValidationErrors(res)).to.be.equal(false);
         const { status } = res.data;
         expect(status).to.be.equal(200)
