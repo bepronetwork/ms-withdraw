@@ -57,8 +57,7 @@ context('Automatic Withdraw', async () => {
             user : user.id,
             currency : currency._id
         }, user.bearerToken , {id : user.id});
-        let withdrawObject = await WithdrawRepository.prototype.findWithdrawById(res.data.message)
-        console.log(withdrawObject);
+        let withdrawObject = await WithdrawRepository.prototype.findWithdrawById(res.data.message);
         expect(withdrawObject).to.be.not.null;
         expect(withdrawObject.confirmed).to.be.true;
         expect(detectValidationErrors(res)).to.be.equal(false);
