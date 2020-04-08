@@ -10,7 +10,6 @@ let error = new ErrorManager();
 // Private fields
 let self; // eslint-disable-line no-unused-vars
 let library;
-let modules;
 
 let __private = {};
 

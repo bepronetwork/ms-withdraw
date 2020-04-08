@@ -4,13 +4,11 @@
 const _ = require('lodash');
 import { ErrorManager } from '../controllers/Errors';
 import LogicComponent from './logicComponent';
-import { UsersRepository, AppRepository, WalletsRepository, WithdrawRepository } from '../db/repos';
+
+import { UsersRepository, AppRepository, WalletsRepository, WithdrawRepository, AddOnRepository, AutoWithdrawRepository } from '../db/repos';
 import Numbers from './services/numbers';
 import { Withdraw } from '../models';
-import { globals } from '../Globals';
 import { throwError } from '../controllers/Errors/ErrorManager';
-import { verifytransactionHashWithdrawUser } from './services/services';
-import { detectCurrencyAmountToSmartContractAmount } from './utils/currencies';
 import BitGoSingleton from './third-parties/bitgo';
 import { Security } from '../controllers/Security';
 import Mailer from './services/mailer';
@@ -68,7 +66,8 @@ const processActions = {
             let user_in_app = (app.users.findIndex(x => (x._id.toString() == user._id.toString())) > -1);
 
             /* Verify if Withdraw position is already opened in the Smart-Contract */
-            let res = {
+            var res = {
+                withdrawNotification: params.textError,
                 // max_withdraw: (!userWallet.max_withdraw) ? 0 : userWallet.max_withdraw,
                 max_withdraw: (!wallet.max_withdraw) ? 0 : wallet.max_withdraw,
                 hasEnoughBalance,
@@ -87,6 +86,55 @@ const processActions = {
             return res;
         } catch(err) {
             throw err;
+        }
+    },
+    __verifyEmailConfirmed : async (params) => {
+        let user = await UsersRepository.prototype.findUserById(params.user);
+        return {verify : user.email_confirmed, textError : user.email_confirmed ? "success" : "Email Not Verified" };
+    },
+    __verifyIfIsAutoWithdraw : async (params) => {
+        var isAutomaticWithdraw;
+        let app = await AppRepository.prototype.findAppById(params.app);
+        if (app.addOn){
+            let addOn = await AddOnRepository.prototype.findById(app.addOn);
+            if (addOn.autoWithdraw){
+                isAutomaticWithdraw = await AutoWithdrawRepository.prototype.findById(addOn.autoWithdraw);
+                isAutomaticWithdraw = isAutomaticWithdraw.isAutoWithdraw
+                return {verify : isAutomaticWithdraw, textError : isAutomaticWithdraw ? "success" : "Automatic withdrawal set to false" };
+            } else {
+                return {verify : false, textError : "AutoWithdraw as Undefined"};
+            }
+        } else {
+            return {verify : false, textError : "AddOn as Undefined"};
+        }
+    },
+    __verifyMaxWithdrawAmountCumulative : async (params) => {
+        let app = await AppRepository.prototype.findAppById(params.app);
+        let addOn = await AddOnRepository.prototype.findById(app.addOn);
+        let maxWithdrawAmountCumulativeObject = await AutoWithdrawRepository.prototype.findById(addOn.autoWithdraw)
+        let user = await UsersRepository.prototype.findUserById(params.user);
+        let withdrawPerCurrency = user.withdraws.filter(c => c.currency.toString() == params.currency.toString())
+        let withdrawAcumulative = withdrawPerCurrency.reduce(
+            (acumulative , withdrawValue) => acumulative + withdrawValue.amount
+            , 0 
+        );
+        withdrawAcumulative = parseFloat(params.tokenAmount + withdrawAcumulative).toFixed(6);
+        let maxWithdrawAmountCumulativePerCurrency = maxWithdrawAmountCumulativeObject.maxWithdrawAmountCumulative.find(c => c.currency.toString() == params.currency.toString())
+        if(withdrawAcumulative <= maxWithdrawAmountCumulativePerCurrency.amount){
+            return {verify : true, textError : "success"};
+        } else {
+            return {verify : false, textError : "Amount accumulated withdrawal greater than the maximum allowed"};
+        }
+    },
+    __verifyMaxWithdrawAmountPerTransaction : async (params) => {
+        let app = await AppRepository.prototype.findAppById(params.app);
+        let addOn = await AddOnRepository.prototype.findById(app.addOn);
+        let maxWithdrawAmountPerTransactionObject = await AutoWithdrawRepository.prototype.findById(addOn.autoWithdraw)
+        let maxWithdrawAmountPerTransactionPerCurrency = maxWithdrawAmountPerTransactionObject.maxWithdrawAmountPerTransaction.find(c => c.currency.toString() == params.currency.toString())
+        if(params.tokenAmount <= maxWithdrawAmountPerTransactionPerCurrency.amount){
+            return {verify : true, textError : "success"};
+        } else {
+            return {verify : false, textError : "Amount withdrawal greater than the maximum allowed"};
         }
     },
     __requestAffiliateWithdraw : async (params) => {
@@ -135,8 +183,6 @@ const processActions = {
     },
     __finalizeWithdraw : async (params) => {
         try{
-            var tokenAmount;
-
             const { currency } = params;
 
             /* Get User Id */
@@ -194,20 +240,20 @@ const processActions = {
  * @param {function} params - Function Params
  **/
 
-  
 const progressActions = {
     __requestWithdraw : async (params) => {
          /* Add Withdraw to user */
          var withdraw = new Withdraw({
             app                     : params.app,
             user                    : params.user._id,
-            creation_timestamp      : new Date(),                    
+            creation_timestamp      : new Date(),
             address                 : params.withdrawAddress,                         // Deposit Address 
             currency                : params.currency,
             amount                  : params.amount,
             nonce                   : params.nonce,
+            withdrawNotification    : params.withdrawNotification
         })
-    
+
         /* Save Deposit Data */
         var withdrawSaveObject = await withdraw.createWithdraw();
 
@@ -216,7 +262,19 @@ const progressActions = {
         
         /* Add Deposit to user */
         await UsersRepository.prototype.addWithdraw(params.user._id, withdrawSaveObject._id);
-        return null;
+        return withdrawSaveObject._id;
+    },
+    __verifyEmailConfirmed : async (params) => {
+        return params;
+    },
+    __verifyIfIsAutoWithdraw : async (params) => {
+        return params;
+    },
+    __verifyMaxWithdrawAmountCumulative : async (params) => {
+        return params;
+    },
+    __verifyMaxWithdrawAmountPerTransaction : async (params) => {
+        return params;
     },
     __requestAffiliateWithdraw :  async (params) => {
         /* Add Withdraw to user */
@@ -254,7 +312,7 @@ const progressActions = {
             });
             let link_url = setLinkUrl({ticker : params.currency.ticker, address : bitgo_tx.txid, isTransactionHash : true })
             /* Add Withdraw to user */
-            let text= await WithdrawRepository.prototype.finalizeWithdraw(params.withdraw_id, {
+            await WithdrawRepository.prototype.finalizeWithdraw(params.withdraw_id, {
                 transactionHash         :   bitgo_tx.txid,
                 bitgo_id                :   bitgo_tx.transfer.id,
                 last_update_timestamp   :   new Date(),
@@ -326,11 +384,23 @@ class UserLogic extends LogicComponent {
                 case 'RequestWithdraw' : {
 					return await library.process.__requestWithdraw(params); 
                 };
+                case 'VerifyIfIsAutoWithdraw' : {
+					return await library.process.__verifyIfIsAutoWithdraw(params); 
+                };
+                case 'VerifyMaxWithdrawAmountCumulative' : {
+					return await library.process.__verifyMaxWithdrawAmountCumulative(params); 
+                };
+                case 'VerifyMaxWithdrawAmountPerTransaction' : {
+					return await library.process.__verifyMaxWithdrawAmountPerTransaction(params); 
+                };
                 case 'RequestAffiliateWithdraw' : {
                     return await library.process.__requestAffiliateWithdraw(params); 
                 }
                 case 'FinalizeWithdraw' : {
 					return await library.process.__finalizeWithdraw(params); 
+                };
+                case 'VerifyEmailConfirmed': {
+                    return await library.process.__verifyEmailConfirmed(params);
                 };
 			}
 		}catch(err){
@@ -361,11 +431,23 @@ class UserLogic extends LogicComponent {
                 case 'RequestWithdraw' : {
 					return await library.progress.__requestWithdraw(params); 
                 };
+                case 'VerifyIfIsAutoWithdraw' : {
+					return await library.progress.__verifyIfIsAutoWithdraw(params); 
+                };
+                case 'VerifyMaxWithdrawAmountCumulative' : {
+					return await library.progress.__verifyMaxWithdrawAmountCumulative(params); 
+                };
+                case 'VerifyMaxWithdrawAmountPerTransaction' : {
+					return await library.progress.__verifyMaxWithdrawAmountPerTransaction(params); 
+                };
                 case 'RequestAffiliateWithdraw' : {
                     return await library.progress.__requestAffiliateWithdraw(params); 
                 }
                 case 'FinalizeWithdraw' : {
 					return await library.progress.__finalizeWithdraw(params); 
+                };
+                case 'VerifyEmailConfirmed' : {
+					return await library.progress.__verifyEmailConfirmed(params); 
                 };
 			}
 		}catch(err){

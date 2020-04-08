@@ -2,14 +2,9 @@
 
 
 const _ = require('lodash');
-import { Security } from '../controllers/Security';
 import { ErrorManager } from '../controllers/Errors';
 import LogicComponent from './logicComponent';
-import ConverterSingleton from './utils/converter';
-import { Deposit, User } from '../models';
 import { DepositRepository, AppRepository, UsersRepository, WalletsRepository } from '../db/repos';
-import { globals } from '../Globals';
-import axios from 'axios';
 
 let error = new ErrorManager();
 

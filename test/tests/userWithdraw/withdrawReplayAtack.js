@@ -1,10 +1,7 @@
 import { mochaAsync, detectValidationErrors } from "../../utils/testing";
-import { Logger } from "../../utils/logger";
 import { createEthAccount, registerUser, loginUser, depositWallet } from "../../utils/env";
 import { requestUserWithdraw } from "../../methods";
 import chai from 'chai';
-import Numbers from "../../logic/services/numbers";
-const delay = require('delay');
 
 const expect = chai.expect;
 

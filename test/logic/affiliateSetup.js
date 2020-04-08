@@ -3,7 +3,7 @@
 import { ErrorManager } from '../controllers/Errors';
 import LogicComponent from './logicComponent';
 import _ from 'lodash';
-import { AffiliateSetupRepository, AffiliateStructureRepository } from '../db/repos';
+import { AffiliateStructureRepository } from '../db/repos';
 import { AffiliateStructure } from '../models';
 let error = new ErrorManager();
 
@@ -11,7 +11,6 @@ let error = new ErrorManager();
 // Private fields
 let self; // eslint-disable-line no-unused-vars
 let library;
-let modules;
 
 let __private = {};
 

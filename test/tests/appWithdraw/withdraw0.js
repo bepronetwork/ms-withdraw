@@ -1,8 +1,6 @@
 import { mochaAsync, detectValidationErrors } from "../../utils/testing";
 import { requestAppWithdraw, getAppAuth } from "../../methods";
 import chai from 'chai';
-import {  appWalletInfo } from "../../utils/env";
-import Numbers from "../../logic/services/numbers";
 const expect = chai.expect;
 
 context('Withdraw 0', async () => {
