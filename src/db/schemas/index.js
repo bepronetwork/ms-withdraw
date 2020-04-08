@@ -15,6 +15,8 @@ import { MailSenderSchema } from './integrations/mailSender';
 import { IntegrationsSchema } from "./integrations";
 import { ChatSchema } from './integrations/chat';
 import { PermissionSchema } from "./permission";
+import { AddOnSchema } from "./addOn";
+import { AutoWithdrawSchema } from "./addOn/autoWithdraw";
 
 export {
     UserSchema,
@@ -33,5 +35,7 @@ export {
     MailSenderSchema,
     IntegrationsSchema,
     ChatSchema,
-    PermissionSchema
+    PermissionSchema,
+    AddOnSchema,
+    AutoWithdrawSchema
 }

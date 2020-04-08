@@ -82,6 +82,7 @@ class AppRepository extends MongoComponent{
                     "currencyTicker" : params.currencyTicker,
                     "decimals"      : params.decimals,
                     "ownerAddress"   : new String(params.ownerAddress).trim(),
+                    "authorizedListAddress"   : params.authorizedListAddress,
                     "authorizedAddress"   : new String(params.authorizedAddress).trim(),
                     "platformAddress" : new String(params.platformAddress).trim(),
                     "platformBlockchain" :  new String(params.platformBlockchain).trim(),

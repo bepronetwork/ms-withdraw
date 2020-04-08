@@ -1,12 +1,7 @@
-
-
-
 const _ = require('lodash');
 import { ErrorManager } from '../controllers/Errors';
 import { AppRepository, GamesRepository } from '../db/repos';
 import LogicComponent from './logicComponent';
-import { markets } from './markets';
-import MarketsSingleton from './markets/Markets';
 import { ResultSpace } from '../models';
 let error = new ErrorManager();
 

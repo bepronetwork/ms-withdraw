@@ -10,7 +10,10 @@ AppSchema.prototype.schema =  {
     name                : {  type: String, required : true},
     description         : {  type: String, required : true},
     isValid             : {  type: Boolean, required : true, default : false},
-    ownerAddress        : { type: String, required : true, default : 'N/A'},
+    whitelistedAddresses: [{
+        currency            : { type: mongoose.Schema.Types.ObjectId, ref: 'Currency' },
+        addresses           : [{ type: String, required : true, default : 'N/A' }]
+    }],
     authorizedAddress   : { type: String, required : true, default : 'N/A'},
     games               : [{ type: mongoose.Schema.Types.ObjectId, ref: 'Game'}],
     listAdmins          : [{ type: mongoose.Schema.Types.ObjectId, ref: 'Admin', required : true}],
@@ -31,6 +34,7 @@ AppSchema.prototype.schema =  {
     metadataJSON        : {  type: JSON},
     isWithdrawing       : { type : Boolean, default : false, required : true },
     integrations        : { type: mongoose.Schema.Types.ObjectId, ref: 'Integrations'},
+    addOn               : { type: mongoose.Schema.Types.ObjectId, ref: 'AddOn'}
 }
 
 

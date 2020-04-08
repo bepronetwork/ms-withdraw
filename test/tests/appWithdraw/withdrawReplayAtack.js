@@ -1,7 +1,6 @@
 import { mochaAsync, detectValidationErrors } from "../../utils/testing";
 import { requestAppWithdraw, finalizeAppWithdraw, getAppAuth } from "../../methods";
 import chai from 'chai';
-import { appWalletInfo } from "../../utils/env";
 const expect = chai.expect;
 
 context('Withdraw Replay Atack', async () => {

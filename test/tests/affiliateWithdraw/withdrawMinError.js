@@ -1,11 +1,7 @@
 import { mochaAsync, detectValidationErrors } from "../../utils/testing";
-import { loginUser } from "../../utils/env";
 import { requestUserAffiliateWithdraw } from "../../methods";
 import chai from 'chai';
 const expect = chai.expect;
-
-
-const WITHDRAW_AMOUNT = 1;
 
 context('Withdraw under min allowed', async () => {
     var user, app, user_eth_account, currency, appWallet;

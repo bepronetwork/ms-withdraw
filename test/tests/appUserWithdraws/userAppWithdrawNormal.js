@@ -4,7 +4,6 @@ import { getAppUserWithdraws } from "../../methods";
 import chai from 'chai';
 const expect = chai.expect;
 
-const TOTAL_WITHDRAWS = 6;
 
 context('Get App Users Withdraw Normal', async () => {
     var app, admin, totalWithdraws;

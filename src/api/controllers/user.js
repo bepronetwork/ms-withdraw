@@ -9,9 +9,25 @@ async function requestWithdraw (req, res) {
     try{
         SecuritySingleton.verify({type : 'user', req});
         let params = req.body;
-		let user = new User(params);
-        let data = await user.requestWithdraw();
-        MiddlewareSingleton.respond(res, data);
+        let user = new User(params);
+
+        let verifyAutoWithdraw                      = await user.verifyIfIsAutoWithdraw();
+        let verifyMaxWithdrawAmountCumulative       = verifyAutoWithdraw.verify ? await user.verifyMaxWithdrawAmountCumulative() : {verify: false, textError: verifyAutoWithdraw.textError};
+        let verifyMaxWithdrawAmountPerTransaction   = verifyAutoWithdraw.verify ? await user.verifyMaxWithdrawAmountPerTransaction() : {verify: false, textError: verifyAutoWithdraw.textError};
+        let verifyEmailConfirmed                    = verifyAutoWithdraw.verify ? await user.verifyEmailConfirmed() : {verify: false, textError: verifyAutoWithdraw.textError};
+
+        let textError = [verifyAutoWithdraw, verifyMaxWithdrawAmountCumulative, verifyMaxWithdrawAmountPerTransaction, verifyEmailConfirmed];
+        textError = textError.find( t => t.verify == false );
+        textError = (textError == null || textError == undefined) ? "Success" : textError.textError
+        let userRequest = new User({...params, textError});
+
+        let withdraw_id = await userRequest.requestWithdraw();
+
+        if(verifyAutoWithdraw.verify && verifyMaxWithdrawAmountCumulative.verify && verifyMaxWithdrawAmountPerTransaction.verify && verifyEmailConfirmed.verify){
+            let userFinalizeWithdraw = new User({...params, withdraw_id})
+            await userFinalizeWithdraw.finalizeWithdraw();
+        }
+        MiddlewareSingleton.respond(res, withdraw_id);
 	}catch(err){
         MiddlewareSingleton.respondError(res, err);
 	}

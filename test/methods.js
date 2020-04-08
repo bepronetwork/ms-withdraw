@@ -165,6 +165,24 @@ export async function updateUserWallet(params, bearerToken, payload){
     })).data;
 }
 
+export async function addAutowithdraw(params, bearerToken, payload){
+    return (await axios.post(`${MS_MASTER_URL}/api/app/autoWithdraw/add`, params, {
+        headers : {
+            "authorization" : `Bearer ${bearerToken}`,
+            "payload" : getPayloadString(payload)
+        }
+    })).data;
+}
+
+export async function editAutowithdraw(params, bearerToken, payload){
+    return (await axios.post(`${MS_MASTER_URL}/api/app/autoWithdraw/editAutoWithdraw`, params, {
+        headers : {
+            "authorization" : `Bearer ${bearerToken}`,
+            "payload" : getPayloadString(payload)
+        }
+    })).data;
+}
+
 function getPayloadString(payloadObject){
     if(!payloadObject){return null}
     return JSON.stringify({ id : payloadObject.id })

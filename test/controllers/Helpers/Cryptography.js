@@ -1,5 +1,3 @@
-import { globals } from "../../Globals";
-import Numbers from "../../logic/services/numbers";
 
 var SHA512 = require("crypto-js/hmac-sha512");
 var SHA512_HASH = require("crypto-js/sha512");

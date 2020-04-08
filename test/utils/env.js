@@ -1,14 +1,30 @@
 import { generateEthAccountWithTokensAndEthereum } from "./eth";
-import { Admin, App, User } from "../models";
+import { Admin, App } from "../models";
 import {
     registerUser as registerUserAPI,
     loginUser as loginUserAPI,
-    updateUserWallet,
-    updateAppWallet
+    addAutowithdraw as addAutowithdrawAPI,
+    editAutowithdraw as editAutowithdrawAPI
 } from '../methods';
 import { globals } from "../Globals";
 import { WalletsRepository } from "../db/repos";
 import { UsersRepository } from "../db/repos";
+
+export async function addAutoWithdraw({admin_id, app_id, bearerToken, payload}){
+    return (await addAutowithdrawAPI({
+        app : app_id,
+        admin : admin_id
+    }, bearerToken, payload)).data.message;
+}
+
+export async function editAutoWithdraw({admin_id, app_id, currency, autoWithdrawParams, bearerToken, payload}){
+    return (await editAutowithdrawAPI({
+        app : app_id,
+        admin : admin_id,
+        currency,
+        autoWithdrawParams
+    }, bearerToken, payload)).data.message;
+}
 
 export async function createEthAccount({ethAmount}){
     /* Create User Address and give it ETH */

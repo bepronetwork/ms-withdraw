@@ -3,12 +3,10 @@ import { ErrorManager } from '../controllers/Errors';
 import { AppRepository, AdminsRepository, WalletsRepository, DepositRepository, UsersRepository, WithdrawRepository, GamesRepository } from '../db/repos';
 import LogicComponent from './logicComponent';
 import { getServices, fromDecimals, verifytransactionHashDepositApp, verifytransactionHashWithdrawApp } from './services/services';
-import { Game, Deposit, Withdraw, AffiliateSetup } from '../models';
-import games from '../config/games.config.json';
+import { Game, Deposit, AffiliateSetup } from '../models';
 import CasinoContract from './eth/CasinoContract';
 import { globals } from '../Globals';
 import Numbers from './services/numbers';
-import codes from './categories/codes';
 import { fromPeriodicityToDates } from './utils/date';
 import GamesEcoRepository from '../db/repos/ecosystem/game';
 import { throwError } from '../controllers/Errors/ErrorManager';
@@ -20,7 +18,6 @@ let error = new ErrorManager();
 // Private fields
 let self; // eslint-disable-line no-unused-vars
 let library;
-let modules;
 
 let __private = {};
 
@@ -103,8 +100,8 @@ const processActions = {
 		return res;
     },
     __addBlockchainInformation : async (params) => {
-
         let res = {
+            authorizedListAddress: params.authorizedListAddress,
             app : params.app,
             ownerAddress : params.address,
             decimals : params.decimals,

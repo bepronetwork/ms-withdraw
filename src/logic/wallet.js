@@ -3,7 +3,7 @@
 const _ = require('lodash');
 import { ErrorManager } from '../controllers/Errors';
 import LogicComponent from './logicComponent';
-import { WalletsRepository, UsersRepository, AppRepository } from '../db/repos';
+import { WalletsRepository, AppRepository } from '../db/repos';
 import { throwError } from '../controllers/Errors/ErrorManager';
 let error = new ErrorManager();
 
@@ -11,7 +11,6 @@ let error = new ErrorManager();
 // Private fields
 let self; // eslint-disable-line no-unused-vars
 let library;
-let modules;
 
 let __private = {};
 

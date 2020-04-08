@@ -179,7 +179,7 @@ let outputs = {
                     })
                 }): object.app.games,
                 "authorizedAddress": object.app.authorizedAddress,
-                "ownerAddress": object.app.ownerAddress,
+                "whitelistedAddresses": object.app.whitelistedAddresses,
                 "isValid": object.app.isValid,
             },
             "creation_timestamp": object.creation_timestamp,

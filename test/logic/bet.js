@@ -3,10 +3,9 @@
 
 const _ = require('lodash');
 import { ErrorManager } from '../controllers/Errors';
-import { AppRepository, GamesRepository, UsersRepository, WalletsRepository } from '../db/repos';
+import { GamesRepository, UsersRepository, WalletsRepository } from '../db/repos';
 import LogicComponent from './logicComponent';
 import { CryptographySingleton } from '../controllers/Helpers';
-import BetsRepository from '../db/repos/bet';
 import CasinoLogicSingleton from './utils/casino';
 
 import Numbers from './services/numbers';
@@ -20,7 +19,6 @@ let error = new ErrorManager();
 // Private fields
 let self; // eslint-disable-line no-unused-vars
 let library;
-let modules;
 
 let __private = {};
 

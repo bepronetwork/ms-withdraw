@@ -1,5 +1,4 @@
 import { mochaAsync, detectValidationErrors } from "../../utils/testing";
-import { Logger } from "../../utils/logger";
 import { createEthAccount, registerUser, loginUser } from "../../utils/env";
 import { requestUserWithdraw } from "../../methods";
 import chai from 'chai';
