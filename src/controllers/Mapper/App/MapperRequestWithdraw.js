@@ -56,8 +56,7 @@ let outputs = {
                                 "functionName": templateIds.functionName,
                                 "template_id": templateIds.template_id,
                             })
-                        }) : object.app.integrations.chat.templateIds,
-                        "apiKey": object.app.integrations.chat.apiKey,
+                        }) : object.app.integrations.chat.templateIds
                     },
                 },
                 "description": object.app.description,
@@ -119,8 +118,6 @@ let outputs = {
                             "name": wallet.currency.name,
                             "address": wallet.currency.address
                         },
-                        "bitgo_id": wallet.bitgo_id,
-                        "hashed_passphrase": wallet.hashed_passphrase,
                         "link_url": wallet.link_url,
                         "max_withdraw": wallet.max_withdraw,
                         "max_deposit": wallet.max_deposit,
@@ -135,7 +132,6 @@ let outputs = {
                         "username": user.username,
                         "affiliate": user.affiliate,
                         "name": user.name,
-                        "hash_password": user.hash_password,
                         "register_timestamp": user.register_timestamp,
                         "security": user.security,
                         "email": user.email,

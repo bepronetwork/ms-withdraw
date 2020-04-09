@@ -29,7 +29,6 @@ let outputs = {
                 "confirmed": object.confirmed,
                 "maxConfirmations": object.maxConfirmations,
                 "confirmations": object.confirmations,
-                "bitgo_id": object.bitgo_id,
                 "last_update_timestamp": object.last_update_timestamp,
                 "logId": object.logId,
                 "transactionHash": object.transactionHash,

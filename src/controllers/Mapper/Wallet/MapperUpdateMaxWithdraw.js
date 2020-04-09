@@ -23,8 +23,6 @@ let outputs = {
                 })
             }) : object.depositAddresses,
             "currency": object.currency,
-            "bitgo_id": object.bitgo_id,
-            "hashed_passphrase": object.hashed_passphrase,
             "link_url": object.link_url,
             "max_withdraw": object.max_withdraw,
             "max_deposit": object.max_deposit,
