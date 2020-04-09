@@ -16,7 +16,7 @@ export const setLinkUrl = ({ ticker, address, isTransactionHash }) => {
                 link_url = address;
                 return link_url;
         }
-    } else if (ENV === "production") {
+    } else {
         switch (new String(ticker).toLowerCase().trim()) {
             case 'eth': {
                 link_url = `https://etherscan.io/${isTransactionHash ? 'tx' : 'address'}/${address}`;
