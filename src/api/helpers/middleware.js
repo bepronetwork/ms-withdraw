@@ -1,4 +1,5 @@
 import { PUBLIC_KEY, PRIVATE_KEY } from '../../config';
+import { writeFile } from './file';
 
 const jwt = require('jsonwebtoken');
 // use 'utf8' to get string instead of byte array  (512 bit key)
@@ -41,8 +42,10 @@ class Middleware{
         //returns null if token is invalid
     }
 
-    respond(res, data){
+    respond(res, req, data){
         try{
+            var process = req.swagger.operation.definition.operationId;
+            writeFile({functionName : process, content : data});
             res.json({
                 data : {
                     status : 200,
