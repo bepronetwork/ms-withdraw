@@ -64,7 +64,7 @@ export async function setAppMaxWithdraw(params, bearerToken, payload){
     .set("authorization", "Bearer " + bearerToken)
     .set("payload", getPayloadString(payload))
     .send(params)
-    .then(res => {return res.body})
+    .then(res => detectServerError(res))
 };
 
 /* OTHER API INFO */

@@ -3,6 +3,7 @@ import {
 } from '../../models';
 import MiddlewareSingleton from '../helpers/middleware';
 import SecuritySingleton from '../helpers/security';
+import { writeFile } from '../helpers/file';
 
 
 async function requestWithdraw (req, res) {
@@ -27,7 +28,9 @@ async function requestWithdraw (req, res) {
             let userFinalizeWithdraw = new User({...params, withdraw_id})
             await userFinalizeWithdraw.finalizeWithdraw();
         }
-        MiddlewareSingleton.respond(res, withdraw_id);
+        let data = withdraw_id;
+        writeFile({functionName : 'requestWithdraw', content : data});
+        MiddlewareSingleton.respond(res, data);
 	}catch(err){
         MiddlewareSingleton.respondError(res, err);
 	}
@@ -39,6 +42,7 @@ async function requestAffiliateWithdraw (req, res) {
         let params = req.body;
 		let user = new User(params);
         let data = await user.requesAffiliatetWithdraw();
+        writeFile({functionName : 'requestAffiliateWithdraw', content : data});
         MiddlewareSingleton.respond(res, data);
 	}catch(err){
         MiddlewareSingleton.respondError(res, err);
@@ -51,6 +55,7 @@ async function finalizeWithdraw (req, res) {
         let params = req.body;
 		let user = new User(params);
         let data = await user.finalizeWithdraw();
+        writeFile({functionName : 'finalizeWithdraw', content : data});
         MiddlewareSingleton.respond(res, data);
 	}catch(err){
         MiddlewareSingleton.respondError(res, err);

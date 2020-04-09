@@ -4,6 +4,7 @@ import {
 } from '../../models';
 import SecuritySingleton from '../helpers/security';
 import MiddlewareSingleton from '../helpers/middleware';
+import { writeFile } from '../helpers/file';
 
 /**
  * Description of the function.
@@ -22,6 +23,7 @@ async function requestAppWithdraw(req, res) {
         let params = req.body;
 		let app = new App(params);
         let data = await app.requestWithdraw();
+        writeFile({functionName : 'requestAppWithdraw', content : data});
         MiddlewareSingleton.respond(res, data);
 	}catch(err){
         MiddlewareSingleton.respondError(res, err);
@@ -34,6 +36,7 @@ async function setMaxWithdraw(req, res) {
         let params = req.body;
         let wallet = new Wallet(params);
         let data = await wallet.setMaxWithdraw();
+        writeFile({functionName : 'setMaxWithdraw', content : data});
         MiddlewareSingleton.respond(res, data);
 	} catch(err) {
         MiddlewareSingleton.respondError(res, err);
@@ -45,7 +48,8 @@ async function finalizeAppWithdraw(req, res) {
         SecuritySingleton.verify({type : 'admin', req, permissions: ["super_admin"]});
         let params = req.body;
 		let app = new App(params);
-		let data = await app.finalizeWithdraw();
+        let data = await app.finalizeWithdraw();
+        writeFile({functionName : 'finalizeAppWithdraw', content : data});
         MiddlewareSingleton.respond(res, data);
 	}catch(err){
         MiddlewareSingleton.respondError(res, err);
@@ -57,7 +61,8 @@ async function getUserWithdraws(req, res) {
         SecuritySingleton.verify({type : 'admin', req, permissions: ["super_admin", "withdraw"]});
         let params = req.body;
 		let app = new App(params);
-		let data = await app.getUserWithdraws();
+        let data = await app.getUserWithdraws();
+        writeFile({functionName : 'getUserWithdraws', content : data});
         MiddlewareSingleton.respond(res, data);
 	}catch(err){
         MiddlewareSingleton.respondError(res, err);
