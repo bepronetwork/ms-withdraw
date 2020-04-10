@@ -8,7 +8,7 @@ export const getCurrencyAmountToBitGo = ({ticker, amount}) => {
         };
         case 'btc' : {
             // to satoshi
-            return parseFloat(parseFloat(amount)*100000000);
+            return parseInt(parseFloat(amount)*100000000);
         };
         case 'usdc' : {
             // to 6 
