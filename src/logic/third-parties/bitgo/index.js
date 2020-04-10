@@ -45,6 +45,7 @@ class BitGoClass {
 
     async sendTransaction({wallet_id, ticker, amount, address, passphrase}){
         const wallet = await this.getWallet({id : wallet_id, ticker});
+        console.log("Amount",new String(getCurrencyAmountToBitGo({ticker, amount})).trim().toString() )
         return await wallet.send({
             amount: new String(getCurrencyAmountToBitGo({ticker, amount})).trim().toString(),
             address: address,

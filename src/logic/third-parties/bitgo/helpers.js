@@ -4,12 +4,24 @@ export const getCurrencyAmountToBitGo = ({ticker, amount}) => {
     switch(new String(ticker).toLowerCase().trim()){
         case 'eth' : {
             // to wei
-            return parseFloat(amount)*1000000000000000000;
+            return parseFloat(parseFloat(amount)*1000000000000000000);
         };
         case 'btc' : {
             // to satoshi
-            return parseFloat(amount)*100000000;
-        }
+            return parseFloat(parseFloat(amount)*100000000);
+        };
+        case 'usdc' : {
+            // to 6 
+            return parseFloat(parseFloat(amount)*1000000);
+        };
+        case 'usdt' : {
+            // to 6
+            return parseFloat(parseFloat(amount)*1000000);
+        };
+        case 'dai' : {
+            // to 18
+            return parseFloat(parseFloat(amount)*1000000000000000000);
+        };
     }
 }
 
@@ -19,12 +31,24 @@ export const getCurrencyAmountFromBitGo = ({ticker, amount}) => {
     switch(new String(ticker).toLowerCase().trim()){
         case 'eth' : {
             // to wei
-            return parseFloat(amount)/1000000000000000000;
+            return parseFloat(parseFloat(amount)/1000000000000000000);
         };
         case 'btc' : {
             // to satoshi
-            return parseFloat(amount)/100000000;
-        }
+            return parseFloat(parseFloat(amount)/100000000);
+        };
+        case 'usdc' : {
+            // to 6 
+            return parseFloat(parseFloat(amount)/1000000);
+        };
+        case 'usdt' : {
+            // to 6
+            return parseFloat(parseFloat(amount)/1000000);
+        };
+        case 'dai' : {
+            // to 18
+            return parseFloat(parseFloat(amount)/1000000000000000000);
+        };
     }
 }
 
