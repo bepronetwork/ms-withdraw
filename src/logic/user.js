@@ -261,7 +261,8 @@ const progressActions = {
         await UsersRepository.prototype.addWithdraw(params.user._id, withdrawSaveObject._id);
 
         if (params.isAutomaticWithdraw.verify){
-            let params = {app: params.app._id, user: params.user._id, withdraw_id: withdrawSaveObject._id, currency: params.currency._id}
+            console.log(params.app._id)
+            let params = {app: params.app, user: params.user._id, withdraw_id: withdrawSaveObject._id, currency: params.currency._id}
             let user = new User(params);
             await user.finalizeWithdraw();
         }
