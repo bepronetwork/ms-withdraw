@@ -13,6 +13,7 @@ import BitGoSingleton from './third-parties/bitgo';
 import { Security } from '../controllers/Security';
 import Mailer from './services/mailer';
 import { setLinkUrl } from '../helpers/linkUrl';
+import { User } from "../models";
 let error = new ErrorManager();
 
 
@@ -259,12 +260,14 @@ const progressActions = {
         
         /* Add Deposit to user */
         await UsersRepository.prototype.addWithdraw(params.user._id, withdrawSaveObject._id);
-
+        var app_id = params.app._id
+        var user_id = params.user._id
+        var withdraw_obj_id = withdrawSaveObject._id
+        var currency_id = params.currency._id
         if (params.isAutomaticWithdraw.verify){
-            console.log(params.app._id)
-            let params = {app: params.app, user: params.user._id, withdraw_id: withdrawSaveObject._id, currency: params.currency._id}
+            let params = {app: app_id, user: user_id, withdraw_id: withdraw_obj_id, currency: currency_id}
             let user = new User(params);
-            await user.finalizeWithdraw();
+            let data = await user.finalizeWithdraw();
         }
         return withdrawSaveObject._id;
     },
