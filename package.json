@@ -11,7 +11,7 @@
         "pm2": "pm2-runtime start ./app.js --interpreter ./node_modules/babel-cli/bin/babel-node.js",
         "build": "babel src -d build",
         "server": "node build/app",
-        "test": "./node_modules/.bin/mocha --inspect test/test.js --timeout 1000000 --require babel-core/register --require babel-polyfill",
+        "test": "./node_modules/.bin/mocha --inspect ./test.js --timeout 1000000 --require babel-core/register --require babel-polyfill",
         "simulator": "babel-node test/simulator --nopresets es2015,stage-2",
         "md-docs": "swagger-markdown -i api/swagger/swagger.yaml",
         "generate-docs": "docsify init docs",

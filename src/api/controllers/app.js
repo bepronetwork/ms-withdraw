@@ -4,7 +4,6 @@ import {
 } from '../../models';
 import SecuritySingleton from '../helpers/security';
 import MiddlewareSingleton from '../helpers/middleware';
-import { writeFile } from '../helpers/file';
 
 /**
  * Description of the function.
@@ -23,8 +22,7 @@ async function requestAppWithdraw(req, res) {
         let params = req.body;
 		let app = new App(params);
         let data = await app.requestWithdraw();
-        writeFile({functionName : 'requestAppWithdraw', content : data});
-        MiddlewareSingleton.respond(res, data);
+        MiddlewareSingleton.respond(res, req, data);
 	}catch(err){
         MiddlewareSingleton.respondError(res, err);
 	}
@@ -36,8 +34,7 @@ async function setMaxWithdraw(req, res) {
         let params = req.body;
         let wallet = new Wallet(params);
         let data = await wallet.setMaxWithdraw();
-        writeFile({functionName : 'setMaxWithdraw', content : data});
-        MiddlewareSingleton.respond(res, data);
+        MiddlewareSingleton.respond(res, req, data);
 	} catch(err) {
         MiddlewareSingleton.respondError(res, err);
 	}
@@ -49,8 +46,7 @@ async function finalizeAppWithdraw(req, res) {
         let params = req.body;
 		let app = new App(params);
         let data = await app.finalizeWithdraw();
-        writeFile({functionName : 'finalizeAppWithdraw', content : data});
-        MiddlewareSingleton.respond(res, data);
+        MiddlewareSingleton.respond(res, req, data);
 	}catch(err){
         MiddlewareSingleton.respondError(res, err);
 	}
@@ -62,8 +58,7 @@ async function getUserWithdraws(req, res) {
         let params = req.body;
 		let app = new App(params);
         let data = await app.getUserWithdraws();
-        writeFile({functionName : 'getUserWithdraws', content : data});
-        MiddlewareSingleton.respond(res, data);
+        MiddlewareSingleton.respond(res, req, data);
 	}catch(err){
         MiddlewareSingleton.respondError(res, err);
 	}
