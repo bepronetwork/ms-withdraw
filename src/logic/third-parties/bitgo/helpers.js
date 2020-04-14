@@ -4,7 +4,7 @@ export const getCurrencyAmountToBitGo = ({ticker, amount}) => {
     switch(new String(ticker).toLowerCase().trim()){
         case 'eth' : {
             // to wei
-            return parseFloat(parseFloat(amount)*1000000000000000000);
+            return parseInt(parseFloat(amount)*1000000000000000000);
         };
         case 'btc' : {
             // to satoshi
@@ -12,15 +12,15 @@ export const getCurrencyAmountToBitGo = ({ticker, amount}) => {
         };
         case 'usdc' : {
             // to 6 
-            return parseFloat(parseFloat(amount)*1000000);
+            return parseInt(parseFloat(amount)*1000000);
         };
         case 'usdt' : {
             // to 6
-            return parseFloat(parseFloat(amount)*1000000);
+            return parseInt(parseFloat(amount)*1000000);
         };
         case 'dai' : {
             // to 18
-            return parseFloat(parseFloat(amount)*1000000000000000000);
+            return parseInt(parseFloat(amount)*1000000000000000000);
         };
     }
 }

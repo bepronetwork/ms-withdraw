@@ -45,42 +45,6 @@ class User extends ModelComponent{
         }
     }
 
-    async verifyIfIsAutoWithdraw(){
-        try{
-            let res = await this.process('VerifyIfIsAutoWithdraw');
-            return res;
-        }catch(err){
-            throw err;
-        }
-    }
-
-    async verifyMaxWithdrawAmountCumulative(){
-        try{
-            let res = await this.process('VerifyMaxWithdrawAmountCumulative');
-            return res;
-        }catch(err){
-            throw err;
-        }
-    }
-
-    async verifyMaxWithdrawAmountPerTransaction(){
-        try{
-            let res = await this.process('VerifyMaxWithdrawAmountPerTransaction');
-            return res;
-        }catch(err){
-            throw err;
-        }
-    }
-
-    async verifyEmailConfirmed(){
-        try{
-            let res = await this.process('VerifyEmailConfirmed');
-            return res;
-        }catch(err){
-            throw err;
-        }
-    }
-
     async requesAffiliatetWithdraw(){
         // Output = Null
         const { user } = this.self.params;
