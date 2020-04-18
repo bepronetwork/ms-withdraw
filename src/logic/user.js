@@ -114,8 +114,8 @@ const processActions = {
             /* Verify if Withdraw position is already opened in the Smart-Contract */
             var res = {
                 withdrawNotification: isAutomaticWithdraw.textError,
-                // max_withdraw: (!userWallet.max_withdraw) ? 0 : userWallet.max_withdraw,
                 max_withdraw: (!wallet.max_withdraw) ? 0 : wallet.max_withdraw,
+                min_withdraw: (!wallet.min_withdraw) ? 0 : wallet.min_withdraw,
                 hasEnoughBalance,
                 user_in_app,
                 currency      : userWallet.currency,

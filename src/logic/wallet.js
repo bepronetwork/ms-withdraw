@@ -49,7 +49,26 @@ const processActions = {
 		}catch(err){
 			throw err;
 		}
-	}
+	},
+
+	__updateMinWithdraw : async (params) => {
+		try{
+			const app = await AppRepository.prototype.findAppById(params.app);
+			if(!app){
+				throwError('APP_NOT_EXISTENT');
+			}
+			const wallet = app.wallet.find( w => new String(w._id).toString() == new String(params.wallet_id).toString());
+			if(!wallet){throwError('CURRENCY_NOT_EXISTENT')};
+
+			let normalized = {
+				wallet_id	: {_id: params.wallet_id},
+				amount 		: params.amount
+			}
+			return normalized;
+		}catch(err){
+			throw err;
+		}
+	},
 }
 
 /**
@@ -75,6 +94,13 @@ const progressActions = {
 	},
 	__updateMaxWithdraw : async (params) => {
 		let wallet = await WalletsRepository.prototype.updateMaxWithdraw(
+			params.wallet_id,
+			params.amount
+		);
+		return wallet;
+	},
+	__updateMinWithdraw : async (params) => {
+		let wallet = await WalletsRepository.prototype.updateMinWithdraw(
 			params.wallet_id,
 			params.amount
 		);
@@ -135,7 +161,10 @@ class WalletLogic extends LogicComponent {
 				};
 				case 'UpdateMaxWithdraw' : {
 					return await library.process.__updateMaxWithdraw(params);
-				}
+				};
+				case 'UpdateMinWithdraw' : {
+					return await library.process.__updateMinWithdraw(params);
+				};
 			}
 		}catch(report){
 			throw `Failed to validate Wallet schema: Wallet \n See Stack Trace : ${report}`;
@@ -165,10 +194,13 @@ class WalletLogic extends LogicComponent {
 			switch(progressAction) {
 				case 'Register' : {
 					return await library.progress.__register(params);
-				}
+				};
 				case 'UpdateMaxWithdraw' : {
 					return await library.progress.__updateMaxWithdraw(params);
-				}
+				};
+				case 'UpdateMinWithdraw' : {
+					return await library.progress.__updateMinWithdraw(params);
+				};
 			}
 		}catch(report){
 			throw `Failed to validate Wallet schema: Wallet \n See Stack Trace : ${report}`;

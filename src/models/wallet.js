@@ -38,6 +38,15 @@ class Wallet extends ModelComponent{
         }
     }
 
+    async setMinWithdraw(){
+        try {
+            let res = await this.process('UpdateMinWithdraw');
+            return res;
+        }catch(err){
+            throw err;
+        }
+    }
+
 }
 
 export default Wallet;
