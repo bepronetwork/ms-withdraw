@@ -131,7 +131,7 @@ context('Withdraw Min', async () => {
             currency : currency._id
         }, user.bearerToken , {id : user.id});
 
-        expect(detectValidationErrors(res)).to.be.equal(true);
+        expect(detectValidationErrors(res)).to.be.equal(false);
         const { status } = res.data;
         expect(status).to.be.equal(48)
     }));
