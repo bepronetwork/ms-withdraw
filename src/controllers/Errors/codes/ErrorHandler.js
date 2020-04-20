@@ -57,7 +57,8 @@ ErrorHandler.prototype.KEYS =  {
     'MIN_WITHDRAW_NOT_PASSED'               : "040",
     'CURRENCY_NOT_EXISTENT'                 : "045",
     'MAX_WITHDRAW'                          : "046",
-    'EMAIL_NOT_CONFIRMED'                   : "047"
+    'EMAIL_NOT_CONFIRMED'                   : "047",
+    'MIN_WITHDRAW'                          : "048"
 };
 
 

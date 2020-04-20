@@ -48,6 +48,35 @@ paths:
           schema:
             $ref: "#/definitions/ErrorResponse"
 
+  /withdraw/min/set :
+    x-swagger-router-controller: app
+    post:
+      tags:
+      - app
+      summary: Set Min withdraw
+      operationId: setMinWithdraw
+      description: Set Min withdraw Data
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: withdraw
+          description: Set Min withdraw
+          required: true
+          schema:
+            $ref: '#/definitions/SetMinWithdraw'
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/GeneralResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+
   /users/requestWithdraw: 
     x-swagger-router-controller: user
     post:
@@ -235,6 +264,26 @@ paths:
 # complex objects have schema definitions
 definitions:
   SetMaxWithdraw :
+    type: object
+    required:
+      - wallet_id
+      - amount
+      - app
+    properties:
+      wallet_id:
+        type : string
+        description: |
+          Unique identifier of the wallet
+      amount:
+        type : number
+        description: |
+          Max value for withdraw
+      app:
+        type : string
+        description: |
+          ID app
+
+  SetMinWithdraw :
     type: object
     required:
       - wallet_id

@@ -174,5 +174,9 @@
     "047" : {
         "key": "EMAIL_NOT_CONFIRMED",
         "message"   : "Unconfirmed Email"
+    },
+    "048" : {
+        "key": "MIN_WITHDRAW",
+        "message"   : "Withdrawal amount less than the minimum allowed"
     }
 }

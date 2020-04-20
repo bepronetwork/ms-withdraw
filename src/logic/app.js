@@ -55,6 +55,7 @@ const processActions = {
 
             let res = {
                 max_withdraw: (!wallet.max_withdraw) ? 0 : wallet.max_withdraw,
+                min_withdraw: (!wallet.min_withdraw) ? 0 : wallet.min_withdraw,
                 listAddress,
                 allUsersBalance,
                 appBalance,

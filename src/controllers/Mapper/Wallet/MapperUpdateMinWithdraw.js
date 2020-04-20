@@ -12,7 +12,7 @@ let self;
 
 
 let outputs = {
-    updateMaxWithdraw : (object) => {
+    updateMinWithdraw : (object) => {
         return {
             ...wallet_update_object(object)
         }
@@ -20,7 +20,7 @@ let outputs = {
 }
 
 
-class UpdateMaxWithdraw{
+class UpdateMinWithdraw{
 
     constructor(){
         self = {
@@ -34,7 +34,7 @@ class UpdateMaxWithdraw{
          */
 
         this.KEYS = {
-            UpdateMaxWithdraw : 'updateMaxWithdraw'
+            UpdateMinWithdraw : 'updateMinWithdraw'
         }
     }
 
@@ -47,8 +47,8 @@ class UpdateMaxWithdraw{
     }
 }
 
-let UpdateMaxWithdrawSingleton = new UpdateMaxWithdraw();
+let UpdateMinWithdrawSingleton = new UpdateMinWithdraw();
 
 export{
-    UpdateMaxWithdrawSingleton
+    UpdateMinWithdrawSingleton
 }

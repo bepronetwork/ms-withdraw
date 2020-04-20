@@ -28,6 +28,9 @@ class ErrorManager {
                     // verify amount < max withdraw
                     if(parseFloat(object.amount) > parseFloat(object.max_withdraw))
                         libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.MAX_WITHDRAW));
+                    // verify if amount is less than min withdraw
+                    if(parseFloat(object.amount) < parseFloat(object.min_withdraw))
+                        libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.MIN_WITHDRAW));
                     // Verify email is confirmed
                     if(!object.emailConfirmed)
                         libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.EMAIL_NOT_CONFIRMED));

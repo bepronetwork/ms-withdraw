@@ -10,7 +10,8 @@ import {
 } from "./App";
 
 import {
-    UpdateMaxWithdrawSingleton
+    UpdateMaxWithdrawSingleton,
+    UpdateMinWithdrawSingleton
 } from "./Wallet";
 
 export {
@@ -19,5 +20,6 @@ export {
     FinalizeWithdrawAppSingleton,
     RequestWithdrawAppSingleton,
     UpdateMaxWithdrawSingleton,
-    GetUsersWithdrawsSingleton
+    GetUsersWithdrawsSingleton,
+    UpdateMinWithdrawSingleton
 }

@@ -1,7 +1,7 @@
 import {WalletLogic} from '../logic';
 import {WalletsRepository} from '../db/repos';
 import ModelComponent from './modelComponent';
-import { UpdateMaxWithdrawSingleton } from "../controllers/Mapper";
+import { UpdateMaxWithdrawSingleton, UpdateMinWithdrawSingleton } from "../controllers/Mapper";
 
 class Wallet extends ModelComponent{
 
@@ -33,6 +33,15 @@ class Wallet extends ModelComponent{
         try {
             let res = await this.process('UpdateMaxWithdraw');
             return UpdateMaxWithdrawSingleton.output('UpdateMaxWithdraw', res);
+        }catch(err){
+            throw err;
+        }
+    }
+
+    async setMinWithdraw(){
+        try {
+            let res = await this.process('UpdateMinWithdraw');
+            return UpdateMinWithdrawSingleton.output('UpdateMinWithdraw', res);
         }catch(err){
             throw err;
         }
