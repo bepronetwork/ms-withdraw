@@ -120,6 +120,7 @@ let outputs = {
                         },
                         "link_url": wallet.link_url,
                         "max_withdraw": wallet.max_withdraw,
+                        "min_withdraw": wallet.min_withdraw,
                         "max_deposit": wallet.max_deposit,
                         "bank_address": wallet.bank_address,
                         "playBalance": wallet.playBalance,
