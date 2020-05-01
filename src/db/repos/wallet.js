@@ -52,6 +52,18 @@ class WalletsRepository extends MongoComponent{
         });
     }
 
+    updateMinWithdraw(wallet_id, amount){
+        return new Promise( (resolve, reject) => {
+            WalletsRepository.prototype.schema.model.findByIdAndUpdate(wallet_id, {
+                min_withdraw: amount
+            })
+            .exec( (err, wallet) => {
+                if(err) { reject(err)}
+                resolve(wallet);
+            });
+        });
+    }
+
     updatePlayBalance(id, amount){
         return new Promise( (resolve, reject) => {
             WalletsRepository.prototype.schema.model.findByIdAndUpdate(id,

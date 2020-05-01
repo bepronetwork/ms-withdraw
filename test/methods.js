@@ -67,6 +67,15 @@ export async function setAppMaxWithdraw(params, bearerToken, payload){
     .then(res => detectServerError(res))
 };
 
+export async function setAppMinWithdraw(params, bearerToken, payload){
+    return request(global.app)
+    .post('/api/withdraw/min/set')
+    .set("authorization", "Bearer " + bearerToken)
+    .set("payload", getPayloadString(payload))
+    .send(params)
+    .then(res => detectServerError(res))
+};
+
 /* OTHER API INFO */
 export async function addCurrencyWalletToApp(params, bearerToken, payload) {
     return await axios.post(`${MS_MASTER_URL}/api/app/wallet/currency/add`, params, {
