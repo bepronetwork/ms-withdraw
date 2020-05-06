@@ -54,6 +54,9 @@ class ErrorManager {
                     // Verify if Withdraw Amount is Positive
                     if(parseFloat(object.amount) <= 0)
                         libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.NEGATIVE_AMOUNT))
+                    // verify if amount is less than min withdraw
+                    if(parseFloat(object.amount) < parseFloat(object.min_withdraw))
+                        libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.MIN_WITHDRAW));
                     // Verify User is in App
                     if(!object.user_in_app)
                         throw libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.USER_NOT_EXISTENT_IN_APP));

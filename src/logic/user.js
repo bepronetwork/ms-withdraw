@@ -162,6 +162,7 @@ const processActions = {
 
             /* Verify if Withdraw position is already opened in the Smart-Contract */
             let res = {
+                min_withdraw: (!userWallet.min_withdraw) ? 0 : userWallet.min_withdraw,
                 hasEnoughBalance,
                 user_in_app,
                 currency      : userWallet.currency,
