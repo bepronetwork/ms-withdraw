@@ -77,6 +77,35 @@ paths:
           schema:
             $ref: "#/definitions/ErrorResponse"
 
+  /affiliate/withdraw/min/set :
+    x-swagger-router-controller: app
+    post:
+      tags:
+      - app
+      summary: Set Affiliate Min withdraw
+      operationId: setAffiliateMinWithdraw
+      description: Set Affiliate Min withdraw Data
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: withdraw
+          description: Set Affiliate Min withdraw
+          required: true
+          schema:
+            $ref: '#/definitions/SetAffiliateMinWithdraw'
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/GeneralResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+
   /users/requestWithdraw: 
     x-swagger-router-controller: user
     post:
@@ -284,6 +313,26 @@ definitions:
           ID app
 
   SetMinWithdraw :
+    type: object
+    required:
+      - wallet_id
+      - amount
+      - app
+    properties:
+      wallet_id:
+        type : string
+        description: |
+          Unique identifier of the wallet
+      amount:
+        type : number
+        description: |
+          Max value for withdraw
+      app:
+        type : string
+        description: |
+          ID app
+
+  SetAffiliateMinWithdraw :
     type: object
     required:
       - wallet_id

@@ -47,6 +47,16 @@ class Wallet extends ModelComponent{
         }
     }
 
+    async setAffiliateMinWithdraw(){
+        try {
+            let res = await this.process('UpdateAffiliateMinWithdraw');
+            return res;
+            // return UpdateMinWithdrawSingleton.output('UpdateMinWithdraw', res);
+        }catch(err){
+            throw err;
+        }
+    }
+
 }
 
 export default Wallet;
