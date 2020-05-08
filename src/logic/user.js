@@ -152,7 +152,6 @@ const processActions = {
 
             const wallet = app.wallet.find( w => new String(w.currency._id).toString() == new String(currency).toString());
             if(!wallet || !wallet.currency){throwError('CURRENCY_NOT_EXISTENT')};
-            console.log("WALLET:: ", wallet)
             
             /* Get Amount of Withdraw */
             let amount = parseFloat(Math.abs(params.tokenAmount));
@@ -181,7 +180,6 @@ const processActions = {
                 nonce : params.nonce,
                 isAlreadyWithdrawingAPI : user.isWithdrawing
             }
-            console.log("res:: ", res)
             return res;
         }catch(err){ 
             throw err;
