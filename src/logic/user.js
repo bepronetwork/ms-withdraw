@@ -150,7 +150,12 @@ const processActions = {
             const userWallet = user.affiliate.wallet.find( w => new String(w.currency._id).toString() == new String(currency).toString());
             if(!userWallet || !userWallet.currency){throwError('CURRENCY_NOT_EXISTENT')};
 
+            const wallet = app.wallet.find( w => new String(w.currency._id).toString() == new String(currency).toString());
+            if(!wallet || !wallet.currency){throwError('CURRENCY_NOT_EXISTENT')};
+            
+            /* Get Amount of Withdraw */
             let amount = parseFloat(Math.abs(params.tokenAmount));
+            
             /* User Current Balance */
             let currentBalance = parseFloat(userWallet.playBalance);
             
@@ -162,6 +167,7 @@ const processActions = {
 
             /* Verify if Withdraw position is already opened in the Smart-Contract */
             let res = {
+                affiliate_min_withdraw: (!wallet.affiliate_min_withdraw) ? 0 : wallet.affiliate_min_withdraw,
                 hasEnoughBalance,
                 user_in_app,
                 currency      : userWallet.currency,
