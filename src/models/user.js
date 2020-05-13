@@ -45,6 +45,16 @@ class User extends ModelComponent{
         }
     }
 
+    async cancelWithdraw(){
+        try{
+            // Output = Boolean
+            let res = await this.process('CancelWithdraw');
+            return res;
+        }catch(err){
+            throw err;
+        }
+    }
+
     async requesAffiliatetWithdraw(){
         // Output = Null
         const { user } = this.self.params;
