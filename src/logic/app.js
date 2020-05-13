@@ -284,4 +284,3 @@ class AppLogic extends LogicComponent{
 
 // Export Default Module
 export default AppLogic;
-
