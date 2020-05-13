@@ -65,6 +65,25 @@ class WithdrawRepository extends MongoComponent{
         });
     }
 
+    cancelWithdraw(id, params){
+        return new Promise( (resolve, reject) => {
+            WithdrawRepository.prototype.schema.model.findByIdAndUpdate(id,
+                { $set:
+                    {
+                        done                    : true,
+                        confirmed               : false,
+                        status                  : 'Canceled',
+                        last_update_timestamp   : params.last_update_timestamp,
+                        note                    : params.note
+                }},{ new: true }
+            )
+            .exec( (err, Withdraw) => {
+                if(err) { reject(err)}
+                resolve(Withdraw);
+            });
+        });
+    }
+
     getTransactionsByApp(app, filters=[]){
         try{
             let pipeline =  pipeline_transactions_app(app, filters);
