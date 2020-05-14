@@ -4,6 +4,7 @@ context('User Testing', async () => {
     require('./withdrawNoApp');
     require('./withdrawNoCredentials');
     require('./withdraw0');
+    require('./txFeeWithdraw');
     require('./autoWithdraw');
     require('./withdrawMax');
     require('./withdrawEmailNoConfirmed');

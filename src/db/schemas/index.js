@@ -17,8 +17,10 @@ import { ChatSchema } from './integrations/chat';
 import { PermissionSchema } from "./permission";
 import { AddOnSchema } from "./addOn";
 import { AutoWithdrawSchema } from "./addOn/autoWithdraw";
+import { TxFeeSchema } from "./addOn/txFee";
 
 export {
+    TxFeeSchema,
     UserSchema,
     AppSchema,
     WalletSchema,

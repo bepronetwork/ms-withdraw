@@ -57,6 +57,13 @@ const processActions = {
 
             let amount = parseFloat(Math.abs(tokenAmount));
 
+            /* Verifying AddOn and set Fee */
+            let addOn = app.addOn;
+            let fee = 0;
+            if(addOn && addOn.txFee && addOn.txFee.isTxFee){
+                fee = addOn.txFee.withdraw_fee.find(c => new String(c.currency).toString() == new String(currency).toString()).amount;
+            }
+
             /* User Current Balance */
             let currentBalance = parseFloat(userWallet.playBalance);
 
@@ -128,7 +135,9 @@ const processActions = {
                 nonce : params.nonce,
                 isAlreadyWithdrawingAPI : user.isWithdrawing,
                 emailConfirmed : (user.email_confirmed != undefined && user.email_confirmed === true ),
-                isAutomaticWithdraw
+                isAutomaticWithdraw,
+                fee,
+                app_wallet : wallet
             }
             return res;
         } catch(err) {
@@ -283,6 +292,11 @@ const processActions = {
 
 const progressActions = {
     __requestWithdraw : async (params) => {
+        let { amount, app_wallet, fee, playBalanceDelta } = params;
+
+        /* Subtracting fee from amount */
+        amount = amount - fee;
+
          /* Add Withdraw to user */
          var withdraw = new Withdraw({
             app                     : params.app,
@@ -290,16 +304,20 @@ const progressActions = {
             creation_timestamp      : new Date(),
             address                 : params.withdrawAddress,                         // Deposit Address 
             currency                : params.currency,
-            amount                  : params.amount,
+            amount                  : amount,
             nonce                   : params.nonce,
-            withdrawNotification    : params.withdrawNotification
+            withdrawNotification    : params.withdrawNotification,
+            fee                     : fee
         })
         
         /* Save Deposit Data */
         var withdrawSaveObject = await withdraw.createWithdraw();
 
         /* Update User Wallet in the Platform */
-        await WalletsRepository.prototype.updatePlayBalance(params.userWallet._id, params.playBalanceDelta);
+        await WalletsRepository.prototype.updatePlayBalance(params.userWallet._id, playBalanceDelta);
+
+        /* Update App Wallet in the Platform */
+        await WalletsRepository.prototype.updatePlayBalance(app_wallet._id, fee);
         
         /* Add Deposit to user */
         await UsersRepository.prototype.addWithdraw(params.user._id, withdrawSaveObject._id);
