@@ -174,6 +174,15 @@ export async function getAppAuth(params, bearerToken, payload) {
     })).data;
 }
 
+export async function getUser(params, bearerToken, payload) {
+    return (await axios.post(`${MS_MASTER_URL}/api/app/user/get`, params, {
+        headers: {
+            "authorization": `Bearer ${bearerToken}`,
+            "payload": getPayloadString(payload)
+        }
+    })).data;
+}
+
 export async function updateAppWallet(params, bearerToken, payload) {
     return (await axios.post(`${MS_MASTER_URL}/api/app/updateWallet`, params, {
         headers: {
@@ -203,6 +212,24 @@ export async function addAutowithdraw(params, bearerToken, payload) {
 
 export async function editAutowithdraw(params, bearerToken, payload) {
     return (await axios.post(`${MS_MASTER_URL}/api/app/autoWithdraw/editAutoWithdraw`, params, {
+        headers: {
+            "authorization": `Bearer ${bearerToken}`,
+            "payload": getPayloadString(payload)
+        }
+    })).data;
+}
+
+export async function addTxFee(params, bearerToken, payload) {
+    return (await axios.post(`${MS_MASTER_URL}/api/app/txFee/add`, params, {
+        headers: {
+            "authorization": `Bearer ${bearerToken}`,
+            "payload": getPayloadString(payload)
+        }
+    })).data;
+}
+
+export async function editTxFee(params, bearerToken, payload) {
+    return (await axios.post(`${MS_MASTER_URL}/api/app/txFee/editTxFee`, params, {
         headers: {
             "authorization": `Bearer ${bearerToken}`,
             "payload": getPayloadString(payload)

@@ -9,6 +9,18 @@ let populate_app_all = [
         populate : populate_wallet_all
     },
     {
+        path : 'addOn',
+        model : 'AddOn',
+        select : { '__v': 0},
+        populate : [
+           {
+                path : 'txFee',
+                model : 'TxFee',
+                select : { '__v': 0}
+            }
+        ]
+    },
+    {
         path : 'users',
         model : 'User',
         select : { '__v': 0}
