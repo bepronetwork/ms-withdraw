@@ -2,6 +2,7 @@ import { mochaAsync, detectValidationErrors } from "../../utils/testing";
 import { createEthAccount, registerUser, loginUser, addTxFee, editTxFee, depositWallet } from "../../utils/env";
 import { requestUserWithdraw, getAppAuth, getUser } from "../../methods";
 import chai from 'chai';
+import { WithdrawRepository } from "../../db/repos";
 const expect = chai.expect;
 
 const initialState = {
@@ -40,10 +41,10 @@ context('Tx Fee', async () => {
         await depositWallet({ wallet_id: userWallet._id, amount: (global.test.depositAmounts[ticker] + 0.01) });
         global.test.user = user;
         global.test.user_eth_account = user_eth_account;
-        userInfo = (await getUser({app : app.id, user: user.id, admin: admin.id}, admin.bearerToken, {id : admin.id})).data.message;
+        userInfo = (await getUser({ app: app.id, user: user.id, admin: admin.id }, admin.bearerToken, { id: admin.id })).data.message;
         walletUserInfo = userInfo.wallet.find(w => new String(w.currency.ticker).toLowerCase() == new String(ticker).toLowerCase());
-        app = (await getAppAuth({app : app.id, admin: admin.id}, admin.bearerToken, {id : admin.id})).data.message;
-        appWallet = app.wallet.find( w => new String(w.currency.ticker).toLowerCase() == new String(ticker).toLowerCase());
+        app = (await getAppAuth({ app: app.id, admin: admin.id }, admin.bearerToken, { id: admin.id })).data.message;
+        appWallet = app.wallet.find(w => new String(w.currency.ticker).toLowerCase() == new String(ticker).toLowerCase());
         /* Add AutoWithdraw to App */
         addTxFeeResult = await addTxFee({ admin_id: admin.id, app_id: app.id, bearerToken, payload: { id: admin.id } });
         /* Edit AutoWithdraw */
@@ -61,10 +62,20 @@ context('Tx Fee', async () => {
             user: user.id,
             currency: currency._id
         }, user.bearerToken, { id: user.id });
-        userInfo = (await getUser({app : app.id, user: user.id, admin: admin.id}, admin.bearerToken, {id : admin.id})).data.message;
+
+        /* Find Request Withdraw By Id to see amount of this */
+        let withdraw = await WithdrawRepository.prototype.findWithdrawById(res.data.message);
+        console.log(withdraw.amount)
+
+        /* Auth user to get new wallet status info */
+        userInfo = (await getUser({ app: app.id, user: user.id, admin: admin.id }, admin.bearerToken, { id: admin.id })).data.message;
         walletUserInfo = userInfo.wallet.find(w => new String(w.currency.ticker).toLowerCase() == new String(ticker).toLowerCase());
-        app = (await getAppAuth({app : app.id, admin: admin.id}, admin.bearerToken, {id : admin.id})).data.message;
-        appWallet = app.wallet.find( w => new String(w.currency.ticker).toLowerCase() == new String(ticker).toLowerCase());
+
+        /* Auth App to get new wallet status info */
+        app = (await getAppAuth({ app: app.id, admin: admin.id }, admin.bearerToken, { id: admin.id })).data.message;
+        appWallet = app.wallet.find(w => new String(w.currency.ticker).toLowerCase() == new String(ticker).toLowerCase());
+
+        expect(withdraw.amount).to.be.equal((global.test.depositAmounts[ticker] / 2) - (txFeeParams.withdraw_fee))
         expect(walletUserInfo.playBalance).to.be.equal(initialPlayBalanceUser - (global.test.depositAmounts[ticker] / 2))
         expect(appWallet.playBalance).to.be.equal(initialPlayBalanceApp + (txFeeParams.withdraw_fee))
     }));
