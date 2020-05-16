@@ -64,6 +64,9 @@ const processActions = {
                 fee = addOn.txFee.withdraw_fee.find(c => new String(c.currency).toString() == new String(currency).toString()).amount;
             }
 
+            /* Verify if amount less than fee */
+            if(amount <= fee){throwError('WITHDRAW_FEE')}
+
             /* User Current Balance */
             let currentBalance = parseFloat(userWallet.playBalance);
 

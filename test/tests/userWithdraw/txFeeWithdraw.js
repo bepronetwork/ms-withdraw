@@ -65,7 +65,6 @@ context('Tx Fee', async () => {
 
         /* Find Request Withdraw By Id to see amount of this */
         let withdraw = await WithdrawRepository.prototype.findWithdrawById(res.data.message);
-        console.log(withdraw.amount)
 
         /* Auth user to get new wallet status info */
         userInfo = (await getUser({ app: app.id, user: user.id, admin: admin.id }, admin.bearerToken, { id: admin.id })).data.message;
@@ -78,5 +77,17 @@ context('Tx Fee', async () => {
         expect(withdraw.amount).to.be.equal((global.test.depositAmounts[ticker] / 2) - (txFeeParams.withdraw_fee))
         expect(walletUserInfo.playBalance).to.be.equal(initialPlayBalanceUser - (global.test.depositAmounts[ticker] / 2))
         expect(appWallet.playBalance).to.be.equal(initialPlayBalanceApp + (txFeeParams.withdraw_fee))
+    }));
+
+    it('shouldnt be able to ask withdraw with fee (Whithdraw less than Fee)', mochaAsync(async () => {
+        let res = await requestUserWithdraw({
+            tokenAmount: 0.0001,
+            nonce: 34523451256,
+            app: app.id,
+            address: user_eth_account.getAddress(),
+            user: user.id,
+            currency: currency._id
+        }, user.bearerToken, { id: user.id });
+        expect(res.data.status).to.be.equal(49);
     }));
 });
