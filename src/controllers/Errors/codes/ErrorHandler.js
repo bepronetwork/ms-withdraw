@@ -58,7 +58,8 @@ ErrorHandler.prototype.KEYS =  {
     'CURRENCY_NOT_EXISTENT'                 : "045",
     'MAX_WITHDRAW'                          : "046",
     'EMAIL_NOT_CONFIRMED'                   : "047",
-    'MIN_WITHDRAW'                          : "048"
+    'MIN_WITHDRAW'                          : "048",
+    'WITHDRAW_FEE'                          : "049"
 };
 
 
