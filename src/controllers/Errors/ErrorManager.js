@@ -54,6 +54,9 @@ class ErrorManager {
                     // Verify if Withdraw Amount is Positive
                     if(parseFloat(object.amount) <= 0)
                         libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.NEGATIVE_AMOUNT))
+                    // verify if amount is less than min withdraw
+                    if(parseFloat(object.amount) < parseFloat(object.affiliate_min_withdraw))
+                        libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.MIN_WITHDRAW));
                     // Verify User is in App
                     if(!object.user_in_app)
                         throw libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.USER_NOT_EXISTENT_IN_APP));
@@ -80,6 +83,29 @@ class ErrorManager {
                     // Verify if transaction was already added
                     if(object.wasAlreadyAdded)
                         libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.WITHDRAW_ALREADY_ADDED)); 
+                    break;
+                }
+                case 'CancelWithdraw' : {
+                    // Verify User
+                    if(typeof object == 'undefined' || Object.is(object, null)){
+                        libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.APP_NOT_EXISTENT));
+                        break;
+                    }
+                    // Verify if Address of User is the Same as the Withdraw one
+                    if(object.wasAlreadyAdded){
+                        libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.WITHDRAW_ALREADY_ADDED));
+                        break;
+                    }
+                    // Verify if App is Mentioned
+                    if(!object.app || _.isEmpty(object.app)){
+                        libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.APP_NOT_EXISTENT));
+                        break;
+                    }
+                    // Verify if transaction was already added
+                    if(!object.withdrawExists){
+                        libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.WITHDRAW_ID_NOT_DEFINED));
+                        break;
+                    }
                     break;
                 }
             }

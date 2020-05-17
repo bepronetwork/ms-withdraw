@@ -1,6 +1,6 @@
 import {UserLogic} from '../logic';
 import ModelComponent from './modelComponent';
-import {UsersRepository} from '../db/repos';
+import {UsersRepository, AppRepository} from '../db/repos';
 import { FinalizeWithdrawUserSingleton } from '../controllers/Mapper';
 
 class User extends ModelComponent{
@@ -45,6 +45,26 @@ class User extends ModelComponent{
         }
     }
 
+    async cancelWithdraw(){
+        const { app } = this.self.params;
+        try{
+            /* Close Mutex */
+            await AppRepository.prototype.changeWithdrawPosition(app, true);
+            // Output = Boolean
+            let res = await this.process('CancelWithdraw');
+            /* Open Mutex */
+            await AppRepository.prototype.changeWithdrawPosition(app, false);
+            return res;
+        }catch(err){
+            if(parseInt(err.code) != 14){
+                /* If not withdrawing atm */
+                /* Open Mutex */
+                await AppRepository.prototype.changeWithdrawPosition(app, false);
+            }
+            throw err;
+        }
+    }
+
     async requesAffiliatetWithdraw(){
         // Output = Null
         const { user } = this.self.params;
@@ -67,10 +87,20 @@ class User extends ModelComponent{
 
     
     async finalizeWithdraw(){
+        const { app } = this.self.params;
         try{
+            /* Close Mutex */
+            await AppRepository.prototype.changeWithdrawPosition(app, true);
             let res = await this.process('FinalizeWithdraw');
+             /* Open Mutex */
+             await AppRepository.prototype.changeWithdrawPosition(app, false);
             return FinalizeWithdrawUserSingleton.output('FinalizeWithdrawUser', res);
         }catch(err){
+            if(parseInt(err.code) != 14){
+                /* If not withdrawing atm */
+                /* Open Mutex */
+                await AppRepository.prototype.changeWithdrawPosition(app, false);
+            }
             throw err;
         }
     }

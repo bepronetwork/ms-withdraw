@@ -178,5 +178,9 @@
     "048" : {
         "key": "MIN_WITHDRAW",
         "message"   : "Withdrawal amount less than the minimum allowed"
+    },
+    "049" : {
+        "key": "WITHDRAW_FEE",
+        "message"   : "Withdraw less than Fee"
     }
 }

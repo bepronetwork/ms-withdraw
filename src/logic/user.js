@@ -57,6 +57,16 @@ const processActions = {
 
             let amount = parseFloat(Math.abs(tokenAmount));
 
+            /* Verifying AddOn and set Fee */
+            let addOn = app.addOn;
+            let fee = 0;
+            if(addOn && addOn.txFee && addOn.txFee.isTxFee){
+                fee = addOn.txFee.withdraw_fee.find(c => new String(c.currency).toString() == new String(currency).toString()).amount;
+            }
+
+            /* Verify if amount less than fee */
+            if(amount <= fee){throwError('WITHDRAW_FEE')}
+
             /* User Current Balance */
             let currentBalance = parseFloat(userWallet.playBalance);
 
@@ -128,7 +138,9 @@ const processActions = {
                 nonce : params.nonce,
                 isAlreadyWithdrawingAPI : user.isWithdrawing,
                 emailConfirmed : (user.email_confirmed != undefined && user.email_confirmed === true ),
-                isAutomaticWithdraw
+                isAutomaticWithdraw,
+                fee,
+                app_wallet : wallet
             }
             return res;
         } catch(err) {
@@ -150,7 +162,12 @@ const processActions = {
             const userWallet = user.affiliate.wallet.find( w => new String(w.currency._id).toString() == new String(currency).toString());
             if(!userWallet || !userWallet.currency){throwError('CURRENCY_NOT_EXISTENT')};
 
+            const wallet = app.wallet.find( w => new String(w.currency._id).toString() == new String(currency).toString());
+            if(!wallet || !wallet.currency){throwError('CURRENCY_NOT_EXISTENT')};
+            
+            /* Get Amount of Withdraw */
             let amount = parseFloat(Math.abs(params.tokenAmount));
+            
             /* User Current Balance */
             let currentBalance = parseFloat(userWallet.playBalance);
             
@@ -162,6 +179,7 @@ const processActions = {
 
             /* Verify if Withdraw position is already opened in the Smart-Contract */
             let res = {
+                affiliate_min_withdraw: (!wallet.affiliate_min_withdraw) ? 0 : wallet.affiliate_min_withdraw,
                 hasEnoughBalance,
                 user_in_app,
                 currency      : userWallet.currency,
@@ -225,6 +243,43 @@ const processActions = {
         }catch(err){
             throw err;
         }
+    },
+    __cancelWithdraw : async (params) => {
+        try{
+            const { currency } = params;
+
+            /* Get User Id */
+            let user = await UsersRepository.prototype.findUserById(params.user);
+            let app = await AppRepository.prototype.findAppById(params.app);
+            if(!app){throwError('APP_NOT_EXISTENT')}
+            if(!user){throwError('USER_NOT_EXISTENT')}
+            const wallet = user.wallet.find( w => new String(w.currency._id).toString() == new String(currency).toString());
+            if(!wallet || !wallet.currency){throwError('CURRENCY_NOT_EXISTENT')};
+
+            /* Verify if User is in App */
+            let user_in_app = (app.users.findIndex(x => (x._id.toString() == user._id.toString())) > -1);
+
+            let withdraw = await WithdrawRepository.prototype.findWithdrawById(params.withdraw_id);
+            let withdrawExists = withdraw ? true : false;
+            let wasAlreadyAdded = withdraw ? withdraw.done : false;
+
+            // let transactionIsValid = true;
+
+            let res = {
+                wallet_id: wallet._id,
+                amount: withdraw.amount,
+                note: params.note,
+                user_in_app,
+                withdrawExists,
+                withdraw_id : params.withdraw_id,
+                wasAlreadyAdded,
+                app,
+                user
+            }
+            return res;
+        }catch(err){
+            throw err;
+        }
     }
 }
 
@@ -240,6 +295,11 @@ const processActions = {
 
 const progressActions = {
     __requestWithdraw : async (params) => {
+        let { amount, app_wallet, fee, playBalanceDelta } = params;
+
+        /* Subtracting fee from amount */
+        amount = amount - fee;
+
          /* Add Withdraw to user */
          var withdraw = new Withdraw({
             app                     : params.app,
@@ -247,16 +307,20 @@ const progressActions = {
             creation_timestamp      : new Date(),
             address                 : params.withdrawAddress,                         // Deposit Address 
             currency                : params.currency,
-            amount                  : params.amount,
+            amount                  : amount,
             nonce                   : params.nonce,
-            withdrawNotification    : params.withdrawNotification
+            withdrawNotification    : params.withdrawNotification,
+            fee                     : fee
         })
         
         /* Save Deposit Data */
         var withdrawSaveObject = await withdraw.createWithdraw();
 
         /* Update User Wallet in the Platform */
-        await WalletsRepository.prototype.updatePlayBalance(params.userWallet._id, params.playBalanceDelta);
+        await WalletsRepository.prototype.updatePlayBalance(params.userWallet._id, playBalanceDelta);
+
+        /* Update App Wallet in the Platform */
+        await WalletsRepository.prototype.updatePlayBalance(app_wallet._id, fee);
         
         /* Add Deposit to user */
         await UsersRepository.prototype.addWithdraw(params.user._id, withdrawSaveObject._id);
@@ -325,6 +389,19 @@ const progressActions = {
         }catch(err){
             throw err;
         }
+    },
+    __cancelWithdraw : async (params) => {
+        try {
+            /* Add Cancel Withdraw to user */
+            await WithdrawRepository.prototype.cancelWithdraw(params.withdraw_id, {
+                last_update_timestamp   :   new Date(),
+                note: params.note
+            });
+            await WalletsRepository.prototype.updatePlayBalance(params.wallet_id, params.amount);
+            return true;
+        } catch(err) {
+            throw err;
+        }
     }
 }
 
@@ -384,6 +461,9 @@ class UserLogic extends LogicComponent {
                 }
                 case 'FinalizeWithdraw' : {
 					return await library.process.__finalizeWithdraw(params); 
+                }
+                case 'CancelWithdraw' : {
+                    return await library.process.__cancelWithdraw(params);
                 };
 			}
 		}catch(err){
@@ -419,6 +499,9 @@ class UserLogic extends LogicComponent {
                 }
                 case 'FinalizeWithdraw' : {
 					return await library.progress.__finalizeWithdraw(params); 
+                }
+                case 'CancelWithdraw' : {
+					return await library.progress.__cancelWithdraw(params);
                 };
 			}
 		}catch(err){

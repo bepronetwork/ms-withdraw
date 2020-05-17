@@ -77,6 +77,35 @@ paths:
           schema:
             $ref: "#/definitions/ErrorResponse"
 
+  /affiliate/withdraw/min/set :
+    x-swagger-router-controller: app
+    post:
+      tags:
+      - app
+      summary: Set Affiliate Min withdraw
+      operationId: setAffiliateMinWithdraw
+      description: Set Affiliate Min withdraw Data
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: withdraw
+          description: Set Affiliate Min withdraw
+          required: true
+          schema:
+            $ref: '#/definitions/SetAffiliateMinWithdraw'
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/GeneralResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+
   /users/requestWithdraw: 
     x-swagger-router-controller: user
     post:
@@ -126,6 +155,37 @@ paths:
           required: true
           schema:
             $ref: '#/definitions/UserFinalizeWithdrawRequest'
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/GeneralResponse"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+
+  /users/cancelWithdraw:
+    x-swagger-router-controller: user
+    post:
+      tags:
+      - user
+      summary: Request for User Cancel Withdraw
+      operationId: cancelWithdraw
+      description: Request Cancel Withdraw
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: user
+          description: User Information
+          required: true
+          schema:
+            $ref: '#/definitions/UserCancelWithdrawRequest'
       responses:
         "200":
           description: Success
@@ -303,6 +363,26 @@ definitions:
         description: |
           ID app
 
+  SetAffiliateMinWithdraw :
+    type: object
+    required:
+      - wallet_id
+      - amount
+      - app
+    properties:
+      wallet_id:
+        type : string
+        description: |
+          Unique identifier of the wallet
+      amount:
+        type : number
+        description: |
+          Max value for withdraw
+      app:
+        type : string
+        description: |
+          ID app
+
   AppRequestWithdrawRequest : 
     type: object
     required:
@@ -384,7 +464,46 @@ definitions:
         example: "0xe8rghwe8rghwe9r87ynw987eyncwre"
         description: |
           User Address
-  UserFinalizeWithdrawRequest : 
+  UserCancelWithdrawRequest :
+    type: object
+    required:
+      - app
+      - user
+      - withdraw_id
+      - currency
+      - note
+    properties:
+      app :
+        type : string
+        format : name
+        example : "5cuedgq7e6t334t34"
+        description: |
+          App ID
+      user :
+        type : string
+        format: name
+        example : "5cuedgq7e6t334t34"
+        description: |
+          User ID
+      withdraw_id :
+        type : string
+        format: name
+        example: "65f76st8vdsb3181"
+        description: |
+            Withdraw Id
+      currency :
+        type : string
+        format: name
+        example: "0xe8rghwe8rghwe9r87ynw987eyncwre"
+        description: |
+          User Address
+      note :
+        type : string
+        format: name
+        example: "Test Test"
+        description: |
+          Note text
+  UserFinalizeWithdrawRequest :
     type: object
     required:
       - app
