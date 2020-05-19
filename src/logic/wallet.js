@@ -6,7 +6,6 @@ import LogicComponent from './logicComponent';
 import { WalletsRepository, AppRepository } from '../db/repos';
 import { throwError } from '../controllers/Errors/ErrorManager';
 let error = new ErrorManager();
-import { Security } from '../controllers/Security';
 
 
 // Private fields
@@ -41,7 +40,6 @@ const processActions = {
 			}
 			const wallet = app.wallet.find( w => new String(w._id).toString() == new String(params.wallet_id).toString());
 			if(!wallet){throwError('CURRENCY_NOT_EXISTENT')};
-            console.log("fixed ", Security.prototype.decryptData(wallet.hashed_passphrase));
 
 			let normalized = {
 				wallet_id	: {_id: params.wallet_id},
