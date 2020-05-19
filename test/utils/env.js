@@ -4,7 +4,9 @@ import {
     registerUser as registerUserAPI,
     loginUser as loginUserAPI,
     addAutowithdraw as addAutowithdrawAPI,
-    editAutowithdraw as editAutowithdrawAPI
+    editAutowithdraw as editAutowithdrawAPI,
+    addTxFee as addTxFeeAPI,
+    editTxFee as editTxFeeAPI
 } from '../methods';
 import { globals } from "../Globals";
 import { WalletsRepository } from "../db/repos";
@@ -23,6 +25,22 @@ export async function editAutoWithdraw({admin_id, app_id, currency, autoWithdraw
         admin : admin_id,
         currency,
         autoWithdrawParams
+    }, bearerToken, payload)).data.message;
+}
+
+export async function addTxFee({admin_id, app_id, bearerToken, payload}){
+    return (await addTxFeeAPI({
+        app : app_id,
+        admin : admin_id
+    }, bearerToken, payload)).data.message;
+}
+
+export async function editTxFee({admin_id, app_id, currency, txFeeParams, bearerToken, payload}){
+    return (await editTxFeeAPI({
+        app : app_id,
+        admin : admin_id,
+        currency,
+        txFeeParams
     }, bearerToken, payload)).data.message;
 }
 

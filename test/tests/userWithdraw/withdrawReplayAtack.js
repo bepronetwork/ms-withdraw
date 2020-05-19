@@ -1,14 +1,14 @@
 import { mochaAsync, detectValidationErrors } from "../../utils/testing";
 import { createEthAccount, registerUser, loginUser, depositWallet } from "../../utils/env";
-import { requestUserWithdraw } from "../../methods";
+import { requestUserWithdraw, finalizeUserWithdraw, cancelUserWithdraw } from "../../methods";
 import chai from 'chai';
 
 const expect = chai.expect;
 
 const initialState = {
     user : {
-        eth_balance : 0.2,
-        token_balance : 5,
+        eth_balance : 0.00001,
+        token_balance : 1,
     }
 }
 
@@ -16,10 +16,10 @@ context('Withdraw Replay Atack', async () => {
     global.test.currencies.forEach( async ticker => {
         
         describe(`${ticker}`, async () => {
-            var user, app, user_eth_account, currency, appWallet;
+            var user, app, user_eth_account, currency, appWallet, withdrawToFinalize, admin;
             
             before( async () =>  {
-
+                admin = global.test.admin;
                 app = global.test.app;
                 appWallet = app.wallet.find( w => new String(w.currency.ticker).toLowerCase() == new String(ticker).toLowerCase());
                 currency = appWallet.currency;
@@ -39,7 +39,7 @@ context('Withdraw Replay Atack', async () => {
 
             it('should be able to withdraw only once, and phoibit second', mochaAsync(async () => {
                 let res = requestUserWithdraw({
-                    tokenAmount : global.test.depositAmounts[ticker],
+                    tokenAmount : global.test.depositAmounts[ticker]/5,
                     nonce : 2123423,
                     app : app.id,
                     address : user_eth_account.getAddress(),
@@ -48,7 +48,7 @@ context('Withdraw Replay Atack', async () => {
                 }, user.bearerToken , {id : user.id});
 
                 let res_replay_atack = await requestUserWithdraw({
-                    tokenAmount : global.test.depositAmounts[ticker],
+                    tokenAmount : global.test.depositAmounts[ticker]/5,
                     nonce : 344563456,
                     app : app.id,
                     address : user_eth_account.getAddress(),
@@ -62,13 +62,93 @@ context('Withdraw Replay Atack', async () => {
 
                 // Confirm either one or the other tx got phroibited
                 if(status_1 == 200){
+                    withdrawToFinalize = ret.data.message;
+                    expect(status_1).to.be.equal(200);
+                    expect(status).to.be.equal(14);
+                }else{
+                    withdrawToFinalize = res_replay_atack.data.message;
+                    expect(status_1).to.be.equal(14);
+                    expect(status).to.be.equal(200);
+                }
+                expect(detectValidationErrors(res_replay_atack)).to.be.equal(false);
+
+            }));
+
+            it('should be able to confirm withdraw only once', mochaAsync(async () => {
+
+                let res = finalizeUserWithdraw({
+                    app : app.id,
+                    admin : admin.id,
+                    user : user.id,
+                    withdraw_id : withdrawToFinalize,
+                    currency : currency._id
+                }, admin.bearerToken , {id : admin.id});
+
+                let res_replay_atack = await finalizeUserWithdraw({
+                    app : app.id,
+                    admin : admin.id,
+                    user : user.id,
+                    withdraw_id : withdrawToFinalize,
+                    currency : currency._id
+                }, admin.bearerToken , {id : admin.id});
+
+                let ret = await Promise.resolve(await res);
+                let status_1 = ret.data.status;
+                const { status } = res_replay_atack.data;
+
+                if(status_1 == 200){
+                    withdrawToFinalize = ret.data.message;
+                    expect(status_1).to.be.equal(200);
+                    expect(status).to.be.equal(14);
+                }else{
+                    withdrawToFinalize = res_replay_atack.data.message;
+                    expect(status_1).to.be.equal(14);
+                    expect(status).to.be.equal(200);
+                }
+            }));
+            it('should be able to cancel withdraw only once', mochaAsync(async () => {
+                let request = await requestUserWithdraw({
+                    tokenAmount : global.test.depositAmounts[ticker]/5,
+                    nonce : 2123427,
+                    app : app.id,
+                    address : user_eth_account.getAddress(),
+                    user : user.id,
+                    currency : currency._id
+                }, user.bearerToken , {id : user.id});
+
+                let idWithdraw = request.data.message;
+
+                let res = cancelUserWithdraw({
+                    app : app.id,
+                    admin : admin.id,
+                    user : user.id,
+                    withdraw_id : idWithdraw,
+                    currency : currency._id,
+                    note     : "test"
+                }, admin.bearerToken , {id : admin.id});
+
+
+                let res_replay_atack = await cancelUserWithdraw({
+                    app : app.id,
+                    admin : admin.id,
+                    user : user.id,
+                    withdraw_id : idWithdraw,
+                    currency : currency._id,
+                    note     : "test"
+                }, admin.bearerToken , {id : admin.id});
+
+                let ret = await Promise.resolve(await res);
+                let status_1 = ret.data.status;
+                const { status } = res_replay_atack.data;
+
+                // Confirm either one or the other tx got phroibited
+                if(status_1 == 200){
                     expect(status_1).to.be.equal(200);
                     expect(status).to.be.equal(14);
                 }else{
                     expect(status_1).to.be.equal(14);
                     expect(status).to.be.equal(200);
                 }
-                expect(detectValidationErrors(res_replay_atack)).to.be.equal(false);
 
             }));
         });

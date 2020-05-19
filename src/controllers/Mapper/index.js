@@ -11,7 +11,8 @@ import {
 
 import {
     UpdateMaxWithdrawSingleton,
-    UpdateMinWithdrawSingleton
+    UpdateMinWithdrawSingleton,
+    UpdateAffiliateMinWithdrawSingleton
 } from "./Wallet";
 
 export {
@@ -21,5 +22,6 @@ export {
     RequestWithdrawAppSingleton,
     UpdateMaxWithdrawSingleton,
     GetUsersWithdrawsSingleton,
-    UpdateMinWithdrawSingleton
+    UpdateMinWithdrawSingleton,
+    UpdateAffiliateMinWithdrawSingleton
 }

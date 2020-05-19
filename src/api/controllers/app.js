@@ -17,63 +17,75 @@ import MiddlewareSingleton from '../helpers/middleware';
  */
 
 async function requestAppWithdraw(req, res) {
-    try{
-        SecuritySingleton.verify({type : 'admin', req, permissions: ["super_admin"]});
+    try {
+        SecuritySingleton.verify({ type: 'admin', req, permissions: ["super_admin"] });
         let params = req.body;
-		let app = new App(params);
+        let app = new App(params);
         let data = await app.requestWithdraw();
         MiddlewareSingleton.respond(res, req, data);
-	}catch(err){
+    } catch (err) {
         MiddlewareSingleton.respondError(res, err);
-	}
+    }
 }
 
 async function setMaxWithdraw(req, res) {
-    try{
-        SecuritySingleton.verify({type : 'admin', req, permissions: ["super_admin"]});
+    try {
+        SecuritySingleton.verify({ type: 'admin', req, permissions: ["super_admin"] });
         let params = req.body;
         let wallet = new Wallet(params);
         let data = await wallet.setMaxWithdraw();
         MiddlewareSingleton.respond(res, req, data);
-	} catch(err) {
+    } catch (err) {
         MiddlewareSingleton.respondError(res, err);
-	}
+    }
 }
 
 async function setMinWithdraw(req, res) {
-    try{
-        SecuritySingleton.verify({type : 'admin', req, permissions: ["super_admin"]});
+    try {
+        SecuritySingleton.verify({ type: 'admin', req, permissions: ["super_admin"] });
         let params = req.body;
         let wallet = new Wallet(params);
         let data = await wallet.setMinWithdraw();
         MiddlewareSingleton.respond(res, req, data);
-	} catch(err) {
+    } catch (err) {
         MiddlewareSingleton.respondError(res, err);
-	}
+    }
+}
+
+async function setAffiliateMinWithdraw(req, res) {
+    try {
+        SecuritySingleton.verify({ type: 'admin', req, permissions: ["super_admin"] });
+        let params = req.body;
+        let wallet = new Wallet(params);
+        let data = await wallet.setAffiliateMinWithdraw();
+        MiddlewareSingleton.respond(res, req, data);
+    } catch (err) {
+        MiddlewareSingleton.respondError(res, err);
+    }
 }
 
 async function finalizeAppWithdraw(req, res) {
-    try{
-        SecuritySingleton.verify({type : 'admin', req, permissions: ["super_admin"]});
+    try {
+        SecuritySingleton.verify({ type: 'admin', req, permissions: ["super_admin"] });
         let params = req.body;
-		let app = new App(params);
+        let app = new App(params);
         let data = await app.finalizeWithdraw();
         MiddlewareSingleton.respond(res, req, data);
-	}catch(err){
+    } catch (err) {
         MiddlewareSingleton.respondError(res, err);
-	}
+    }
 }
 
 async function getUserWithdraws(req, res) {
-    try{
-        SecuritySingleton.verify({type : 'admin', req, permissions: ["super_admin", "withdraw"]});
+    try {
+        SecuritySingleton.verify({ type: 'admin', req, permissions: ["super_admin", "withdraw"] });
         let params = req.body;
-		let app = new App(params);
+        let app = new App(params);
         let data = await app.getUserWithdraws();
         MiddlewareSingleton.respond(res, req, data);
-	}catch(err){
+    } catch (err) {
         MiddlewareSingleton.respondError(res, err);
-	}
+    }
 }
 
 export {
@@ -81,5 +93,6 @@ export {
     finalizeAppWithdraw,
     getUserWithdraws,
     setMaxWithdraw,
-    setMinWithdraw
+    setMinWithdraw,
+    setAffiliateMinWithdraw
 };

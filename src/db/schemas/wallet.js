@@ -13,6 +13,7 @@ WalletSchema.prototype.schema = {
     max_deposit                 : { type: Number, default: 1},
     max_withdraw                : { type: Number, default: 1},
     min_withdraw                : { type: Number, default: 0.000001},
+    affiliate_min_withdraw      : { type: Number, default: 0.000001},
     bitgo_id                    : { type: String},
     hashed_passphrase           : { type : String},
     link_url                    : { type: String, default : null}

@@ -17,6 +17,7 @@ const wallet_update_object = (object) => {
         "min_withdraw": object.min_withdraw,
         "link_url": object.link_url,
         "max_withdraw": object.max_withdraw,
+        "affiliate_min_withdraw": object.affiliate_min_withdraw,
         "max_deposit": object.max_deposit,
         "bank_address": object.bank_address,
         "playBalance": object.playBalance,

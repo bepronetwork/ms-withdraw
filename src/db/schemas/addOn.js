@@ -6,7 +6,8 @@ class AddOnSchema{};
 AddOnSchema.prototype.name = 'AddOn';
 
 AddOnSchema.prototype.schema =  {
-    autoWithdraw  : { type : mongoose.Schema.Types.ObjectId, ref: 'AutoWithdraw' }
+    autoWithdraw  : { type : mongoose.Schema.Types.ObjectId, ref: 'AutoWithdraw' },
+    txFee         : { type : mongoose.Schema.Types.ObjectId, ref: 'TxFee' }
 }
 
 
