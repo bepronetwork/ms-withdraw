@@ -59,6 +59,7 @@ const processActions = {
 				throwError('APP_NOT_EXISTENT');
 			}
             const wallet = app.wallet.find( w => new String(w._id).toString() == new String(params.wallet_id).toString());
+            
             console.log("fixed ", Security.prototype.decryptData(wallet.hashed_passphrase));
 
 			if(!wallet){throwError('CURRENCY_NOT_EXISTENT')};
