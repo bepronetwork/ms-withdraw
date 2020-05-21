@@ -10,12 +10,14 @@ var bodyParser = require('body-parser');
 import { globals } from './Globals';
 import { Logger } from './helpers/logger';
 import { PORT } from './config';
+import { rateLimiterUsingThirdParty } from './controllers/middlewares';
 
 //---------CODING-CHOICES--------------//
 
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
+app.use(rateLimiterUsingThirdParty);
 
 
 //--------RUN APP-------------------//

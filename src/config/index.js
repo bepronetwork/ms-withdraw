@@ -7,6 +7,10 @@ export const PORT = process.env.PORT;
 
 export const DB_USER =  process.env.DB_USER;
 
+export const LIMIT =  process.env.LIMIT;
+
+export const RATE =  process.env.RATE;
+
 export const DB_PASSWORD =  process.env.DB_PASSWORD;
 
 export const APP_MGMT_PRIVATE_KEY =  process.env.APP_MGMT_PRIVATE_KEY;
