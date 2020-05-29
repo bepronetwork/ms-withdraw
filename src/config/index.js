@@ -7,9 +7,9 @@ export const PORT = process.env.PORT;
 
 export const DB_USER =  process.env.DB_USER;
 
-export const LIMIT =  process.env.LIMIT;
+export const LIMIT =  process.env.LIMIT || 1;
 
-export const RATE =  process.env.RATE;
+export const RATE =  process.env.RATE || 100;
 
 export const DB_PASSWORD =  process.env.DB_PASSWORD;
 
