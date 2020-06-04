@@ -34,6 +34,8 @@ jobs: # a collection of steps
             echo 'export QUOTA_GUARD_URL=http://1uf1vgmue9ztet:3k1ajq0eev28rmx06uvrj2ox8t@eu-west-static-04.quotaguard.com:9293' >> $BASH_ENV
             echo 'export SENDINBLUE_API_KEY=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' >> $BASH_ENV
             echo 'export SENDINBLUE_EMAIL_TO=sandbox.betprotocol.com' >> $BASH_ENV
+            echo 'export LIMIT=1' >> $BASH_ENV
+            echo 'export RATE=100' >> $BASH_ENV
             source $BASH_ENV
       - run: # run tests
           name: test

@@ -58,6 +58,23 @@ export async function finalizeAppWithdraw(params, bearerToken, payload) {
         .then(res => detectServerError(res))
 };
 
+export async function pingPost(params, bearerToken, payload){
+    return request(global.app)
+    .post('/api/status/post')
+    .set("authorization", "Bearer " + bearerToken)
+    .set("payload", getPayloadString(payload))
+    .send(params)
+    .then(res => detectServerError(res))
+};
+export async function pingPostMiddleware(params, bearerToken, payload){
+    return request(global.app)
+    .post('/api/status/post')
+    .set("authorization", "Bearer " + bearerToken)
+    .set("payload", getPayloadString(payload))
+    .send(params)
+    .then(res => res)
+};
+
 export async function getAppUserWithdraws(params, bearerToken, payload) {
     return request(global.app)
         .post('/api/app/users/withdraws')
