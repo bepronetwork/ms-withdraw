@@ -2,8 +2,8 @@ import { mochaAsync, detectValidationErrors } from "../../utils/testing";
 import { createEthAccount, registerUser, loginUser, depositWallet } from "../../utils/env";
 import { requestUserWithdraw, getAppUserWithdraws, finalizeUserWithdraw, cancelUserWithdraw } from "../../methods";
 import chai from 'chai';
-import { WalletsRepository } from "../../db/repos";
 const expect = chai.expect;
+import { WalletsRepository } from "../../../src/db/repos";
 
 const initialState = {
     user : {
@@ -44,7 +44,7 @@ context('Withdraw Some Amount', async () => {
                 console.log(userWallet._id)
                 let res = await requestUserWithdraw({
                     tokenAmount : 0.001,
-                    nonce : 3456365756,
+                    nonce : 34563657553,
                     app : app.id,
                     address : user_eth_account.getAddress(),
                     user : user.id,
