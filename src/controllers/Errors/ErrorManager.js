@@ -210,8 +210,8 @@ class ErrorManager {
 export default ErrorManager;
 
 
-const throwError = (typeError='UNKNOWN') => {
-    throw libraries.throwError(libraries.handler.getError(libraries.handler.KEYS[typeError]));
+const throwError = (typeError='UNKNOWN', messageParams = '') => {
+    throw libraries.throwError(libraries.handler.getError(libraries.handler.KEYS[typeError], messageParams));
 }
 
 export {

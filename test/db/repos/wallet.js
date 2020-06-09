@@ -61,6 +61,22 @@ class WalletsRepository extends MongoComponent{
             })
         })
     }
+
+    updateBonusAndAmount({wallet_id, playBalance, bonusAmount}){        
+        return new Promise( (resolve,reject) => {
+            WalletsRepository.prototype.schema.model.findOneAndUpdate(
+                { _id: wallet_id}, 
+                { $set: { 
+                    "playBalance" : playBalance,
+                    "bonusAmount" : bonusAmount
+                } })
+                .exec( (err, item) => {
+                    if(err){reject(err)}
+                    resolve(true);
+                }
+            )
+        });
+    }
 }
 
 WalletsRepository.prototype.schema = new WalletSchema();

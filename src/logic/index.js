@@ -5,6 +5,7 @@ import WalletLogic from './wallet';
 import IntegrationsLogic from './integrations';
 import MailSenderLogic from './mailSender';
 import ChatLogic from './chat';
+import CurrencyLogic from "./currency";
 
 
 export {
@@ -14,6 +15,7 @@ export {
     WalletLogic,
     IntegrationsLogic,
     MailSenderLogic,
-    ChatLogic
+    ChatLogic,
+    CurrencyLogic
 }
 
