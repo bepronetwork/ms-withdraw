@@ -39,7 +39,7 @@ context('Withdraw Some Amount', async () => {
             
             });
 
-            it('should be able to ask to withdraw some amount', mochaAsync(async () => {
+            it('shouldnt be able to ask to withdraw some amount - Has Bonus Yet', mochaAsync(async () => {
                 await WalletsRepository.prototype.updateBonusAndAmount({ wallet_id: userWallet._id, playBalance: 0.001, bonusAmount: 0.001 });
                 console.log(userWallet._id)
                 let res = await requestUserWithdraw({

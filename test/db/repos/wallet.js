@@ -71,8 +71,10 @@ class WalletsRepository extends MongoComponent{
                     "bonusAmount" : bonusAmount
                 } })
                 .exec( (err, item) => {
+                    console.log(item)
+                    console.log(err)
                     if(err){reject(err)}
-                    resolve(true);
+                    resolve(item);
                 }
             )
         });
