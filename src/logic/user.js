@@ -54,12 +54,9 @@ const processActions = {
 
             /* Just Make Request If haven't Bonus Amount on Wallet */
             let bonusAmount = userWallet.bonusAmount
-            console.log("bonusAmount:: ",bonusAmount)
             let whatsLeftBetAmountForBonus = userWallet.minBetAmountForBonusUnlocked - userWallet.incrementBetAmountForBonus
-            console.log("whatsLeftBetAmountForBonus:: ",whatsLeftBetAmountForBonus)
             let currencyObject = await CurrencyRepository.prototype.findById(currency);
-            console.log("currencyObject:: ",currencyObject)
-            if(bonusAmount > 0){console.log(1);throwError('HAS_BONUS_YET', `, ${whatsLeftBetAmountForBonus} ${currencyObject.ticker} left before there can be a withdrawal`)}
+            if(bonusAmount > 0){throwError('HAS_BONUS_YET', `, ${whatsLeftBetAmountForBonus} ${currencyObject.ticker} left before there can be a withdrawal`)}
 
             const wallet = app.wallet.find( w => new String(w.currency._id).toString() == new String(currency).toString());
             if(!wallet || !wallet.currency){throwError('CURRENCY_NOT_EXISTENT')};
