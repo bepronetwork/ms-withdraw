@@ -59,7 +59,8 @@ ErrorHandler.prototype.KEYS =  {
     'MAX_WITHDRAW'                          : "046",
     'EMAIL_NOT_CONFIRMED'                   : "047",
     'MIN_WITHDRAW'                          : "048",
-    'WITHDRAW_FEE'                          : "049"
+    'WITHDRAW_FEE'                          : "049",
+    'HAS_BONUS_YET'                         : "050"
 };
 
 
@@ -78,11 +79,11 @@ ErrorHandler.prototype.getKey = function(code){
     return this.errors[code].key;
 }
 
-ErrorHandler.prototype.getError = function(code){
+ErrorHandler.prototype.getError = function(code, messageParams = ''){
     return {
         key     : this.getKey(code),
         code    : parseInt(code),
-        message : this.getMessage(code)
+        message : this.getMessage(code) + messageParams
     }
 }
 

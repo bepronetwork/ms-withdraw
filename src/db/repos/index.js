@@ -24,8 +24,10 @@ import ChatRepository from "./chat";
 import PermissionRepository from "./permission";
 import AutoWithdrawRepository from "./autoWithdraw";
 import AddOnRepository from "./addOn";
+import CurrencyRepository from "./currency";
 
 export{
+    CurrencyRepository,
     AffiliateLinkRepository,
     AffiliateRepository,
     AffiliateSetupRepository,

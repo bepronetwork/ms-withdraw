@@ -5,7 +5,7 @@ const _ = require('lodash');
 import { ErrorManager } from '../controllers/Errors';
 import LogicComponent from './logicComponent';
 
-import { UsersRepository, AppRepository, WalletsRepository, WithdrawRepository, AddOnRepository, AutoWithdrawRepository } from '../db/repos';
+import { UsersRepository, AppRepository, WalletsRepository, WithdrawRepository, AddOnRepository, AutoWithdrawRepository, CurrencyRepository } from '../db/repos';
 import Numbers from './services/numbers';
 import { Withdraw } from '../models';
 import { throwError } from '../controllers/Errors/ErrorManager';
@@ -51,6 +51,12 @@ const processActions = {
             /* Get User and App Wallets */
             const userWallet = user.wallet.find( w => new String(w.currency._id).toString() == new String(currency).toString());
             if(!userWallet || !userWallet.currency){throwError('CURRENCY_NOT_EXISTENT')};
+
+            /* Just Make Request If haven't Bonus Amount on Wallet */
+            let bonusAmount = userWallet.bonusAmount
+            let whatsLeftBetAmountForBonus = userWallet.minBetAmountForBonusUnlocked - userWallet.incrementBetAmountForBonus
+            let currencyObject = await CurrencyRepository.prototype.findById(currency);
+            if(bonusAmount > 0){throwError('HAS_BONUS_YET', `, ${whatsLeftBetAmountForBonus} ${currencyObject.ticker} left before there can be a withdrawal`)}
 
             const wallet = app.wallet.find( w => new String(w.currency._id).toString() == new String(currency).toString());
             if(!wallet || !wallet.currency){throwError('CURRENCY_NOT_EXISTENT')};

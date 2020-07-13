@@ -182,5 +182,9 @@
     "049" : {
         "key": "WITHDRAW_FEE",
         "message"   : "Withdraw less than Fee"
+    },
+    "050" : {
+        "key": "HAS_BONUS_YET",
+        "message"   : "The balance still has a bonus to be played"
     }
 }
