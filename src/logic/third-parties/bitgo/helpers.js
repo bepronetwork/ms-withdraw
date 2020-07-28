@@ -22,6 +22,10 @@ export const getCurrencyAmountToBitGo = ({ticker, amount}) => {
             // to 18
             return parseInt(parseFloat(amount)*1000000000000000000);
         };
+        case 'fft' : {
+            // to 18
+            return parseInt(parseFloat(amount)*1000000000000000000);
+        };
     }
 }
 
@@ -46,6 +50,10 @@ export const getCurrencyAmountFromBitGo = ({ticker, amount}) => {
             return parseFloat(parseFloat(amount)/1000000);
         };
         case 'dai' : {
+            // to 18
+            return parseFloat(parseFloat(amount)/1000000000000000000);
+        };
+         case 'fft' : {
             // to 18
             return parseFloat(parseFloat(amount)/1000000000000000000);
         };

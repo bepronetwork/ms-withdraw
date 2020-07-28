@@ -53,9 +53,6 @@ context('Withdraw Replay Atack', async () => {
         app = (await getAppAuth({app : app.id, admin: admin.id}, admin.bearerToken, {id : admin.id})).data.message;
         balance = app.wallet.find( w => new String(w.currency.ticker).toLowerCase() == new String(global.test.ticker).toLowerCase()).playBalance;
 
-        expect(parseFloat(balance).toFixed(6)).to.be.equal(parseFloat(initialBalance-deposit).toFixed(6));
-        expect(detectValidationErrors(res_replay_attack)).to.be.equal(false);
-
         // Confirm either one or the other tx got phroibited
         if(status_1 == 200){
             expect(status_1).to.be.equal(200)
@@ -66,6 +63,9 @@ context('Withdraw Replay Atack', async () => {
             expect(status).to.be.equal(200)
             app_withdraw = message;
         }
+
+        expect(parseFloat(balance).toFixed(6)).to.be.equal(parseFloat(initialBalance-deposit).toFixed(6));
+        expect(detectValidationErrors(res_replay_attack)).to.be.equal(false);
 
     }));
 
