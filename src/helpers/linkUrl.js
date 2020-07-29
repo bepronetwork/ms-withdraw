@@ -12,6 +12,22 @@ export const setLinkUrl = ({ ticker, address, isTransactionHash }) => {
                 link_url = `https://testnet.smartbit.com.au/${isTransactionHash ? 'tx' : 'address'}/${address}`;
                 return link_url;
             };
+            case 'fft': {
+                link_url = `https://kovan.etherscan.io/${isTransactionHash ? 'tx' : 'address'}/${address}`;
+                return link_url;
+            };
+            case 'usdc': {
+                link_url = `https://kovan.etherscan.io/${isTransactionHash ? 'tx' : 'address'}/${address}`;
+                return link_url;
+            };
+            case 'dai': {
+                link_url = `https://kovan.etherscan.io/${isTransactionHash ? 'tx' : 'address'}/${address}`;
+                return link_url;
+            };
+            case 'usdt': {
+                link_url = `https://kovan.etherscan.io/${isTransactionHash ? 'tx' : 'address'}/${address}`;
+                return link_url;
+            };
             default:
                 link_url = address;
                 return link_url;
@@ -24,6 +40,22 @@ export const setLinkUrl = ({ ticker, address, isTransactionHash }) => {
             };
             case 'btc': {
                 link_url = `https://live.blockcypher.com/btc/${isTransactionHash ? 'tx' : 'address'}/${address}`;
+                return link_url;
+            };
+            case 'fft': {
+                link_url = `https://kovan.etherscan.io/${isTransactionHash ? 'tx' : 'address'}/${address}`;
+                return link_url;
+            };
+            case 'usdc': {
+                link_url = `https://kovan.etherscan.io/${isTransactionHash ? 'tx' : 'address'}/${address}`;
+                return link_url;
+            };
+            case 'dai': {
+                link_url = `https://kovan.etherscan.io/${isTransactionHash ? 'tx' : 'address'}/${address}`;
+                return link_url;
+            };
+            case 'usdt': {
+                link_url = `https://kovan.etherscan.io/${isTransactionHash ? 'tx' : 'address'}/${address}`;
                 return link_url;
             };
             default:
