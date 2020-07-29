@@ -38,7 +38,7 @@
         "bcryptjs": "^2.4.3",
         "bee-queue": "^1.2.2",
         "big-number": "^2.0.0",
-        "bitgo": "^9.5.1",
+        "bitgo": "^11.4.0",
         "bluebird": "^3.5.5",
         "body-parser": "~1.17.1",
         "browser-cookies": "^1.2.0",
