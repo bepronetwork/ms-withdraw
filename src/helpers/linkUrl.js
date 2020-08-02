@@ -43,19 +43,19 @@ export const setLinkUrl = ({ ticker, address, isTransactionHash }) => {
                 return link_url;
             };
             case 'fft': {
-                link_url = `https://kovan.etherscan.io/${isTransactionHash ? 'tx' : 'address'}/${address}`;
+                link_url = `https://etherscan.io/${isTransactionHash ? 'tx' : 'address'}/${address}`;
                 return link_url;
             };
             case 'usdc': {
-                link_url = `https://kovan.etherscan.io/${isTransactionHash ? 'tx' : 'address'}/${address}`;
+                link_url = `https://etherscan.io/${isTransactionHash ? 'tx' : 'address'}/${address}`;
                 return link_url;
             };
             case 'dai': {
-                link_url = `https://kovan.etherscan.io/${isTransactionHash ? 'tx' : 'address'}/${address}`;
+                link_url = `https://etherscan.io/${isTransactionHash ? 'tx' : 'address'}/${address}`;
                 return link_url;
             };
             case 'usdt': {
-                link_url = `https://kovan.etherscan.io/${isTransactionHash ? 'tx' : 'address'}/${address}`;
+                link_url = `https://etherscan.io/${isTransactionHash ? 'tx' : 'address'}/${address}`;
                 return link_url;
             };
             default:
