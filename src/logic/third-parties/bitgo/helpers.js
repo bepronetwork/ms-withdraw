@@ -6,7 +6,7 @@ export const getCurrencyAmountToBitGo = ({ticker, amount}) => {
     switch(new String(ticker).toLowerCase().trim()){
         case 'eth' : {
             // to wei
-            return parseInt(parseFloat(amount)*1000000000000000000);
+            return web3.utils.toWei(new String(amount).toString(), 'ether');
         };
         case 'btc' : {
             // to satoshi
@@ -22,10 +22,9 @@ export const getCurrencyAmountToBitGo = ({ticker, amount}) => {
         };
         case 'dai' : {
             // to 18
-            return parseInt(parseFloat(amount)*1000000000000000000);
+            return web3.utils.toWei(new String(amount).toString(), 'ether');
         };
         case 'fft' : {
-            console.log("fft", web3.utils.toWei(new String(amount).toString(), 'ether'));
             // to 18
             return web3.utils.toWei(new String(amount).toString(), 'ether');
         };
