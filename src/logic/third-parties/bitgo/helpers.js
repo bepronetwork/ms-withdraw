@@ -23,6 +23,7 @@ export const getCurrencyAmountToBitGo = ({ticker, amount}) => {
             return parseInt(parseFloat(amount)*1000000000000000000);
         };
         case 'fft' : {
+            console.log("fft", parseInt(parseFloat(amount)*1000000000000000000));
             // to 18
             return parseInt(parseFloat(amount)*1000000000000000000);
         };
