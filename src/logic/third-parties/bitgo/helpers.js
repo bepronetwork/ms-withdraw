@@ -1,4 +1,5 @@
-import web3 from 'web3';
+import Web3 from 'web3';
+const web3 = new Web3(new Web3.providers.HttpProvider("https://mainnet.infura.io/v3/811fe4fa5c4b41cb9b92f9656aaeaa3b"));
 
 export const getCurrencyAmountToBitGo = ({ticker, amount}) => {
     
