@@ -27,7 +27,7 @@ export const getCurrencyAmountToBitGo = ({ticker, amount}) => {
         case 'fft' : {
             console.log("fft", web3.utils.toWei(new String(amount).toString(), 'ether'));
             // to 18
-            return parseInt(web3.utils.toWei(new String(amount).toString(), 'ether'));
+            return web3.utils.toWei(new String(amount).toString(), 'ether');
         };
     }
 }
