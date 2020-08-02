@@ -24,8 +24,7 @@ export const getCurrencyAmountToBitGo = ({ticker, amount}) => {
             return parseInt(parseFloat(amount)*1000000000000000000);
         };
         case 'fft' : {
-            console.log("fft", amount, parseInt(parseFloat(amount)*1000000000000000000), web3.utils.toWei(new String(amount).toString(), 'ether');
-);
+            console.log("fft", amount, parseInt(parseFloat(amount)*1000000000000000000), web3.utils.toWei(new String(amount).toString(), 'ether'));
             // to 18
             return parseInt(parseFloat(amount)*1000000000000000000);
         };
