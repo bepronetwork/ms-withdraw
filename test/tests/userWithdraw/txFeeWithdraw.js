@@ -41,7 +41,7 @@ context('Tx Fee', async () => {
         await depositWallet({ wallet_id: userWallet._id, amount: (global.test.depositAmounts[ticker] + 0.01) });
         global.test.user = user;
         global.test.user_eth_account = user_eth_account;
-        userInfo = (await getUser({ app: app.id, user: user.id, admin: admin.id }, admin.bearerToken, { id: admin.id })).data.message;
+        userInfo = (await getUser({ app: app.id, user: user.id, admin: admin.id, currency: currency._id }, admin.bearerToken, { id: admin.id })).data.message;
         walletUserInfo = userInfo.wallet.find(w => new String(w.currency.ticker).toLowerCase() == new String(ticker).toLowerCase());
         app = (await getAppAuth({ app: app.id, admin: admin.id }, admin.bearerToken, { id: admin.id })).data.message;
         appWallet = app.wallet.find(w => new String(w.currency.ticker).toLowerCase() == new String(ticker).toLowerCase());
@@ -67,7 +67,7 @@ context('Tx Fee', async () => {
         let withdraw = await WithdrawRepository.prototype.findWithdrawById(res.data.message);
 
         /* Auth user to get new wallet status info */
-        userInfo = (await getUser({ app: app.id, user: user.id, admin: admin.id }, admin.bearerToken, { id: admin.id })).data.message;
+        userInfo = (await getUser({ app: app.id, user: user.id, admin: admin.id, currency: currency._id }, admin.bearerToken, { id: admin.id })).data.message;
         walletUserInfo = userInfo.wallet.find(w => new String(w.currency.ticker).toLowerCase() == new String(ticker).toLowerCase());
 
         /* Auth App to get new wallet status info */
