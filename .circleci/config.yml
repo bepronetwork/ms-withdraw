@@ -36,6 +36,10 @@ jobs: # a collection of steps
             echo 'export SENDINBLUE_EMAIL_TO=sandbox.betprotocol.com' >> $BASH_ENV
             echo 'export LIMIT=1' >> $BASH_ENV
             echo 'export RATE=100' >> $BASH_ENV
+            echo 'export MONGO_URL=mongodb://BetProtocolAdmin:wNmm4OmASXEp8UXi@cluster0-shard-00-00-2gxjd.mongodb.net:27017,cluster0-shard-00-01-2gxjd.mongodb.net:27017,cluster0-shard-00-02-2gxjd.mongodb.net:27017/' >> $BASH_ENV
+            echo 'export MONGO_MAIN=main?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin&retryWrites=true' >> $BASH_ENV
+            echo 'export MONGO_ECOSYSTEM=ecosystem?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin&retryWrites=true' >> $BASH_ENV
+            echo 'export MONGO_REDIS=redis?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin&retryWrites=true' >> $BASH_ENV
             source $BASH_ENV
       - run: # run tests
           name: test

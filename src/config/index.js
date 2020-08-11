@@ -58,12 +58,14 @@ var DB_MONGO = config.mongo;
  */
 
 
-DB_MONGO = changeAllStringsInObjectRecursive(DB_MONGO, 'DB_USER', DB_USER);
-
-DB_MONGO = changeAllStringsInObjectRecursive(DB_MONGO, 'DB_PASSWORD', DB_PASSWORD);
-        
-DB_MONGO = changeAllStringsInObjectRecursive(DB_MONGO, 'MONGO_ID', MONGO_ID);
-
+DB_MONGO = {
+    "connection_string" : process.env.MONGO_URL,
+    "dbs" : {
+        "main" : process.env.MONGO_MAIN,
+        "ecosystem" : process.env.MONGO_ECOSYSTEM,
+        "redis" : process.env.MONGO_REDIS
+    }
+};
 
 
 if(ETH_RPC_URL){
