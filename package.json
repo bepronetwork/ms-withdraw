@@ -4,7 +4,7 @@
     "private": true,
     "main": "app.js",
     "engines": {
-        "node": "8.12.0"
+        "node": "8.13.0"
     },
     "scripts": {
         "start": "babel-node app --nopresets es2015,stage-2",
