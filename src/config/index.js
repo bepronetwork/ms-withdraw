@@ -5,19 +5,14 @@ export const PORT = process.env.PORT;
 
 /* ENV */
 
-export const DB_USER =  process.env.DB_USER;
 
 export const LIMIT =  process.env.LIMIT || 1;
 
 export const RATE =  process.env.RATE || 100;
 
-export const DB_PASSWORD =  process.env.DB_PASSWORD;
-
 export const APP_MGMT_PRIVATE_KEY =  process.env.APP_MGMT_PRIVATE_KEY;
 
 export const ETH_TEST_NET = process.env.ETH_NET; 
-
-export const MONGO_ID = process.env.MONGO_ID; 
 
 export const INFURA_KEY = process.env.INFURA_KEY; 
 
@@ -56,6 +51,16 @@ var ETH_NETWORK = config.eth;
 /**
  * @function SET_ENV
  */
+
+
+DB_MONGO = {
+    "connection_string" : process.env.MONGO_URL,
+    "dbs" : {
+        "main" : process.env.MONGO_MAIN,
+        "ecosystem" : process.env.MONGO_ECOSYSTEM,
+        "redis" : process.env.MONGO_REDIS
+    }
+};
 
 
 if(ETH_RPC_URL){

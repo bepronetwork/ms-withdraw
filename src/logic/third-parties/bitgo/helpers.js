@@ -1,10 +1,12 @@
+import Web3 from 'web3';
+const web3 = new Web3(new Web3.providers.HttpProvider("https://mainnet.infura.io/v3/811fe4fa5c4b41cb9b92f9656aaeaa3b"));
 
 export const getCurrencyAmountToBitGo = ({ticker, amount}) => {
     
     switch(new String(ticker).toLowerCase().trim()){
         case 'eth' : {
             // to wei
-            return parseInt(parseFloat(amount)*1000000000000000000);
+            return web3.utils.toWei(new String(amount).toString(), 'ether');
         };
         case 'btc' : {
             // to satoshi
@@ -20,11 +22,11 @@ export const getCurrencyAmountToBitGo = ({ticker, amount}) => {
         };
         case 'dai' : {
             // to 18
-            return parseInt(parseFloat(amount)*1000000000000000000);
+            return web3.utils.toWei(new String(amount).toString(), 'ether');
         };
         case 'fft' : {
             // to 18
-            return parseInt(parseFloat(amount)*1000000000000000000);
+            return web3.utils.toWei(new String(amount).toString(), 'ether');
         };
     }
 }
