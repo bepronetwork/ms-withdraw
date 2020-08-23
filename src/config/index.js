@@ -53,7 +53,7 @@ var ETH_NETWORK = config.eth;
  */
 
 
-DB_MONGO = {
+var DB_MONGO = {
     "connection_string" : process.env.MONGO_URL,
     "dbs" : {
         "main" : process.env.MONGO_MAIN,
