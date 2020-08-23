@@ -20,10 +20,7 @@ jobs: # a collection of steps
           command: |
             echo 'export MONGO_CONNECTION_STRING=mongodb+srv://BetProtocolAdmin:wNmm4OmASXEp8UXi@cluster0.2gxjd.mongodb.net' >> $BASH_ENV
             echo 'export ETH_NET_NAME=kovan' >> $BASH_ENV
-            echo 'export DB_USER=BetProtocolAdmin' >> $BASH_ENV
-            echo 'export DB_PASSWORD=wNmm4OmASXEp8UXi' >> $BASH_ENV
             echo 'export APP_MGMT_PRIVATE_KEY=0xA109C83409D4DCB71DD1CFAA8048004969126D9CAEF12BB86E0CA6056BB67DA6' >> $BASH_ENV
-            echo 'export MONGO_ID=2gxjd' >> $BASH_ENV
             echo 'export INFURA_KEY=811fe4fa5c4b41cb9b92f9656aaeaa3b' >> $BASH_ENV
             echo 'export ENV=development' >> $BASH_ENV
             echo 'export PRIVATE_KEY=MIIBOgIBAAJBALLaXE1qt9my6cWkh9NGYr+mM/WLagt8AqObSNs9sNbL9da6qrYxuq57XUepaWWgyA81bZXOUy25wfkBpwwQmXsCAwEAAQJAT6hrtdtTGTXTYsC98f6GWr9movU9/PF1p3KxB1y5l2Cu0Zef2aGXsSc6+QaFRQXgs3KL9giUam4DknOdmfY9AQIhAOh7N0vocqKsu9N33RMNg4if/uzsJ0ysLH965mImxIaBAiEAxPJIHQpxVRPZ3bUWgZYesEWalA7MCpxMPppssXxuOfsCIQCwquojojpzSsbVddInp25chhGI5BEdX/3UxoWK8yEHgQIgFb9/cR2HGFMB2va1TogKSYLWKAVeSMmrrboVyJ+p+GMCIGmPcNLl+QdKxivLLYVLK8JRRTglt9fJpLFKqZDboTUQ' >> $BASH_ENV
