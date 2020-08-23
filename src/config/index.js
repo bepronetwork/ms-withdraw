@@ -45,25 +45,17 @@ export const SENDINBLUE_API_KEY = process.env.SENDINBLUE_API_KEY;
 
 export const SENDINBLUE_EMAIL_TO = process.env.SENDINBLUE_EMAIL_TO;
 
+export const MONGO_CONNECTION_STRING = process.env.MONGO_CONNECTION_STRING;
+
 export const ENV = process.env.ENV;
 
 /* Variables */
 
 var ETH_NETWORK = config.eth;
 
-var DB_MONGO = config.mongo;
-
 /**
  * @function SET_ENV
  */
-
-
-DB_MONGO = changeAllStringsInObjectRecursive(DB_MONGO, 'DB_USER', DB_USER);
-
-DB_MONGO = changeAllStringsInObjectRecursive(DB_MONGO, 'DB_PASSWORD', DB_PASSWORD);
-        
-DB_MONGO = changeAllStringsInObjectRecursive(DB_MONGO, 'MONGO_ID', MONGO_ID);
-
 
 
 if(ETH_RPC_URL){
@@ -76,6 +68,5 @@ if(ETH_RPC_URL){
 }
 
 export {
-    ETH_NETWORK,
-    DB_MONGO
+    ETH_NETWORK
 }
