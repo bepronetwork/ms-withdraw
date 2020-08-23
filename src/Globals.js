@@ -84,11 +84,11 @@ class Globals{
     async connect(){      
         // Main DB
         this.main_db = new Mongoose();
-        await this.main_db.connect(DB_MONGO.connection_string + DB_MONGO.dbs.main, {useMongoClient : true});
+        await this.main_db.connect(DB_MONGO.connection_string + DB_MONGO.dbs.main, { useNewUrlParser: true, useUnifiedTopology: true});
         this.main_db.Promise = bluebird;
         // Ecosystem DB
         this.ecosystem_db = new Mongoose();
-        await this.ecosystem_db.connect(DB_MONGO.connection_string + DB_MONGO.dbs.ecosystem, {useMongoClient : true})
+        await this.ecosystem_db.connect(DB_MONGO.connection_string + DB_MONGO.dbs.ecosystem, { useNewUrlParser: true, useUnifiedTopology: true})
         this.ecosystem_db.Promise = bluebird;
         // Main DB
         this.default = new Mongoose();
