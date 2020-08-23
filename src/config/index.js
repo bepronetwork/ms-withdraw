@@ -40,13 +40,13 @@ export const SENDINBLUE_API_KEY = process.env.SENDINBLUE_API_KEY;
 
 export const SENDINBLUE_EMAIL_TO = process.env.SENDINBLUE_EMAIL_TO;
 
+export const MONGO_CONNECTION_STRING = process.env.MONGO_CONNECTION_STRING;
+
 export const ENV = process.env.ENV;
 
 /* Variables */
 
 var ETH_NETWORK = config.eth;
-
-var DB_MONGO = config.mongo;
 
 /**
  * @function SET_ENV
@@ -63,7 +63,6 @@ DB_MONGO = {
 };
 
 
-
 if(ETH_RPC_URL){
     ETH_NETWORK = changeAllStringsInObjectRecursive(ETH_NETWORK, 'APP_MGMT_PRIVATE_KEY', APP_MGMT_PRIVATE_KEY);
     ETH_NETWORK.url = ETH_RPC_URL;
@@ -74,6 +73,5 @@ if(ETH_RPC_URL){
 }
 
 export {
-    ETH_NETWORK,
-    DB_MONGO
+    ETH_NETWORK
 }

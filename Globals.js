@@ -102,12 +102,12 @@ class Globals{
     connect(){        
         // Main DB
         this.main_db = new Mongoose();
-        this.main_db.connect(this.mongo.connection_string + this.mongo.dbs.main, {useMongoClient : true})
+        this.main_db.connect(this.mongo.connection_string + this.mongo.dbs.main, { useNewUrlParser: true, useUnifiedTopology: true})
         this.main_db.Promise = global.Promise;
 
         // Ecosystem DB
         this.ecosystem_db = new Mongoose();
-        this.ecosystem_db.connect(this.mongo.connection_string + this.mongo.dbs.ecosystem, {useMongoClient : true})
+        this.ecosystem_db.connect(this.mongo.connection_string + this.mongo.dbs.ecosystem, { useNewUrlParser: true, useUnifiedTopology: true})
         this.ecosystem_db.Promise = global.Promise;
 
         // Main DB
