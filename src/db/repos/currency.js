@@ -39,6 +39,17 @@ class CurrencyRepository extends MongoComponent{
         });
     }
 
+    async findByTicker(ticker){
+        return new Promise( (resolve,reject) => {
+            this.schema.model.findOne({ticker})
+            .lean()
+            .exec( (err, docs) => {
+                if(err){reject(err)}
+                resolve(docs);
+            })
+        })
+    }
+
     async getAll(){
         return new Promise( (resolve,reject) => {
             this.schema.model.find().lean().populate()
