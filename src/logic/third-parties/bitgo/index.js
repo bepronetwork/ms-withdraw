@@ -39,14 +39,14 @@ class BitGoClass {
         const wallet = await this.getWallet({ticker, id : wallet_id});
         var res = await wallet.getTransfer({ id });
         // Update Amount based on the type of Wei or Sats
-        res.value = getCurrencyAmountFromBitGo({ticker, amount : res.value});
+        res.value = await getCurrencyAmountFromBitGo({ticker, amount : res.value});
         return res;
     }
 
     async sendTransaction({wallet_id, ticker, amount, address, passphrase}){
         const wallet = await this.getWallet({id : wallet_id, ticker});
         return await wallet.send({
-            amount: new String(getCurrencyAmountToBitGo({ticker, amount})).trim().toString(),
+            amount: new String(await getCurrencyAmountToBitGo({ticker, amount})).trim().toString(),
             address: address,
             walletPassphrase : passphrase
         });
