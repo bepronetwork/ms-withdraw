@@ -7,7 +7,7 @@ export const getCurrencyAmountToBitGo = async ({ticker, amount}) => {
     return parseInt(parseFloat(amount)*(10 ** dataTicker.decimals));
 }
 
-export const getCurrencyAmountFromBitGo = ({ticker, amount}) => {
+export const getCurrencyAmountFromBitGo = async ({ticker, amount}) => {
     const dataTicker = await CurrencyRepository.prototype.findByTicker(ticker);
     return parseFloat(parseFloat(amount)/(10 ** dataTicker.decimals));
 }
