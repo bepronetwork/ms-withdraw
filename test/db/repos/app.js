@@ -82,7 +82,7 @@ class AppRepository extends MongoComponent{
                 { $push: {
                     "whitelistedAddresses" : {
                         "currency"      : currency,
-                        "addresses"  : [new String(address).trim()]
+                        "addresses"  : new String(address).trim()
                     },
                 } }
                 ,{ 'new': true })

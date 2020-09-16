@@ -1,4 +1,5 @@
 context('User Testing', async () => {
+    require('./withdrawKyc');
     require('./withdrawReplayAtack');
     require('./withdrawNoUser');
     require('./withdrawNoApp');
