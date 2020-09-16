@@ -121,6 +121,14 @@ export async function addCurrencyWalletToApp(params, bearerToken, payload) {
     })
 }
 
+export async function editKycNeeded(params, bearerToken, payload) {
+    return (await axios.post(`${MS_MASTER_URL}/api/user/kyc_needed/edit`, params, {
+        headers: {
+            "authorization": `Bearer ${bearerToken}`,
+            "payload": getPayloadString(payload)
+        }
+    })).data;
+}
 
 export async function confirmEmail(params) {
     return (await axios.post(`${MS_MASTER_URL}/api/users/email/confirm`, params)).data;

@@ -63,6 +63,10 @@ const processActions = {
 
             let amount = parseFloat(Math.abs(tokenAmount));
 
+            if(user.kyc_needed) {
+                throwError("KYC_NEEDED");
+            }
+
             /* Verifying AddOn and set Fee */
             let addOn = app.addOn;
             let fee = 0;
@@ -126,7 +130,7 @@ const processActions = {
                     isAutomaticWithdraw = {verify : false, textError : "Amount withdrawal greater than the maximum allowed"};
                 }
             }
-            
+
             /* Verify if Withdraw position is already opened in the Smart-Contract */
             var res = {
                 withdrawNotification: isAutomaticWithdraw.textError,

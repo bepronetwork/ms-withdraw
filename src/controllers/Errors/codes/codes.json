@@ -186,5 +186,9 @@
     "050" : {
         "key": "HAS_BONUS_YET",
         "message"   : "The balance still has a bonus to be played"
+    },
+    "051" : {
+        "key": "KYC_NEEDED",
+        "message"   : "It is necessary to confirm your identity"
     }
 }
