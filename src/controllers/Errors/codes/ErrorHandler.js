@@ -60,7 +60,8 @@ ErrorHandler.prototype.KEYS =  {
     'EMAIL_NOT_CONFIRMED'                   : "047",
     'MIN_WITHDRAW'                          : "048",
     'WITHDRAW_FEE'                          : "049",
-    'HAS_BONUS_YET'                         : "050"
+    'HAS_BONUS_YET'                         : "050",
+    'KYC_NEEDED'                            : "051"
 };
 
 
