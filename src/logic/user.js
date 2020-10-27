@@ -370,7 +370,7 @@ const progressActions = {
     },
     __finalizeWithdraw : async (params) => {
         try{
-
+	    console.log(params.appWallet.bitgo_id, params.amount);
             let bitgo_tx = await BitGoSingleton.sendTransaction({
                 wallet_id : params.appWallet.bitgo_id, 
                 ticker : params.currency.ticker, 
