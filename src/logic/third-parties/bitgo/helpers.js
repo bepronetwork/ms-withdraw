@@ -12,6 +12,7 @@ export const getCurrencyAmountToBitGo = async ({ticker, amount}) => {
         case 'btc' : {
             // to satoshi
             return parseInt(parseFloat(amount)*100000000);
+        }
     };
             
     const dataTicker = await CurrencyRepository.prototype.findByTicker(ticker);
