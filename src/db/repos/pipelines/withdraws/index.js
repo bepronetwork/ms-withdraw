@@ -54,9 +54,9 @@ export function userWithdrawsFiltered({size, offset, app, user, status}){
 
     populate.push(user);
     populate.push(status_match);
-    populate.push(limit);
-    populate.push(skip);
     populate.push(sort);
+    populate.push(skip);
+    populate.push(limit);
     populate = populate.filter(el => el != undefined);
     return populate;
 }
