@@ -96,7 +96,6 @@ const test = async () => {
 
 
             app = (await registerApp(postData)).data.message;
-            console.log("appRegister:: ",app)
             admin = (await loginAdmin(postDataAdmin)).data.message;
 
             app = (await getAppAuth({app : admin.app.id, admin: admin.id}, admin.bearerToken, {id : admin.id})).data;
@@ -104,18 +103,13 @@ const test = async () => {
             /* Add Currency Wallet */
 
             // Run Post with contract info
-            console.log("admin.app.id:: ", admin.app.id)
-            console.log("APPAUTH:: ", app)
-            console.log("currencyETH:: ", currencyETH)
-            console.log("currencyETH._id:: ", currencyETH._id)
             postData = {
                 app : admin.app.id,
                 passphrase : 'testhaha1426dw12',
                 currency_id : currencyETH._id
             };
 
-            let teste = await addCurrencyWalletToApp({...postData, admin: admin.id}, admin.bearerToken , {id : admin.id});  
-            console.log("CurrencyWallet::", teste)
+            await addCurrencyWalletToApp({...postData, admin: admin.id}, admin.bearerToken , {id : admin.id});
             /* User Register */
             var postDataUser = {
                 username : "sdfg" + parseInt(Math.random()*10000),
@@ -145,8 +139,6 @@ const test = async () => {
 
             // App Deposit
             console.log("app:: ",app)
-            console.log("app.message:: ",app.message)
-            console.log("app.message.wallet[0]:: ",app.message.wallet[0])
             await admin_eth_account.sendEther(0.1, app.message.wallet[0].bank_address);
             // Wait for Deposit to Settle and funds to be there
             await delay(30*1000);
