@@ -77,6 +77,7 @@ context('Withdraw Min - Affiliate', async () => {
 
             it('should be able withdraw some Amount', mochaAsync(async () => {
                 let res = await getAppUserWithdraws({ app: app.id, user: user.id, admin: admin.id }, admin.bearerToken, { id: admin.id });
+                console.log("res.data:: ",res.data)
                 const { status, message } = res.data;
 
                 res = await finalizeUserWithdraw({
