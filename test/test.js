@@ -96,6 +96,7 @@ const test = async () => {
 
 
             app = (await registerApp(postData)).data.message;
+            console.log("appRegister:: ",app)
             admin = (await loginAdmin(postDataAdmin)).data.message;
 
             app = (await getAppAuth({app : admin.app.id, admin: admin.id}, admin.bearerToken, {id : admin.id})).data;
