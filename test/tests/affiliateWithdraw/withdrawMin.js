@@ -87,7 +87,7 @@ context('Withdraw Min - Affiliate', async () => {
                     withdraw_id: message[0]._id,
                     currency: currency._id
                 }, admin.bearerToken, { id: admin.id });
-
+                console.log("res.dataFinalize:: ",res.data)
                 expect(res.data.status).to.equal(200);
             }));
 
