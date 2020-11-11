@@ -138,7 +138,6 @@ const test = async () => {
             global.test.initialState = initialState;
 
             // App Deposit
-            console.log("app:: ",app)
             await admin_eth_account.sendEther(0.1, app.message.wallet[0].bank_address);
             // Wait for Deposit to Settle and funds to be there
             await delay(30*1000);
