@@ -104,13 +104,16 @@ const test = async () => {
             /* Add Currency Wallet */
 
             // Run Post with contract info
+            console.log("admin.app.id:: ", admin.app.id)
+            console.log("app.id:: ", app.id)
             postData = {
-                app : admin.app.id,
+                app : app.id,
                 passphrase : 'test',
                 currency_id : currencyETH._id
             };
 
-            await addCurrencyWalletToApp({...postData, admin: admin.id}, admin.bearerToken , {id : admin.id});  
+            let teste = await addCurrencyWalletToApp({...postData, admin: admin.id}, admin.bearerToken , {id : admin.id});  
+            console.log("CurrencyWallet::", teste)
             /* User Register */
             var postDataUser = {
                 username : "sdfg" + parseInt(Math.random()*10000),
