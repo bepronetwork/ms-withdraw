@@ -105,6 +105,7 @@ const test = async () => {
 
             // Run Post with contract info
             console.log("admin.app.id:: ", admin.app.id)
+            console.log("APPAUTH:: ", app)
             console.log("currencyETH:: ", currencyETH)
             console.log("currencyETH._id:: ", currencyETH._id)
             postData = {
