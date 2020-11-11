@@ -4,7 +4,7 @@
     "private": true,
     "main": "app.js",
     "engines": {
-        "node": "14.15.0"
+        "node": "8.12.0"
     },
     "scripts": {
         "start": "babel-node app --nopresets es2015,stage-2",
@@ -81,8 +81,8 @@
         "mf-utils-node": "^1.0.14",
         "mocha": "^6.0.1",
         "moment": "^2.21.0",
-        "mongo-express": "^0.53.0",
-        "mongoose": "^5.7.12",
+        "mongo-express": "^0.44.0",
+        "mongoose": "^4.13.1",
         "mongoose-gen": "^2.1.1",
         "morgan": "~1.8.1",
         "msgpack-lite": "^0.1.26",

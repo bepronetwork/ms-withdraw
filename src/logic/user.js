@@ -48,7 +48,6 @@ const processActions = {
             /* Get app and User */
             if(!app){throwError('APP_NOT_EXISTENT')}
             if(!user){throwError('USER_NOT_EXISTENT')}
-            if(user.kyc_needed){throwError('KYC_NEEDED')}
             /* Get User and App Wallets */
             const userWallet = user.wallet.find( w => new String(w.currency._id).toString() == new String(currency).toString());
             if(!userWallet || !userWallet.currency){throwError('CURRENCY_NOT_EXISTENT')};
