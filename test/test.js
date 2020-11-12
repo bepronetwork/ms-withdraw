@@ -27,8 +27,8 @@ const initialState = {
 const runTests = async () => {
 
     mocha
-    .addFile('./test/tests/middlewares')
-    .addFile('./test/tests/appWithdraw/index.js')
+    // .addFile('./test/tests/middlewares')
+    // .addFile('./test/tests/appWithdraw/index.js')
     .addFile('./test/tests/userWithdraw/index.js')
     .addFile('./test/tests/affiliateWithdraw/index.js')
     .addFile('./test/tests/appUserWithdraws/index.js')
@@ -133,12 +133,11 @@ const test = async () => {
 
             global.test.currencies = [ 'eth' ];
             global.test.depositAmounts = {
-                'eth' : 0.01
+                'eth' : 0.005
             }
             global.test.initialState = initialState;
-
             // App Deposit
-            await admin_eth_account.sendEther(0.1, app.message.wallet[0].bank_address);
+            await admin_eth_account.sendEther(0.12, app.message.wallet[0].bank_address);
             // Wait for Deposit to Settle and funds to be there
             await delay(30*1000);
             global.test.ticker = global.test.currencies[0];

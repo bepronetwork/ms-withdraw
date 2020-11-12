@@ -55,7 +55,7 @@ context('Tx Fee', async () => {
         let initialPlayBalanceApp = appWallet.playBalance;
         let initialPlayBalanceUser = walletUserInfo.playBalance;
         let res = await requestUserWithdraw({
-            tokenAmount: global.test.depositAmounts[ticker] / 2,
+            tokenAmount: global.test.depositAmounts[ticker] / 4,
             nonce: 3452345756,
             app: app.id,
             address: user_eth_account.getAddress(),
@@ -74,14 +74,14 @@ context('Tx Fee', async () => {
         app = (await getAppAuth({ app: app.id, admin: admin.id }, admin.bearerToken, { id: admin.id })).data.message;
         appWallet = app.wallet.find(w => new String(w.currency.ticker).toLowerCase() == new String(ticker).toLowerCase());
 
-        expect(withdraw.amount).to.be.equal((global.test.depositAmounts[ticker] / 2) - (txFeeParams.withdraw_fee))
-        expect(walletUserInfo.playBalance).to.be.equal(initialPlayBalanceUser - (global.test.depositAmounts[ticker] / 2))
+        expect(withdraw.amount).to.be.equal((global.test.depositAmounts[ticker] / 4) - (txFeeParams.withdraw_fee))
+        expect(walletUserInfo.playBalance).to.be.equal(initialPlayBalanceUser - (global.test.depositAmounts[ticker] / 4))
         expect(appWallet.playBalance).to.be.equal(initialPlayBalanceApp + (txFeeParams.withdraw_fee))
     }));
 
     it('shouldnt be able to ask withdraw with fee (Whithdraw less than Fee)', mochaAsync(async () => {
         let res = await requestUserWithdraw({
-            tokenAmount: 0.0001,
+            tokenAmount: 0.00001,
             nonce: 34523451256,
             app: app.id,
             address: user_eth_account.getAddress(),
