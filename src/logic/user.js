@@ -217,7 +217,7 @@ const processActions = {
             let app = await AppRepository.prototype.findAppById(params.app);
             if(!app){throwError('APP_NOT_EXISTENT')}
             if(!user){throwError('USER_NOT_EXISTENT')}
-            if(user.kyc_needed || user.kyc_status != "verified"){throwError('KYC_NEEDED')}
+            if(user.kyc_needed || (!app.virtual && user.kyc_status != "verified")){throwError('KYC_NEEDED')}
             const wallet = user.wallet.find( w => new String(w.currency._id).toString() == new String(currency).toString());
             const appWallet = app.wallet.find( w => new String(w.currency._id).toString() == new String(currency).toString());
             if(!wallet || !wallet.currency){throwError('CURRENCY_NOT_EXISTENT')};
