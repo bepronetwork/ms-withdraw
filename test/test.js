@@ -27,8 +27,8 @@ const initialState = {
 const runTests = async () => {
 
     mocha
-    // .addFile('./test/tests/middlewares')
-    // .addFile('./test/tests/appWithdraw/index.js')
+    .addFile('./test/tests/middlewares')
+    .addFile('./test/tests/appWithdraw/index.js')
     .addFile('./test/tests/userWithdraw/index.js')
     .addFile('./test/tests/affiliateWithdraw/index.js')
     .addFile('./test/tests/appUserWithdraws/index.js')
