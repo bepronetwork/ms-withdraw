@@ -86,7 +86,7 @@ export async function registerAdmin(){
     return {...res.data.message, username, password};
 }
 
-export async function registerUser({address, app_id}, emailConfirmed=true){
+export async function registerUser({address, app_id}, emailConfirmed=true, kyc_confirmed=true){
     let password = 'test123';
     let username = 'Daf' + Math.random(234234)*199999;
     /* Create User on Database */
@@ -110,6 +110,11 @@ export async function registerUser({address, app_id}, emailConfirmed=true){
         await UsersRepository.prototype.updateConfirmEmail({
             username: user.username,
             confirm: emailConfirmed
+        });
+    }
+    if(kyc_confirmed){
+        await UsersRepository.prototype.updateKYCConfirmed({
+            username: user.username
         });
     }
 

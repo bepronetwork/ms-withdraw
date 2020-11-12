@@ -224,6 +224,23 @@ class UsersRepository extends MongoComponent{
         }
     }
 
+    updateKYCConfirmed({username}) {
+        try{
+            return new Promise( (resolve, reject) => {
+                UsersRepository.prototype.schema.model.findOneAndUpdate(
+                    { username },
+                    { $set: { "kyc_status" : "verified", "kyc_needed":false } }
+                )
+                .exec( (err, item) => {
+                    if(err){reject(err)}
+                    resolve(item);
+                });
+            });
+        }catch(err){
+            throw (err)
+        }
+    }
+
     async findUserByAddress({address, app}){
         try{
             return new Promise( (resolve, reject) => {
