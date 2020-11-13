@@ -16,7 +16,7 @@ var autoWithdrawParams = {
     isAutoWithdraw : true,
     verifiedKYC : true,
     maxWithdrawAmountCumulative : 0.01,
-    maxWithdrawAmountPerTransaction : 0.001 
+    maxWithdrawAmountPerTransaction : 0.003
 }
 
 context('Automatic Withdraw', async () => {
@@ -50,7 +50,7 @@ context('Automatic Withdraw', async () => {
 
     it('should be able to make automatic withdraw', mochaAsync(async () => {
         let res = await requestUserWithdraw({
-            tokenAmount : global.test.depositAmounts[ticker]/20,
+            tokenAmount : 0.002,
             nonce : 3456365755,
             app : app.id,
             address : user_eth_account.getAddress(),
@@ -83,7 +83,7 @@ context('Automatic Withdraw', async () => {
 
     it('shouldnt be able to make automatic withdraw - Max Per Trasanction Was Reached', mochaAsync(async () => {
         let res = await requestUserWithdraw({
-            tokenAmount : global.test.depositAmounts[ticker]/2,
+            tokenAmount : 0.0031,
             nonce : 3456365751,
             app : app.id,
             address : user_eth_account.getAddress(),
@@ -135,7 +135,7 @@ context('Automatic Withdraw', async () => {
 
     it('shouldnt make automatic withdraw (IsAutoWithdraw as False) - Make Request Withdraw', mochaAsync(async () => {
         let res = await requestUserWithdraw({
-            tokenAmount : global.test.depositAmounts[ticker]/4,
+            tokenAmount : 0.001,
             nonce : 3456365752,
             app : app.id,
             address : user_eth_account.getAddress(),

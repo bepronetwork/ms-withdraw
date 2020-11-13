@@ -37,7 +37,7 @@ context('Withdraw All Amount', async () => {
 
             it('should be able to ask to withdraw all amount', mochaAsync(async () => {
                 let res = await requestUserWithdraw({
-                    tokenAmount : global.test.depositAmounts[ticker],
+                    tokenAmount : 0.001,
                     nonce : 3456365756,
                     app : app.id,
                     address : user_eth_account.getAddress(),

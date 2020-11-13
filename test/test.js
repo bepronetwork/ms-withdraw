@@ -105,11 +105,11 @@ const test = async () => {
             // Run Post with contract info
             postData = {
                 app : admin.app.id,
-                passphrase : 'test',
+                passphrase : 'testhaha1426dw12',
                 currency_id : currencyETH._id
             };
 
-            await addCurrencyWalletToApp({...postData, admin: admin.id}, admin.bearerToken , {id : admin.id});  
+            await addCurrencyWalletToApp({...postData, admin: admin.id}, admin.bearerToken , {id : admin.id});
             /* User Register */
             var postDataUser = {
                 username : "sdfg" + parseInt(Math.random()*10000),
@@ -133,12 +133,11 @@ const test = async () => {
 
             global.test.currencies = [ 'eth' ];
             global.test.depositAmounts = {
-                'eth' : 0.01
+                'eth' : 0.005
             }
             global.test.initialState = initialState;
-
             // App Deposit
-            await admin_eth_account.sendEther(0.1, app.message.wallet[0].bank_address);
+            await admin_eth_account.sendEther(0.12, app.message.wallet[0].bank_address);
             // Wait for Deposit to Settle and funds to be there
             await delay(30*1000);
             global.test.ticker = global.test.currencies[0];
