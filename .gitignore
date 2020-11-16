@@ -5,3 +5,5 @@ build
 .env.production
 .env.local
 env.dmg
+package-lock.json
+./package-lock.json
