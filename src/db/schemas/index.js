@@ -18,8 +18,10 @@ import { PermissionSchema } from "./permission";
 import { AddOnSchema } from "./addOn";
 import { AutoWithdrawSchema } from "./addOn/autoWithdraw";
 import { TxFeeSchema } from "./addOn/txFee";
+import { KycSchema } from "./integrations/kyc";
 
 export {
+    KycSchema,
     TxFeeSchema,
     UserSchema,
     AppSchema,
