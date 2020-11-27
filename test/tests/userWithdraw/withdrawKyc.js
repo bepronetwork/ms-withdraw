@@ -33,7 +33,7 @@ context('Withdraw Kyc', async () => {
 
     });
 
-    it('should kyc_needed==true ', mochaAsync(async () => {
+    it('shouldnt request withdraw when kyc_needed==true ', mochaAsync(async () => {
 
         let postData = {
             admin      : admin.id,
@@ -60,12 +60,13 @@ context('Withdraw Kyc', async () => {
 
     }));
 
-    it('should try confirm withdraw with kyc_status!=verified', mochaAsync(async () => {
+    it('shouldnt confirm withdraw with kyc_status != verified', mochaAsync(async () => {
 
         let postData = {
             admin      : admin.id,
             user       : user.id,
-            kyc_needed : false
+            kyc_needed : false,
+            kyc_status : 'no kyc'
         }
         let res1 = await editKycNeeded(postData , admin.bearerToken , {id : admin.id});
         expect(res1.data.status).to.equal(200);
