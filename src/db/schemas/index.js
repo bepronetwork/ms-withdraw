@@ -18,8 +18,18 @@ import { PermissionSchema } from "./permission";
 import { AddOnSchema } from "./addOn";
 import { AutoWithdrawSchema } from "./addOn/autoWithdraw";
 import { TxFeeSchema } from "./addOn/txFee";
+import { BalanceSchema } from "./addOn/balance";
+import { DepositBonusSchema } from "./addOn/depositBonus";
+import { FreeCurrencySchema } from "./addOn/freeCurrency";
+import { JackpotSchema } from "./addOn/jackpot";
+import { PointSystemSchema } from "./addOn/pointSystem";
 
 export {
+    PointSystemSchema,
+    JackpotSchema,
+    FreeCurrencySchema,
+    DepositBonusSchema,
+    BalanceSchema,
     TxFeeSchema,
     UserSchema,
     AppSchema,

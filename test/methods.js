@@ -30,7 +30,15 @@ export async function requestUserAffiliateWithdraw(params, bearerToken, payload)
         .send(params)
         .then(res => detectServerError(res))
 };
-
+export async function addCurrencyWalletToApp(params, bearerToken, payload) {
+    return request(global.server)
+    .post('/api/app/wallet/currency/add')
+    .set("authorization", "Bearer " + bearerToken)
+    .set("payload", getPayloadString(payload))
+    .send(params)
+    .then(res => detectServerError(res))
+    
+};
 export async function finalizeUserWithdraw(params, bearerToken, payload) {
     return request(global.app)
         .post('/api/users/finalizeWithdraw')

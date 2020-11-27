@@ -1,8 +1,8 @@
 import _ from 'lodash';
 import { ErrorManager } from '../controllers/Errors';
-import { AppRepository,  WalletsRepository,  UsersRepository, WithdrawRepository } from '../db/repos';
+import { AppRepository,  WalletsRepository,  UsersRepository, WithdrawRepository, CurrencyRepository, GamesRepository, JackpotRepository, PointSystemRepository, AutoWithdrawRepository, TxFeeRepository, BalanceRepository, DepositBonusRepository, FreeCurrencyRepository } from '../db/repos';
 import LogicComponent from './logicComponent';
-import { Withdraw } from '../models';
+import { Wallet, Withdraw } from '../models';
 import { throwError } from '../controllers/Errors/ErrorManager';
 import BitGoSingleton from './third-parties/bitgo';
 import { Security } from '../controllers/Security';
@@ -115,6 +115,20 @@ const processActions = {
     },
     __getUsersWithdraws : async (params) => {
         return params;
+    },
+    __addCurrencyWallet : async (params) => {
+        var { currency_id, app, passphrase } = params;
+        if(passphrase.length <10){
+            throwError("MINIMUM_PASSWORD_LENGTH");
+        }
+        app = await AppRepository.prototype.findAppByIdAddCurrencyWallet(app);
+        if(!app){throwError('APP_NOT_EXISTENT')}
+        let currency = await CurrencyRepository.prototype.findById(currency_id);
+        return  {
+            currency,
+            passphrase,
+            app : app
+        }
     }
 }
 
@@ -181,6 +195,141 @@ const progressActions = {
     __getUsersWithdraws : async (params) => {
         let res = await WithdrawRepository.prototype.getAppFiltered(params);
         return res;
+    },
+    __addCurrencyWallet : async (params) => {
+        const { currency, passphrase, app } = params;
+        var wallet, bitgo_wallet, receiveAddress, keys;
+
+        if(currency.virtual){
+            /* Save Wallet on DB */
+            wallet = (await (new Wallet({
+                currency : currency._id,
+                virtual : true,
+                price : app.currencies.map( c => {
+                    return {
+                        currency : c._id,
+                        amount : PRICE_VIRTUAL_CURRENCY_GLOBAL
+                    }
+                })
+            })).register())._doc;
+        }else{  
+            console.log("currency", currency)
+            if(currency.erc20){
+                /* Don't create wallet for bitgo for the platform again */
+                /* Get ETH Wallet */
+                let wallet_eth = app.wallet.find( w => w.currency.ticker == 'ETH');
+
+                /* No Eth Wallet was created */
+                if(!wallet_eth){throwError('NO_ETH_WALLET')};
+
+                /* Save Wallet on DB */
+                wallet = (await (new Wallet({
+                    currency : currency._id,
+                    bitgo_id : wallet_eth.bitgo_id,
+                    virtual : false,
+                    bank_address : wallet_eth.bank_address,
+                    hashed_passphrase : Security.prototype.encryptData(passphrase)
+                })).register())._doc;
+
+            }else{
+                /* Create Wallet on Bitgo */
+                let params = await BitGoSingleton.createWallet({
+                    label : `${app._id}-${currency.ticker}`,
+                    passphrase,
+                    currency : currency.ticker
+                })
+                bitgo_wallet = params.wallet;
+                receiveAddress = params.receiveAddress;
+                keys = params.keys;
+
+
+                /* Record webhooks */
+                await BitGoSingleton.addAppDepositWebhook({wallet : bitgo_wallet, id : app._id, currency_id : currency._id, ticker: currency.ticker});
+                /* Create Policy for Day */
+                await BitGoSingleton.addPolicyToWallet({
+                    ticker : currency.ticker,
+                    bitGoWalletId : bitgo_wallet.id(),
+                    timeWindow : 'day'
+                })
+
+                /* Create Policy for Transaction */
+                await BitGoSingleton.addPolicyToWallet({
+                    ticker : currency.ticker,
+                    bitGoWalletId : bitgo_wallet.id(),
+                    timeWindow : 'hour',
+                })
+
+                /* Create Policy for Hour */
+                await BitGoSingleton.addPolicyToWallet({
+                    ticker : currency.ticker,
+                    bitGoWalletId : bitgo_wallet.id(),
+                    timeWindow : 'transaction',
+                })
+
+                /* No Bitgo Wallet created */
+                if(!bitgo_wallet.id() || !receiveAddress){throwError('UNKNOWN')};
+                /* Save Wallet on DB */
+                wallet = (await (new Wallet({
+                    currency : currency._id,
+                    bitgo_id : bitgo_wallet.id(),
+                    virtual : false,
+                    bank_address : receiveAddress,
+                    hashed_passphrase : Security.prototype.encryptData(passphrase)
+                })).register())._doc;
+
+            }
+         
+            let virtualWallet = app.wallet.find( w => w.currency.virtual == true);
+
+            if(virtualWallet){
+                /* Add Deposit Currency to Virtual Currency */
+                await WalletsRepository.prototype.addCurrencyDepositToVirtualCurrency(virtualWallet._id, currency._id);
+            }
+        }
+
+        /* Add Currency to Platform */
+        await AppRepository.prototype.addCurrency(app._id, currency._id);
+        await AppRepository.prototype.addCurrencyWallet(app._id, wallet);
+
+        /* Add LimitTable to all Games */
+        if(app.games!=undefined) {
+            for(let game of app.games) {
+                await GamesRepository.prototype.addTableLimitWallet({
+                    game    : game._id,
+                    wallet  : wallet._id
+                });
+            }
+        }
+
+        /* add currencies in addons */
+        if(app.addOn.jackpot)         await JackpotRepository.prototype.pushNewCurrency(app.addOn.jackpot._id, currency._id);
+        if(app.addOn.pointSystem)     await PointSystemRepository.prototype.pushNewCurrency(app.addOn.pointSystem._id, currency._id);
+        if(app.addOn.autoWithdraw)    await AutoWithdrawRepository.prototype.pushNewCurrency(app.addOn.autoWithdraw._id, currency._id);
+        if(app.addOn.txFee)           await TxFeeRepository.prototype.pushNewCurrency(app.addOn.txFee._id, currency._id);
+        if(app.addOn.balance)         await BalanceRepository.prototype.pushNewCurrency(app.addOn.balance._id, currency._id);
+        if(app.addOn.depositBonus)    await DepositBonusRepository.prototype.pushNewCurrency(app.addOn.depositBonus._id, currency._id);
+        if(app.addOn.freeCurrency)    await FreeCurrencyRepository.prototype.pushNewCurrency(app.addOn.freeCurrency._id, currency._id);
+        console.log("setting user")
+
+        /* Add Wallet to all Users */
+        await Promise.all(await app.users.map( async u => {
+            let w = (await (new Wallet({
+                currency : currency._id,
+            })).register())._doc;
+            await UsersRepository.prototype.addCurrencyWallet(u._id, w);
+
+            let wAffiliate = (await (new Wallet({
+                currency : currency._id,
+            })).register())._doc;
+            await AffiliateRepository.prototype.addCurrencyWallet(u.affiliate, wAffiliate);
+        }));
+        
+
+        return {
+            currency_id : currency._id,
+            keys : keys,
+            bank_address : receiveAddress
+        }
     }
 }
 
@@ -240,7 +389,10 @@ class AppLogic extends LogicComponent{
                 };
                 case 'GetUsersWithdraws' : {
 					return await library.process.__getUsersWithdraws(params); 
-                }
+                };
+                case 'AddCurrencyWallet' : {
+					return await library.process.__addCurrencyWallet(params);
+                };
             }
 		}catch(error){
 			throw error
@@ -274,7 +426,10 @@ class AppLogic extends LogicComponent{
                 };
                 case 'GetUsersWithdraws' : {
 					return await library.progress.__getUsersWithdraws(params); 
-                }
+                };
+                case 'AddCurrencyWallet' : {
+					return await library.progress.__addCurrencyWallet(params);
+                };
             }
 		}catch(error){
 			throw error;

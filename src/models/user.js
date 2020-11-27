@@ -105,6 +105,17 @@ class User extends ModelComponent{
         }
     }
 
+    async getDepositAddress() {
+        const { app } = this.self.params;
+        /* Mutex In */
+        try{
+            let res = await this.process('GetDepositAddress');
+            return res;
+        }catch(err){
+            throw err;
+        }
+    }
+
 }
 
 export default User;

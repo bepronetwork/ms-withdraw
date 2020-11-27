@@ -1,0 +1,1 @@
+export const events = ['DEPOSIT','WITHDRAW', "PING", "JACKPOT", "UPDATE_BALANCE"]

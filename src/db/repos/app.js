@@ -60,6 +60,21 @@ class AppRepository extends MongoComponent{
         });
     }
 
+    addCurrency(app_id, currency){
+        return new Promise( (resolve,reject) => {
+            AppRepository.prototype.schema.model.findOneAndUpdate(
+                { _id: app_id, currencies : {$nin : [currency._id] } }, 
+                { $push: { "currencies" : currency} },
+                { 'new': true })
+                .lean()
+                .exec( (err, item) => {
+                    if(err){reject(err)}
+                    resolve(item);
+                }
+            )
+        });
+    }
+
     addUser(app_id, user){
         return new Promise( (resolve,reject) => {
             AppRepository.prototype.schema.model.findOneAndUpdate(
@@ -349,6 +364,44 @@ class AppRepository extends MongoComponent{
                 resolve(item);
             });
         });
+    }
+
+    addCurrencyWallet(app_id, wallet){
+        return new Promise( (resolve,reject) => {
+            AppRepository.prototype.schema.model.findOneAndUpdate(
+                { _id: app_id, wallet : {$nin : [wallet._id] } }, 
+                { $push: { "wallet" : wallet._id} },
+                { 'new': true })
+                .lean()
+                .exec( (err, item) => {
+                    if(err){reject(err)}
+                    resolve(item);
+                }
+            )
+        });
+    }
+
+    findAppByIdAddCurrencyWallet(_id){
+        try{
+            return new Promise( (resolve, reject) => {
+                AppRepository.prototype.schema.model.findById(_id, {
+                    '_id': 1,
+                    'currencies': 1,
+                    'games': 1,
+                    'users': 1,
+                    'wallet': 1,
+                    'addOn': 1,
+                    'virtual': 1
+                })
+                .populate(populate_app_add_currency_wallet)
+                .exec( (err, App) => {
+                    if(err) { reject(err)}
+                    resolve(App);
+                });
+            });
+        }catch(err){
+            throw err;
+        }
     }
 
     getAll = async() => {

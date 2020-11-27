@@ -32,6 +32,7 @@ class CurrencyRepository extends MongoComponent{
     async findById(_id){ 
         return new Promise( (resolve, reject) => {
             this.schema.model.findById(_id)
+            .lean()
             .exec( (err, item) => {
                 if(err) { reject(err)}
                 resolve(item);

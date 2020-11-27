@@ -190,5 +190,181 @@
     "051" : {
         "key": "KYC_NEEDED",
         "message"   : "It is necessary to confirm your identity"
+    },
+    "052" : {
+        "key" : "AFFILIATE_RETURN_NOT_VALID",
+        "message"   : "Affiliate Return Not Valid"
+    },
+    "053" : {
+        "key" : "AFFILIATE_NOT_EXISTENT",
+        "message"   : "Affiliate Link Not Valid"
+    },
+    "054" : {
+        "key" : "ERROR_AFFILIATE_EDIT",
+        "message"   : "Affiliate Structure Edit is Invalid"
+    },
+    "055" : {
+        "key" : "BAD_REQUEST",
+        "message"   : "Bad Request"
+    },
+    "056" : {
+        "key" : "CURRENCY_ALREADY_EXISTENT",
+        "message"   : "Currency is already existent in this App, please contract support"
+    },
+    "057" : {
+        "key" : "NO_PASSPHRASE_WALLET",
+        "message"   : "No Passphrase was provided"
+    },
+    "058" : {
+        "key" : "TOKEN_EXPIRED",
+        "message"   : "Expired Token"
+    },
+    "059" : {
+        "key" : "TOKEN_INVALID",
+        "message"   : "Token Invalid"
+    },
+    "060" : {
+        "key" : "APP_INVALID",
+        "message"   : "App not is valid"
+    },
+    "061" : {
+        "key" : "OVERFLOW_DEPOSIT",
+        "message"   : "Deposit max exceeded"
+    },
+    "062" : {
+        "key" : "MAX_BET_NOT_EXISTENT",
+        "message"   : "Maximum Bet not existent on this Game, please verify it"
+    },
+    "063" : {
+        "key" : "MAX_BET_ACHIEVED",
+        "message"   : "Maximum bet reached, please reduce your bet"
+    },
+    "064" : {
+        "key" : "USERNAME_ALREADY_EXISTS",
+        "message"   : "The user is already in the App"
+    },
+    "065" : {
+        "key" : "USERNAME_OR_EMAIL_NOT_EXISTS",
+        "message"   : "User not found"
+    },
+    "066" : {
+        "key" : "JACKPOT_NOT_EXIST_IN_APP",
+        "message"   : "Jackpot not exist in APP"
+    },
+    "067" : {
+        "key" : "NOT_A_VIRTUAL_CASINO",
+        "message"   : "The action can´t be taken since this is not a social casino"
+    },
+    "068" : {
+        "key" : "IS_VIRTUAL_WALLET",
+        "message"   : "The action can´t be taken since this is a social casino"
+    },
+    "069" : {
+        "key" : "UNAUTHORIZED_COUNTRY",
+        "message"   : "Unauthorized Country"
+    },
+    "070" : {
+        "key" : "IS_ETHEREUM_WALLET",
+        "message"   : "Ethereum Deposits are not available"
+    },
+    "071" : {
+        "key" : "WRONG_THEME",
+        "message"   : "Theme not available, choose dark or light"
+    },
+    "072" : {
+        "key" : "ADD_ON_NOT_EXISTS",
+        "message"   : "AddOn not exists"
+    },
+    "073" : {
+        "key" : "ADD_ON_DEPOSIT_BONUS_NOT_EXISTS",
+        "message"   : "Deposit Bonus AddOn not exists"
+    },
+    "074" : {
+        "key" : "INVALID_DEPOSIT_BONUS_PERCENTAGE",
+        "message"   : "Deposit Bonus Percentage can't be equal or less than 0"
+    },
+    "075" : {
+        "key" : "INVALID_DEPOSIT_BONUS_MAX_DEPOSIT",
+        "message"   : "Deposit Bonus Maximum Deposit can't be less than Minimum Deposit"
+    },
+    "076" : {
+        "key" : "INVALID_DEPOSIT_BONUS_MIN_DEPOSIT",
+        "message"   : "Deposit Bonus Minimum Deposit can't be equal or less than 0"
+    },
+    "077" : {
+        "key" : "ADDRESS_NOT_AVAILABLE",
+        "message"   : "No Deposit Address Available"
+    },
+    "078" : {
+        "key" : "NO_ETH_WALLET",
+        "message"   : "No ETH Wallet was created"
+    },
+    "079" : {
+        "key" : "ADD_ON_POINT_SYSTEM_NOT_EXISTS",
+        "message"   : "Point System AddOn not exists"
+    },
+    "080" : {
+        "key" : "UNCONFIRMED_EMAIL",
+        "message"   : "Unverified email"
+    },
+    "081" : {
+        "key" : "WALLET_WAIT",
+        "message"   : "We are updating a new currency, please wait a few minutes or try later"
+    },
+    "082" : {
+        "key" : "PAYMENT_FORWARDING_TRANSACTION",
+        "message"   : "Payment Forwarding Done"
+    },
+    "083" : {
+        "key" : "WRONG_SKIN",
+        "message"   : "Skin not available, choose default or digital"
+    },
+    "084" : {
+        "key" : "ICONS_LIMIT_EXCEEDED",
+        "message"   : "Icons limit exceeded"
+    },
+    "085" : {
+        "key" : "LOGIN_NOT_CURRENCY_ADDED",
+        "message"   : "This app does not yet contain currencies"
+    },
+    "086" : {
+        "key" : "MINIMUM_PASSWORD_LENGTH",
+        "message"   : "The password must be at least 10 characters long"
+    },
+    "087" : {
+        "key" : "REGISTER_NOT_CURRENCY_ADDED",
+        "message"   : "This app does not yet contain currencies"
+    },
+    "088" : {
+        "key" : "NO_FREE_CURRENCY",
+        "message"   : "sorry, but you still can't get free currency, if you have any problems call support"
+    },
+    "089" : {
+        "key" : "FREE_CURRENCY_NO_ACTIVATED",
+        "message"   : "sorry, but you still isn't activated, if you have any problems call support"
+    },
+    "090" : {
+        "key"      : "INSUFFICIENT_FUNDS_APP",
+        "message"   : "Seems of casino don´t have enought funds to procced with this transaction."
+    },
+    "091" : {
+        "key"      : "LANGUAGE_NOT_EXISTENT",
+        "message"   : "Language doesn't exist, please contact support."
+    },
+    "092" : {
+        "key"      : "DEPOSIT_MODE_IN_API",
+        "message"   : "The system is already processing your action"
+    },
+    "093" : {
+        "key"      : "INSUFFICIENT_AGE",
+        "message"   : "You have to be over 18yo to register"
+    },
+    "094" : {
+        "key"      : "COUNTRY_RESTRICTED",
+        "message"   : "Currently we dont operate in your country"
+    },
+    "095" : {
+        "key" : "DEPLOY_ERROR",
+        "message"   : "The Platform was not able to be deployed, please contact support"
     }
 }
