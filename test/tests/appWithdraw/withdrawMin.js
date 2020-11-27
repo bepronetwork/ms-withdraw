@@ -17,8 +17,8 @@ context('Withdraw Min', async () => {
 
     before( async () =>  {
         app = global.test.app;
-        console.log("appIntegrations:: ", app.integrations)
-        // await KycRepository.prototype.findByIdAndUpdateIsActive();
+        console.log("appIntegrations:: ", app.integrations.kyc._id)
+        await KycRepository.prototype.findByIdAndUpdateIsActive(app.integrations.kyc._id ,true);
         admin = global.test.admin;
         bearerToken = admin.bearerToken;
         contract = global.test.contract;
