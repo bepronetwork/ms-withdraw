@@ -60,7 +60,7 @@ const processActions = {
 
             const wallet = app.wallet.find( w => new String(w.currency._id).toString() == new String(currency).toString());
             if(!wallet || !wallet.currency){throwError('CURRENCY_NOT_EXISTENT')};
-
+            console.log(app.integrations.kyc);
             let amount = parseFloat(Math.abs(tokenAmount));
             if(app.integrations &&  app.integrations.kyc && app.integrations.kyc.isActive) {
                 if(!app.virtual && user.kyc_needed){throwError('KYC_NEEDED')}
