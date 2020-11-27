@@ -45,6 +45,23 @@ class KycRepository extends MongoComponent{
         });
     }
 
+    findByIdAndUpdateIsActive(_id, data){
+        return new Promise( (resolve,reject) => {
+            KycRepository.prototype.schema.model.findByIdAndUpdate(
+                {_id},
+                { $set: { 
+                    "isActive" : data
+                } },
+                { 'new': true })
+                .lean()
+                .exec( (err, item) => {
+                    if(err){reject(err)}
+                    resolve(item);
+                }
+            )
+        });
+    }
+
 }
 
 KycRepository.prototype.schema = new KycSchema();

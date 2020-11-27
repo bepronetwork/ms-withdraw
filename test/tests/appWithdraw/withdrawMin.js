@@ -2,6 +2,7 @@ import { mochaAsync, detectValidationErrors } from "../../utils/testing";
 import { createEthAccount, registerUser, loginUser, depositWallet } from "../../utils/env";
 import { getAppAuth, setAppMinWithdraw, requestUserWithdraw, getAppUserWithdraws, finalizeUserWithdraw } from "../../methods";
 import chai from 'chai';
+import KycRepository from "../../../src/db/repos/kyc";
 const expect = chai.expect;
 
 const initialState = {
@@ -16,6 +17,8 @@ context('Withdraw Min', async () => {
 
     before( async () =>  {
         app = global.test.app;
+        console.log("appIntegrations:: ", app.integrations)
+        // await KycRepository.prototype.findByIdAndUpdateIsActive();
         admin = global.test.admin;
         bearerToken = admin.bearerToken;
         contract = global.test.contract;
