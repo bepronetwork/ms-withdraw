@@ -25,8 +25,10 @@ import PermissionRepository from "./permission";
 import AutoWithdrawRepository from "./autoWithdraw";
 import AddOnRepository from "./addOn";
 import CurrencyRepository from "./currency";
+import KycRepository from "./kyc";
 
 export{
+    KycRepository,
     CurrencyRepository,
     AffiliateLinkRepository,
     AffiliateRepository,
