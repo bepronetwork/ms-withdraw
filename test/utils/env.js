@@ -100,7 +100,9 @@ export async function registerUser({address, app_id}, emailConfirmed=true, kyc_c
         app			    : app_id, 
         birthday: "1998-01-02", 
         country: "Brazil", 
-        country_acronym: "BR"
+        country_acronym: "BR",
+        kyc_status: "verified",
+        kyc_needed: false
     };
 
     let user = await registerUserAPI(postData);
