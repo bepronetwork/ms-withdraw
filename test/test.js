@@ -117,7 +117,10 @@ const test = async () => {
                 email : `testt${parseInt(Math.random()*10000)}@gmail.com`,
                 password : 'test123',
                 address : '90x',
-                app : admin.app.id
+                app : admin.app.id, 
+                birthday: "1998-01-02", 
+                country: "Brazil", 
+                country_acronym: "BR"
             }
 
             

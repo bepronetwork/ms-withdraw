@@ -97,7 +97,10 @@ export async function registerUser({address, app_id}, emailConfirmed=true, kyc_c
         email			: `rui${Math.random(234234)*199999}@gmail.com`,
         full_name		: 'Ruie',
         address         : address,
-        app			    : app_id
+        app			    : app_id, 
+        birthday: "1998-01-02", 
+        country: "Brazil", 
+        country_acronym: "BR"
     };
 
     let user = await registerUserAPI(postData);
