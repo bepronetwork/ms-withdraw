@@ -28,7 +28,7 @@ context('Withdraw Kyc', async () => {
         admin = global.test.admin;
     });
 
-    it('should kyc_needed==true ', mochaAsync(async () => {
+    it('shouldnt request withdraw when kyc_needed==true ', mochaAsync(async () => {
 
         let postData = {
             admin      : admin.id,
