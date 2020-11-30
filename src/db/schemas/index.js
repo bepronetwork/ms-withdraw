@@ -23,8 +23,11 @@ import { DepositBonusSchema } from "./addOn/depositBonus";
 import { FreeCurrencySchema } from "./addOn/freeCurrency";
 import { JackpotSchema } from "./addOn/jackpot";
 import { PointSystemSchema } from "./addOn/pointSystem";
+import { KycSchema } from "./integrations/kyc";
+
 
 export {
+    KycSchema,
     PointSystemSchema,
     JackpotSchema,
     FreeCurrencySchema,

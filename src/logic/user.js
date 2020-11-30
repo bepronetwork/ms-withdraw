@@ -63,8 +63,7 @@ const processActions = {
             if(!wallet || !wallet.currency){throwError('CURRENCY_NOT_EXISTENT')};
 
             let amount = parseFloat(Math.abs(tokenAmount));
-
-            if(app.integrations.kyc.isActive) {
+            if(app.integrations &&  app.integrations.kyc && app.integrations.kyc.isActive) {
                 if(!app.virtual && user.kyc_needed){throwError('KYC_NEEDED')}
             } else {
                 throwError('KYC_NEEDED')
@@ -170,7 +169,7 @@ const processActions = {
             let app = await AppRepository.prototype.findAppById(params.app);
             if(!app){throwError('APP_NOT_EXISTENT')}
             if(!user){throwError('USER_NOT_EXISTENT')};
-            if(app.integrations.kyc.isActive) {
+            if(app.integrations &&  app.integrations.kyc && app.integrations.kyc.isActive) {
                 if(!app.virtual && user.kyc_needed){throwError('KYC_NEEDED')}
             } else {
                 throwError('KYC_NEEDED')
@@ -224,7 +223,7 @@ const processActions = {
             let app = await AppRepository.prototype.findAppById(params.app);
             if(!app){throwError('APP_NOT_EXISTENT')}
             if(!user){throwError('USER_NOT_EXISTENT')}
-            if(app.integrations.kyc.isActive) {
+            if(app.integrations &&  app.integrations.kyc && app.integrations.kyc.isActive) {
                 if(!app.virtual && (user.kyc_needed || user.kyc_status != "verified")){throwError('KYC_NEEDED')}
             } else {
                 throwError('KYC_NEEDED')

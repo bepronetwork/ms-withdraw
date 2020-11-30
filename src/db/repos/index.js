@@ -31,8 +31,11 @@ import FreeCurrencyRepository from "./freeCurrency";
 import JackpotRepository from "./jackpot";
 import PointSystemRepository from "./pointSystem";
 import TxFeeRepository from "./txFee";
+import KycRepository from "./kyc";
+
 
 export{
+    KycRepository,
     TxFeeRepository,
     PointSystemRepository,
     JackpotRepository,
