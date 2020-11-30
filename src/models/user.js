@@ -45,6 +45,28 @@ class User extends ModelComponent{
         }
     }
 
+    async updateWallet() {
+        // No Output
+        const { id } = this.self.params;
+        console.log("UserId:: ", id)
+        try {
+            await UsersRepository.prototype.changeDepositPosition(id, true);
+            let res = await this.process('UpdateWallet');
+            UsersRepository.prototype.changeDepositPosition(id, false);
+            return res;
+        } catch (err) {
+            console.log("Error Code: ",err.code)
+            if(parseInt(err.code) != 82){
+                console.log("NO ERROR MUTEX")
+                console.log(err.data)
+                /* If not depositing atm */
+                /* Open Mutex */
+                UsersRepository.prototype.changeDepositPosition(id, false);
+            }
+            throw err;
+        }
+    }
+
     async cancelWithdraw(){
         const { app } = this.self.params;
         try{

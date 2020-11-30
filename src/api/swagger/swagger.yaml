@@ -77,6 +77,60 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+  /app/webhookBitgoDeposit: 
+    x-swagger-router-controller: app
+    post:
+      tags:
+      - app
+      summary: Update Wallet Amount for the App
+      operationId: webhookBitgoDeposit
+      description: Update Wallet Amount for the App
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name : id
+          type : string
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/GeneralResponse"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /user/webhookDeposit:
+    x-swagger-router-controller: user
+    post:
+      tags:
+      - user
+      summary: Update Wallet Amount for the user
+      operationId: webhookDeposit
+      description: Update Wallet Amount for the user
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name : id
+          type : string
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/GeneralResponse"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
   /withdraw/min/set :
     x-swagger-router-controller: app
     post:

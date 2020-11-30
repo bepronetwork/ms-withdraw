@@ -63,9 +63,10 @@ class DepositRepository extends MongoComponent{
         return new Promise( (resolve, reject) => {
             DepositRepository.prototype.schema.model
             .findOne({ transactionHash })
+            .lean()
             .exec( (err, Deposit) => {
                 if(err) { reject(err)}
-                resolve(Deposit)            
+                resolve(Deposit);
             });
         });
     }

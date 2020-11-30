@@ -8,7 +8,7 @@ import {
     pipeline_all_users_balance,
     pipeline_my_bets
 } from './pipelines/user';
-import { populate_user } from './populates';
+import { populate_user, populate_user_simple, populate_user_wallet } from './populates';
 import { throwError } from '../../controllers/Errors/ErrorManager';
 /**
  * Accounts database interaction class.
@@ -39,16 +39,45 @@ class UsersRepository extends MongoComponent{
         return UsersRepository.prototype.schema.model(user)
     }
     
-    async findUserById(_id){ 
+    async findUserById(_id, populate_type=populate_user){
+        switch(populate_type){
+            case 'simple' : { populate_type=populate_user_simple; break; }
+            case 'wallet' : { populate_type=populate_user_wallet; break; }
+        }
+
         try{
             return new Promise( (resolve, reject) => {
                 UsersRepository.prototype.schema.model.findById(_id)
-                .populate(populate_user)
+                .populate(populate_type)
                 .exec( (err, user) => {
                     if(err) { resolve(null)}
                     resolve(user);
                 });
             });
+        }catch(err){
+            throw (err)
+        }
+    }
+
+    async changeDepositPosition(_id, state){
+        try{
+            return new Promise( (resolve, reject) => {
+                UsersRepository.prototype.schema.model.findByIdAndUpdate(
+                    { _id: _id },
+                    { $set: { "isDepositing" : state} })
+                    .lean() 
+                    .exec( (err, item) => {
+                        if(err){reject(err)}
+                        try{
+                            if((state == true) && (item.isDepositing == true)){throwError('DEPOSIT_MODE_IN_API')}
+                            resolve(item);
+                        }catch(err){
+                            reject(err);
+                        }
+
+                    }
+                )
+            })
         }catch(err){
             throw (err)
         }

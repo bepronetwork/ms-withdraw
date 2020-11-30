@@ -2,6 +2,7 @@ import {AppLogic} from '../logic';
 import ModelComponent from './modelComponent';
 import {AppRepository} from '../db/repos';
 import { FinalizeWithdrawAppSingleton, RequestWithdrawAppSingleton, GetUsersWithdrawsSingleton } from '../controllers/Mapper';
+import { MapperUpdateWalletSingleton } from '../controllers/Mapper/App';
 
 class App extends ModelComponent{
 
@@ -66,6 +67,16 @@ class App extends ModelComponent{
             let res = await this.process('GetUsersWithdraws');
             return GetUsersWithdrawsSingleton.output('GetUsersWithdraws', res);
         }catch(err){
+            throw err;
+        }
+    }
+
+    async updateWallet() {
+        const { app } = this.self.params;
+        try {
+            let res = await this.process('UpdateWallet');
+            return MapperUpdateWalletSingleton.output('UpdateWallet', res);
+        } catch (err) {
             throw err;
         }
     }

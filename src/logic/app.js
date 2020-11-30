@@ -1,12 +1,13 @@
 import _ from 'lodash';
 import { ErrorManager } from '../controllers/Errors';
-import { AppRepository,  WalletsRepository,  UsersRepository, WithdrawRepository } from '../db/repos';
+import { AppRepository,  WalletsRepository,  UsersRepository, WithdrawRepository, DepositRepository } from '../db/repos';
 import LogicComponent from './logicComponent';
-import { Withdraw } from '../models';
+import { Withdraw, Deposit } from '../models';
 import { throwError } from '../controllers/Errors/ErrorManager';
 import BitGoSingleton from './third-parties/bitgo';
 import { Security } from '../controllers/Security';
 import { setLinkUrl } from '../helpers/linkUrl';
+import { IS_DEVELOPMENT } from '../config'
 let error = new ErrorManager();
 
 
@@ -29,6 +30,39 @@ let __private = {};
 
   
 const processActions = {
+    __updateWallet : async (params) => {
+        var { currency, id, wBT } = params;
+        /* Get App Id */
+        var app = await AppRepository.prototype.findAppById(id, "simple");
+        if(!app){throwError('APP_NOT_EXISTENT')}
+        if(IS_DEVELOPMENT){
+            wBT.coin = (wBT.coin).substring(1)
+        }
+        const wallet = app.wallet.find( w => new String(w.currency.ticker).toLowerCase() == new String(wBT.coin).toLowerCase());
+        if(!wallet || !wallet.currency){throwError('CURRENCY_NOT_EXISTENT')};
+        if( new String(`${app._id}-${wallet.currency.ticker}-second_wallet`).toLowerCase().toString() == wBT.label) {throwError('PAYMENT_FORWARDING_TRANSACTION')};
+
+        /* Verify if the transactionHash was created */
+        const { state, entries, value : amount, type, txid : transactionHash } = wBT;
+
+        const from = entries[0].address;
+        const isValid = ((state == 'confirmed') && (type == 'receive'));
+
+        /* Verify if this transactionHashs was already added */
+        let deposit = await DepositRepository.prototype.getDepositByTransactionHash(transactionHash);
+        let wasAlreadyAdded = deposit ? true : false;
+
+        return  {
+            app                 : app,
+            wallet              : wallet,
+            creationDate        : new Date(),
+            transactionHash     : transactionHash,
+            from                : from,
+            amount              : amount,
+            wasAlreadyAdded,
+            isValid
+        }
+    },
     __requestWithdraw : async (params) => {
         var app;
         try{
@@ -130,6 +164,31 @@ const processActions = {
 
   
 const progressActions = {
+    __updateWallet : async (params) => {
+     
+
+        /* Create Deposit Object */
+        let deposit = new Deposit({
+            app                     : params.app._id,
+            transactionHash         : params.transactionHash,
+            creation_timestamp      : params.creationDate,                    
+            last_update_timestamp   : params.creationDate,                             
+            address                 : params.from,                         
+            currency                : params.wallet.currency._id,
+            amount                  : params.amount,
+        })
+
+        /* Save Deposit Data */
+        let depositSaveObject = await deposit.createDeposit();
+        
+        /* Update Balance of App */
+        await WalletsRepository.prototype.updatePlayBalance(params.wallet, params.amount);
+        
+        /* Add Deposit to App */
+        await AppRepository.prototype.addDeposit(params.app._id, depositSaveObject._id)
+
+        return params;
+    },
     __requestWithdraw : async (params) => {
 
         /* Add Withdraw to user */
@@ -232,6 +291,9 @@ class AppLogic extends LogicComponent{
 	async objectNormalize(params, processAction) {
 		try{			
 			switch(processAction) {
+                case 'UpdateWallet' : {
+					return await library.process.__updateWallet(params); break;
+                };
                 case 'RequestWithdraw' : {
 					return await library.process.__requestWithdraw(params); 
                 };
@@ -266,6 +328,9 @@ class AppLogic extends LogicComponent{
 	async progress(params, progressAction){
 		try{			
 			switch(progressAction) {
+                case 'UpdateWallet' : {
+					return await library.progress.__updateWallet(params); break;
+                };
                 case 'RequestWithdraw' : {
 					return await library.progress.__requestWithdraw(params); 
                 };

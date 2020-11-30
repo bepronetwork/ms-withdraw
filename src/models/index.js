@@ -4,6 +4,7 @@ import Withdraw from './withdraw';
 import Wallet from "./wallet";
 import Permission from "./permission";
 import Currency from "./currency";
+import Deposit from "./deposit";
 
 export {
     User,
@@ -11,5 +12,6 @@ export {
     Withdraw,
     Wallet,
     Permission,
-    Currency
+    Currency,
+    Deposit
 }

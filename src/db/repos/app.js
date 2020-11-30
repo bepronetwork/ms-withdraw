@@ -13,7 +13,15 @@ import {
     pipeline_popular_numbers
 } from './pipelines/app';
 
-import { populate_app_all, populate_app_affiliates } from './populates';
+import { 
+    populate_app_all,
+    populate_app_affiliates,
+    populate_app_game,
+    populate_app_auth,
+    populate_app_simple,
+    populate_app_wallet,
+    populate_app_address
+} from './populates';
 import { throwError } from '../../controllers/Errors/ErrorManager';
 
 
@@ -172,9 +180,17 @@ class AppRepository extends MongoComponent{
     }
 
     findAppById(_id, populate_type=populate_app_all){
+        let type = populate_type;
         switch(populate_type){
+            case 'get_game' : { populate_type = populate_app_game; break; }
+            case 'get_app_auth' : { populate_type = populate_app_auth; break; }
             case 'affiliates' : { populate_type = populate_app_affiliates; break; }
-        }        
+            case 'simple' : { populate_type = populate_app_simple; break; }
+            case 'wallet' : { populate_type = populate_app_wallet; break; }
+            case 'address' : { populate_type = populate_app_address; break; }
+            case 'none' : { populate_type = []; break; }
+        }
+
         try{
             return new Promise( (resolve, reject) => {
                 AppRepository.prototype.schema.model.findById(_id)
