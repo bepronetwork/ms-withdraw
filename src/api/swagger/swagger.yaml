@@ -401,6 +401,66 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+  /app/wallet/currency/add:
+    x-swagger-router-controller: app
+    post:
+      tags:
+      - app
+      summary: Add Currency Wallet
+      operationId: addCurrencyWallet
+      description: Add Currency Wallet
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: app
+          description: App Information
+          required: true
+          schema:
+            $ref: '#/definitions/AppAddCurrencyWallet'
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/GeneralResponse"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /app/address/get : 
+    x-swagger-router-controller: user
+    post:
+      tags:
+      - user
+      summary: Get Address Deposit for User
+      operationId: getDepositAddress
+      description: Change Footer
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: app
+          description: App Information
+          required: true
+          schema:
+            $ref: '#/definitions/AppUserDepositAddressRequest'
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/GeneralResponse"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
   /swagger:
     x-swagger-pipe: swagger_raw
   
@@ -682,6 +742,55 @@ definitions:
       status :
         type : string
         example : "Queue" 
+  AppAddCurrencyWallet : 
+    type: object
+    required:
+      - app
+      - passphrase
+      - currency_id
+    properties:
+      app:
+        type : string
+        format: name
+        example: "wertwertwertwert"
+        description: |
+          App id
+      currency_id:
+        type : string
+        format: name
+        example: "wertwertwertwert"
+        description: |
+          Currency id
+      passphrase:
+        type : string
+        example: "pass!,*%%a,,"
+        description: |
+          Passphrase to protect the wallet
+  AppUserDepositAddressRequest : 
+    type: object
+    required:
+      - app
+      - currency
+      - id
+    properties:
+      app :
+        type : string
+        format : name
+        example : "5cuedgq7e6t334t34" 
+        description: |
+          App ID
+      currency :
+        type : string
+        format : name
+        example : "5cuedgq7e6t334t34" 
+        description: |
+          Currency ID
+      id :
+        type : string
+        format : name
+        example : "5cuedgq7e6t334t34" 
+        description: |
+          User ID
   GeneralResponse : 
     type: object
     required:

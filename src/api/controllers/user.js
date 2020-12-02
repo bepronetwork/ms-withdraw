@@ -55,7 +55,6 @@ async function cancelWithdraw (req, res) {
         MiddlewareSingleton.respondError(res, err);
 	}
 }
-
 async function webhookDeposit(req, res) {
     try {
         console.log(":::Init webhook::: ", req);
@@ -129,8 +128,21 @@ async function webhookDeposit(req, res) {
         MiddlewareSingleton.respondError(res, err, req);
     }
 }
+async function getDepositAddress(req, res) {
+    try {
+        let params = req.body;
+        let user = new User(params);
+        let data = await user.getDepositAddress();
+        MiddlewareSingleton.log({ type: "user", req, code: 200 });
+        MiddlewareSingleton.respond(res, req, data);
+    } catch (err) {
+        MiddlewareSingleton.log({ type: "user", req, code: err.code });
+        MiddlewareSingleton.respondError(res, err, req);
+    }
+}
 
 export {
+    getDepositAddress,
     requestWithdraw,
     finalizeWithdraw,
     requestAffiliateWithdraw,

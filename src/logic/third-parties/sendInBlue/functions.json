@@ -1,22 +1,22 @@
-[
-    {
-        "template_id": null,
-        "functionName": "USER_REGISTER",
-        "contactlist_Id": 2
-    },
-    {
-        "template_id": null,
-        "functionName": "USER_LOGIN",
-        "contactlist_Id": 2
-    },
-    {
-        "template_id": null,
-        "functionName": "USER_RESET_PASSWORD",
-        "contactlist_Id": 2
-    },
-    {
-        "template_id": null,
-        "functionName": "USER_NOTIFICATION",
-        "contactlist_Id": 2
-    }
-]
+    [
+        {
+            "template_id": null,
+            "functionName": "USER_REGISTER",
+            "contactlist_Id": 2
+        },
+        {
+            "template_id": null,
+            "functionName": "USER_LOGIN",
+            "contactlist_Id": 2
+        },
+        {
+            "template_id": null,
+            "functionName": "USER_RESET_PASSWORD",
+            "contactlist_Id": 2
+        },
+        {
+            "template_id": null,
+            "functionName": "USER_NOTIFICATION",
+            "contactlist_Id": 2
+        }
+    ]

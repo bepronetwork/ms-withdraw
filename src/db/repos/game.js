@@ -43,6 +43,27 @@ class GamesRepository extends MongoComponent{
         });
     }
 
+    addTableLimitWallet({game, wallet}, limit=0) {
+        return new Promise( (resolve,reject) => {
+            GamesRepository.prototype.schema.model.updateOne(
+                {_id: game},
+                {
+                    $push: {
+                        "wallets" : {
+                            wallet      : wallet,
+                            tableLimit  : parseFloat(limit).toFixed(6)
+                        }
+                    }
+                }
+            )
+            .lean()
+            .exec( async (err, item) => {
+                if(err){reject(err)}
+                resolve(item);
+            })
+        });
+    }
+
     editTableLimit({id, tableLimit}){
         return new Promise( (resolve,reject) => {
             GamesRepository.prototype.schema.model.findByIdAndUpdate(

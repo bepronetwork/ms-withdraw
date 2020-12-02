@@ -62,6 +62,15 @@ class App extends ModelComponent{
         }
     }
 
+    async addCurrencyWallet() {
+        try {
+            let app = await this.process('AddCurrencyWallet');
+            return app;
+        } catch (err) {
+            throw err;
+        }
+    }
+
     async getUserWithdraws(){
         try{
             let res = await this.process('GetUsersWithdraws');

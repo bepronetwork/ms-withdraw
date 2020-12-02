@@ -25,8 +25,23 @@ import PermissionRepository from "./permission";
 import AutoWithdrawRepository from "./autoWithdraw";
 import AddOnRepository from "./addOn";
 import CurrencyRepository from "./currency";
+import BalanceRepository from "./balance";
+import DepositBonusRepository from "./depositBonus";
+import FreeCurrencyRepository from "./freeCurrency";
+import JackpotRepository from "./jackpot";
+import PointSystemRepository from "./pointSystem";
+import TxFeeRepository from "./txFee";
+import KycRepository from "./kyc";
+
 
 export{
+    KycRepository,
+    TxFeeRepository,
+    PointSystemRepository,
+    JackpotRepository,
+    FreeCurrencyRepository,
+    DepositBonusRepository,
+    BalanceRepository,
     CurrencyRepository,
     AffiliateLinkRepository,
     AffiliateRepository,

@@ -7,9 +7,11 @@ import MailSenderLogic from './mailSender';
 import ChatLogic from './chat';
 import CurrencyLogic from "./currency";
 import DepositLogic from "./deposit";
+import KycLogic from "./kyc";
 
 
 export {
+    KycLogic,
     UserLogic,
     AppLogic,
     WithdrawLogic,
