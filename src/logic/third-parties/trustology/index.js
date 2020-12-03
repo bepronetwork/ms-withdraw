@@ -2,7 +2,7 @@ import { TrustVault } from "@trustology/trustvault-nodejs-sdk";
 import { BTC } from "./btc";
 import { ETH } from "./eth";
 
-class Trustology{
+class Trustology {
     constructor(listCurrencies){
         this.listCurrencies = listCurrencies;
         const trustVault    = new TrustVault({ apiKey: "<TRUST_VAULT_API_KEY>", environment: "sandbox" });
