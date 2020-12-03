@@ -1,4 +1,6 @@
 import { TrustVault } from "@trustology/trustvault-nodejs-sdk";
+import { BTC } from "./btc";
+import { ETH } from "./eth";
 
 class Trustology{
     constructor(listCurrencies){

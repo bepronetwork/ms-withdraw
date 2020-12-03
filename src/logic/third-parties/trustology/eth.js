@@ -1,4 +1,5 @@
-class ETH extends Prototype{
+import { Prototype } from "./prototype";
+export class ETH extends Prototype{
     constructor(){
         super();
     }

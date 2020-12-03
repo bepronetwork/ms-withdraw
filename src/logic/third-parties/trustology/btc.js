@@ -1,4 +1,5 @@
-class BTC extends Prototype{
+import { Prototype } from "./prototype";
+export class BTC extends Prototype{
     constructor(){
         super();
     }
