@@ -19,6 +19,7 @@
         "generate-result-space": "node scripts/createResultSpace"
     },
     "dependencies": {
+        "@trustology/trustvault-nodejs-sdk": "^1.1.1",
         "abi-decoder": "^1.2.0",
         "accounting": "^0.4.1",
         "asymmetric-crypto": "^1.0.1",
