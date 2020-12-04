@@ -6,6 +6,7 @@ const SendInBlueFunctions = require('./sendInBlue/functions.json');
 const SendInBlueAttributes = require('./sendInBlue/fields.json');
 import { LogOwlSingleton } from "./logOwl";
 import { MatiKYCSingleton } from "./mati_kyc";
+import { TrustologySingleton } from "./trustology";
 
 export {
     LogOwlSingleton,
@@ -16,5 +17,6 @@ export {
     BitGoSingleton,
     SendInBlueFunctions,
     SendInBlueAttributes,
-    MatiKYCSingleton
+    MatiKYCSingleton,
+    TrustologySingleton
 }
