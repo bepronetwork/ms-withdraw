@@ -1,4 +1,3 @@
-import { reject, resolve } from "bluebird";
 import { Prototype } from "./prototype";
 const axios = require('axios');
 export class ETH extends Prototype{
@@ -6,7 +5,7 @@ export class ETH extends Prototype{
         super();
     }
 
-    generateAddress(walletId, userId) {
+    createSubWallet(walletId, userId) {
         return new Promise((resolve, reject)=>{
             const data = JSON.stringify({
                 query: 'mutation($type: SubWalletType!, $name: String!, $walletId: String!, ) {\n    createSubWallet(\n        createSubWalletInput: {\n            type: $type,\n            name: $name,\n            walletId: $walletId,\n        }\n    ) {\n        subWalletId\n    }\n}',

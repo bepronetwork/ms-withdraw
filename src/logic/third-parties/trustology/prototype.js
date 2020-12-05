@@ -1,10 +1,11 @@
-import { IS_DEVELOPMENT } from "../../../config"
+import { IS_DEVELOPMENT } from "../../../config";
+const axios = require('axios');
 export class Prototype {
     constructor(){}
     __setSettings(trustVault){
         this.trustVault = trustVault;
-        this.url        = IS_DEVELOPMENT ? "https://tapi-sandbox.trustology-test.com/graphql": "" ;
-        this.apiKey     = "";
+        this.url    = IS_DEVELOPMENT ? "https://tapi-sandbox.trustology-test.com/graphql": "" ;
+        this.apiKey = "6dYvO5tWl060d79sl7xZm4q5Lp261Mx58dbrXLG4";
     }
     getSettings(){
         return this.trustVault;
@@ -19,5 +20,40 @@ export class Prototype {
             },
             data : data
           };
+    }
+
+    getAddress(subWalletId) {
+        return new Promise((resolve, reject)=>{
+            const data = JSON.stringify({
+            query: `query getAccounts {
+                user {
+                    subWallet (subWalletId: "${subWalletId}"){
+                        address
+                        id
+                        name
+                        createdAt
+                        updatedAt
+                        ... on BlockchainSubWallet {
+                            chain
+                            publicKey
+                            trustVaultPublicKeySignature
+                            __typename
+                        }
+                    }
+                }
+            }`,
+            variables: {}
+            });
+
+            axios(this.axiosConfig(data))
+            .then(function (response) {
+                console.log(JSON.stringify(response.data));
+                resolve(response.data);
+            })
+            .catch(function (error) {
+                console.log(error);
+                reject(error);
+            });
+        });
     }
 }

@@ -103,28 +103,6 @@ let populate_app_auth = [
         model : 'Integrations',
         select : { '__v': 0 },
         populate : populate_integrations_all
-    },
-    {
-        path : 'customization',
-        model : 'Customization',
-        select : { '__v': 0 },
-        populate : populate_customization_all
-    },
-    {
-        path : 'typography',
-        model : 'Typography',
-        select : { '__v': 0 },
-        populate : populate_typography
-    },
-    {
-        path : 'casino_providers',
-        model : 'Provider',
-        select : { '__v': 0}
-    },
-    {
-        path : 'analytics',
-        model : 'Analytics',
-        select : { '__v': 0}
     }
 ] 
 

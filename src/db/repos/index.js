@@ -32,6 +32,7 @@ import JackpotRepository from "./jackpot";
 import PointSystemRepository from "./pointSystem";
 import TxFeeRepository from "./txFee";
 import KycRepository from "./kyc";
+import AddressRepository from "./address";
 
 
 export{
@@ -68,5 +69,6 @@ export{
     ChatRepository,
     PermissionRepository,
     AutoWithdrawRepository,
-    AddOnRepository
-}  
+    AddOnRepository,
+    AddressRepository
+}

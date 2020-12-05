@@ -1,6 +1,3 @@
-import populate_integrations_all from "../integrations/all";
-import populate_customization_all from "../customization/all";
-import populate_typography from "../typography/index";
 import populate_wallet_all from "../wallet/all";
 
 let populate_app_to_bet = [

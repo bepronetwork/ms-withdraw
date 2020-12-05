@@ -117,6 +117,19 @@ class WalletsRepository extends MongoComponent{
         });
     }
 
+    addSubWalletId(wallet_id, subWalletId){        
+        return new Promise( (resolve,reject) => {
+            WalletsRepository.prototype.schema.model.findOneAndUpdate(
+                { _id: wallet_id }, 
+                { $set: { subWalletId } },
+                { 'new': true })
+                .exec( (err, item) => {
+                    if(err){reject(err)}
+                    resolve(true);
+                }
+            )
+        });
+    }
     updateMinWithdraw(wallet_id, amount){
         return new Promise( (resolve, reject) => {
             WalletsRepository.prototype.schema.model.findByIdAndUpdate(wallet_id, {
