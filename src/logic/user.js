@@ -418,7 +418,7 @@ const processActions = {
     __getDepositAddress: async (params) => {
         var { currency, id, app } = params;
         /* Get User Id */
-        let user = await UsersRepository.prototype.findUserById(id);
+        const user = await UsersRepository.prototype.findUserById(id);
         app = await AppRepository.prototype.findAppById(app, "simple");
         if (!app) { throwError('APP_NOT_EXISTENT') }
         if (!user) { throwError('USER_NOT_EXISTENT') }
@@ -426,6 +426,7 @@ const processActions = {
         var app_wallet = app.wallet.find(w => new String(w.currency._id).toString() == new String(currency).toString());
         var user_wallet = user.wallet.find(w => new String(w.currency._id).toString() == new String(currency).toString());
         if(user_wallet.depositAddresses!=null && user_wallet.depositAddresses.length>0){
+            console.log(user_wallet.depositAddresses[0]);
             return {
                 address: user_wallet.depositAddresses[0].address,
                 currency: String(currency).toString()
@@ -441,7 +442,6 @@ const processActions = {
                 return new Error("Add currency eth"); // TO DO
             }
         }
-
         return {
             app_wallet,
             user,
@@ -602,7 +602,13 @@ const progressActions = {
         }
     },
     __getDepositAddress: async (params) => {
-        const { app_wallet, user_wallet, user, erc20, currency } = params;
+        const { app_wallet, user_wallet, user, erc20, currency, address } = params;
+        if(address!=null) {
+            return {
+                address,
+                currency
+            }
+        }
         const user_wallet_real = user.wallet.find(w => new String(w.currency._id).toString() == new String(currency).toString());
         try {
             let newAddress = {};
