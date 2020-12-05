@@ -56,4 +56,24 @@ export class Prototype {
             });
         });
     }
+
+    getTransaction(requestId) {
+        return new Promise((resolve, reject) => {
+            const data = JSON.stringify({
+                query: 'query($requestId: String!) {\n    getRequest(requestId: $requestId) {\n      requestId\n      status\n      type\n      transactionHash\n    }\n  }',
+                variables: { "requestId": requestId }
+            });
+
+            axios(this.axiosConfig(data))
+                .then(function (response) {
+                    console.log(JSON.stringify(response.data));
+                    resolve(response.data);
+                })
+                .catch(function (error) {
+                    console.log(error);
+                    reject(error);
+                });
+        });
+    }
+
 }
