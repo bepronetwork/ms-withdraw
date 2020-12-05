@@ -4,8 +4,8 @@ export class BTC extends Prototype{
         super();
     }
 
-    async sendTransaction(fromSubWalletId, toAddress, amount, speed, signCallback){
-        return await this.getSettings().sendBitcoin(fromSubWalletId, toAddress, amount, speed, signCallback);
+    async sendTransaction(fromSubWalletId, toAddress, amount){
+        return await this.getSettings().sendBitcoin(fromSubWalletId, toAddress, amount, speed);
     }
 
 }

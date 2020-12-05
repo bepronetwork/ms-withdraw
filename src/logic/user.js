@@ -16,6 +16,7 @@ import Mailer from './services/mailer';
 import { setLinkUrl } from '../helpers/linkUrl';
 import { User } from "../models";
 import { getCurrencyAmountFromBitGo } from "./third-parties/bitgo/helpers";
+import { TrustologySingleton } from './third-parties/trustology';
 let error = new ErrorManager();
 
 
@@ -341,6 +342,8 @@ const processActions = {
             }
             const wallet = user.wallet.find( w => new String(w.currency._id).toString() == new String(currency).toString());
             const appWallet = app.wallet.find( w => new String(w.currency._id).toString() == new String(currency).toString());
+            const userAddress = wallet.depositAddresses.find(w => new String(w.currency._id).toString() == new String(currency).toString());
+            const ticker = userAddress.currency.ticker
             if(!wallet || !wallet.currency){throwError('CURRENCY_NOT_EXISTENT')};
 
             /* Verify if User is in App */
@@ -369,7 +372,9 @@ const processActions = {
                 app,
                 user,
                 amount : parseFloat(Math.abs(withdraw.amount)),
-                withdrawAddress : withdraw.address
+                withdrawAddress : withdraw.address,
+                userAddress,
+                ticker: ticker.toUpperCase()
             }
             
             return res;
@@ -548,15 +553,33 @@ const progressActions = {
     },
     __finalizeWithdraw : async (params) => {
         try{
+            let transaction = null;
+            // let bitgo_tx = await BitGoSingleton.sendTransaction({
+            //     wallet_id : params.appWallet.bitgo_id, 
+            //     ticker : params.currency.ticker, 
+            //     amount : params.amount, 
+            //     address : params.withdrawAddress,
+            //     passphrase : Security.prototype.decryptData(params.appWallet.hashed_passphrase)
 
-            let bitgo_tx = await BitGoSingleton.sendTransaction({
-                wallet_id : params.appWallet.bitgo_id, 
-                ticker : params.currency.ticker, 
-                amount : params.amount, 
-                address : params.withdrawAddress,
-                passphrase : Security.prototype.decryptData(params.appWallet.hashed_passphrase)
-
-            });
+            // });
+            switch (params.ticker.toUpperCase()) {
+                case 'BTC':
+                    transaction = await TrustologySingleton.method('BTC').sendTransaction(
+                        params.userWallet.subWalletId.split("/")[0],
+                        params.withdrawAddress,
+                        params.amount
+                    )
+                    break;
+            
+                default:
+                    transaction = await TrustologySingleton.method('ETH').sendETHtransaction(
+                        params.userAddress.address,
+                        params.withdrawAddress,
+                        params.amount,
+                        params.ticker.toUpperCase()
+                        )
+                    break;
+            }
             let link_url = setLinkUrl({ticker : params.currency.ticker, address : bitgo_tx.txid, isTransactionHash : true })
             /* Add Withdraw to user */
             await WithdrawRepository.prototype.finalizeWithdraw(params.withdraw_id, {
