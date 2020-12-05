@@ -8,6 +8,7 @@ import ChatLogic from './chat';
 import CurrencyLogic from "./currency";
 import DepositLogic from "./deposit";
 import KycLogic from "./kyc";
+import AddressLogic from "./address";
 
 
 export {
@@ -20,6 +21,7 @@ export {
     MailSenderLogic,
     ChatLogic,
     CurrencyLogic,
-    DepositLogic
+    DepositLogic,
+    AddressLogic
 }
 

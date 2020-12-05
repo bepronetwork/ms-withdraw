@@ -133,10 +133,8 @@ async function getDepositAddress(req, res) {
         let params = req.body;
         let user = new User(params);
         let data = await user.getDepositAddress();
-        MiddlewareSingleton.log({ type: "user", req, code: 200 });
         MiddlewareSingleton.respond(res, req, data);
     } catch (err) {
-        MiddlewareSingleton.log({ type: "user", req, code: err.code });
         MiddlewareSingleton.respondError(res, err, req);
     }
 }

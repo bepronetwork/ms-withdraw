@@ -6,6 +6,7 @@ import Permission from "./permission";
 import Currency from "./currency";
 import Deposit from "./deposit";
 import Kyc from "./kyc";
+import Address from "./address";
 
 export {
     Kyc,
@@ -15,5 +16,6 @@ export {
     Wallet,
     Permission,
     Currency,
-    Deposit
+    Deposit,
+    Address
 }

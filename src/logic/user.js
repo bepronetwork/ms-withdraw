@@ -7,7 +7,7 @@ import LogicComponent from './logicComponent';
 
 import { UsersRepository, AppRepository, WalletsRepository, WithdrawRepository, AddOnRepository, AutoWithdrawRepository, CurrencyRepository, DepositRepository } from '../db/repos';
 import Numbers from './services/numbers';
-import { Deposit, Withdraw } from '../models';
+import { Deposit, Withdraw, Address } from '../models';
 import { cryptoEth, cryptoBtc } from './third-parties/cryptoFactory';
 import { throwError } from '../controllers/Errors/ErrorManager';
 import BitGoSingleton from './third-parties/bitgo';
@@ -16,7 +16,7 @@ import Mailer from './services/mailer';
 import { setLinkUrl } from '../helpers/linkUrl';
 import { User } from "../models";
 import { getCurrencyAmountFromBitGo } from "./third-parties/bitgo/helpers";
-import { TrustologySingleton } from './third-parties/trustology';
+import { TrustologySingleton } from './third-parties';
 let error = new ErrorManager();
 
 
@@ -422,21 +422,30 @@ const processActions = {
     __getDepositAddress: async (params) => {
         var { currency, id, app } = params;
         /* Get User Id */
-        let user = await UsersRepository.prototype.findUserById(id);
+        const user = await UsersRepository.prototype.findUserById(id);
         app = await AppRepository.prototype.findAppById(app, "simple");
         if (!app) { throwError('APP_NOT_EXISTENT') }
         if (!user) { throwError('USER_NOT_EXISTENT') }
         if (!user.email_confirmed) { throwError('UNCONFIRMED_EMAIL') }
         var app_wallet = app.wallet.find(w => new String(w.currency._id).toString() == new String(currency).toString());
         var user_wallet = user.wallet.find(w => new String(w.currency._id).toString() == new String(currency).toString());
+        if(user_wallet.depositAddresses!=null && user_wallet.depositAddresses.length>0){
+            console.log(user_wallet.depositAddresses[0]);
+            return {
+                address: user_wallet.depositAddresses[0].address,
+                currency: String(currency).toString()
+            }
+        }
         var erc20 = false;
         if(user_wallet.currency.erc20){
             // Is ERC20 Token simulate use of eth wallet
             user_wallet = user.wallet.find(w => new String(w.currency.ticker).toLowerCase() == new String('eth').toLowerCase());
             app_wallet  = app.wallet.find(w => new String(w.currency.ticker).toLowerCase() == new String('eth').toString());
             erc20 = true
+            if(user_wallet.depositAddresses == null || user_wallet.depositAddresses.length == 0) {
+                return new Error("Add currency eth"); // TO DO
+            }
         }
-
         return {
             app_wallet,
             user,
@@ -615,131 +624,38 @@ const progressActions = {
         }
     },
     __getDepositAddress: async (params) => {
-        const { app_wallet, user_wallet, user, app, erc20, currency } = params;
+        const { app_wallet, user_wallet, user, erc20, currency, address } = params;
+        if(address!=null) {
+            return {
+                address,
+                currency
+            }
+        }
+        const user_wallet_real = user.wallet.find(w => new String(w.currency._id).toString() == new String(currency).toString());
         try {
-            let walletToAddress2 = await BitGoSingleton.getWallet({ ticker: app_wallet.currency.ticker, id: app_wallet.bitgo_id });
-            let bitgo_address2;
-            if(!app_wallet.bitgo_id_not_webhook) {
-                bitgo_address2 = await BitGoSingleton.generateDepositAddress({ wallet : walletToAddress2, label: `${app._id}-${app_wallet.currency.ticker}-second_wallet`});
-                await WalletsRepository.prototype.updateBitgoIdNotWebhook(app_wallet._id, bitgo_address2.id);
-                throwError('WALLET_WAIT');
+            let newAddress = {};
+            if(!erc20){
+                const subWalletId = (
+                    await TrustologySingleton
+                    .method(
+                        String(user_wallet_real.currency.ticker).toUpperCase()
+                    )
+                    .createSubWallet(
+                        app_wallet.subWalletId.split("/")[0],
+                        String(user._id).toString()
+                    )
+                ).data.createSubWallet.subWalletId;
+                newAddress = (await TrustologySingleton.method(String(user_wallet_real.currency.ticker).toUpperCase()).getAddress(subWalletId)).data.user.subWallet;
+                newAddress["subWalletId"]=newAddress.id;
+            }else{
+                newAddress = {address: user_wallet.depositAddresses[0].address, subWalletId: user_wallet.subWalletId};
             }
-            if(!app_wallet.bank_address_not_webhook) {
-                bitgo_address2 = await BitGoSingleton.generateDepositAddress({ wallet : walletToAddress2, label: `${app._id}-${app_wallet.currency.ticker}-second_wallet`, id: app_wallet.bitgo_id_not_webhook});
-                if(!bitgo_address2.address) throwError('WALLET_WAIT');
-                await WalletsRepository.prototype.updateAddress2(app_wallet._id, bitgo_address2.address)
-                throwError('WALLET_WAIT');
-            }
-
-            let addresses = user_wallet.depositAddresses;
-            let address = addresses.find( a => a.address);
-            if(!address){
-
-
-                // let bitgo_address = await BitGoSingleton.generateDepositAddress({ wallet, label: user._id, id: bitgo_id });
-                var crypto_address = null;
-                switch ((app_wallet.currency.ticker).toLowerCase()) {
-                    case 'btc': {
-                        crypto_address = await cryptoBtc.CryptoBtcSingleton.generateDepositAddress();
-                        /* Import address to HD Wallet */
-                        await cryptoBtc.CryptoBtcSingleton.importAddressAsWallet({
-                            walletName  : `${user._id}-${user_wallet.currency.ticker}`, 
-                            address     : crypto_address.payload.address,
-                            password    : Security.prototype.decryptData(app_wallet.hashed_passphrase),
-                            privateKey  : crypto_address.payload.privateKey
-                        });
-                        /* Record webhooks */
-                        await cryptoBtc.CryptoBtcSingleton.addAppDepositWebhook({
-                            address     : crypto_address.payload.address,
-                            app_id      : user._id,
-                            currency_id : user_wallet.currency._id,
-                            isApp       : false
-                        });
-                        /* Record Payment Forwarding webhooks */
-                        let resCreatePaymentForwarding = await cryptoBtc.CryptoBtcSingleton.createPaymentForwarding({
-                            from: crypto_address.payload.address,
-                            to: app_wallet.bank_address_not_webhook,
-                            callbackURL: `${MS_MASTER_URL}/api/user/paymentForwarding?id=${user._id}&currency=${user_wallet.currency._id}&isApp=${false}`,
-                            wallet: `${user._id}-${user_wallet.currency.ticker}`,
-                            password: Security.prototype.decryptData(app_wallet.hashed_passphrase),
-                            confirmations: 3
-                        });
-                        if(resCreatePaymentForwarding===false) {throwError('WALLET_WAIT');}
-                        break;
-                    };
-                    case 'eth': {
-                        crypto_address = await cryptoEth.CryptoEthSingleton.generateDepositAddress();
-                        /* Record webhooks */
-                        await cryptoEth.CryptoEthSingleton.addAppDepositWebhook({
-                            address     : crypto_address.payload.address,
-                            app_id      : user._id,
-                            currency_id : user_wallet.currency._id,
-                            isApp       : false
-                        });
-                        /* Record Payment Forwarding webhooks */
-                        let resCreatePaymentForwarding = await cryptoEth.CryptoEthSingleton.createPaymentForwarding({
-                            from: crypto_address.payload.address,
-                            to: app_wallet.bank_address_not_webhook,
-                            callbackURL: `${MS_MASTER_URL}/api/user/paymentForwarding?id=${user._id}&currency=${user_wallet.currency._id}&isApp=${false}`,
-                            wallet: crypto_address.payload.address,
-                            privateKey: crypto_address.payload.privateKey,
-                            confirmations: 3
-                        });
-                        if(resCreatePaymentForwarding===false) {throwError('WALLET_WAIT');}
-                        break;
-                    };
-                }
-
-                address = {
-                    address: crypto_address.payload.address,
-                    hashed_private_key: Security.prototype.encryptData(crypto_address.payload.privateKey),
-                    wif: !crypto_address.payload.wif ? '' : crypto_address.payload.wif
-                };
-                // Bitgo has created the address
-                let addressObject = (await (new Address({ currency: user_wallet.currency._id, user: user._id, address: address.address, wif_btc: address.wif, hashed_private_key : address.hashed_private_key})).register())._doc;
-                // Add Deposit Address to User Deposit Addresses
-                await WalletsRepository.prototype.addDepositAddress(user_wallet._id, addressObject._id);
-            }else if(erc20){
-                var walletUserErc20 = user.wallet.find(w => new String(w.currency._id).toString() == new String(currency).toString());
-
-                if(!(walletUserErc20.depositAddresses.find( a => a.address))){
-
-                    let addressObject = (await (new Address({ currency: walletUserErc20.currency._id, user: user._id, address: address.address, wif_btc: address.wif, hashed_private_key : address.hashed_private_key})).register())._doc;
-
-                    /* Record ERC-20 webhooks */
-                    await cryptoEth.CryptoEthSingleton.addAppDepositERC20Webhook({
-                        address     : address.address,
-                        app_id      : user._id,
-                        currency_id : walletUserErc20.currency._id,
-                        isApp       : false
-                    });
-                    /* Record Payment Forwarding webhooks */
-                    let resCreatePaymentForwarding = await cryptoEth.CryptoEthSingleton.createPaymentForwardingToken({
-                        from: address.address,
-                        to: app_wallet.bank_address_not_webhook,
-                        callbackURL: `${MS_MASTER_URL}/api/user/paymentForwarding?id=${user._id}&currency=${walletUserErc20.currency._id}&isApp=${false}`,
-                        wallet: address.address,
-                        privateKey: Security.prototype.decryptData(address.hashed_private_key),
-                        confirmations: 3,
-                        token: walletUserErc20.currency.address
-                    });
-                    if(resCreatePaymentForwarding===false) {throwError('WALLET_WAIT');}
-
-                    await WalletsRepository.prototype.addDepositAddress(walletUserErc20._id, addressObject._id);
-                }
-            }
-
-            if (address.address) {
-                //Address Existent
-                return {
-                    address: address.address,
-                    currency: user_wallet.currency.ticker
-                }
-            } else {
-                // Not existent
-                return {
-                    message: 'Waiting for address initialization'
-                }
+            let addressObject = (await (new Address({ currency: user_wallet_real.currency._id, user: user._id, address: newAddress.address})).register())._doc;
+            await WalletsRepository.prototype.addDepositAddress(user_wallet_real._id, addressObject._id);
+            await WalletsRepository.prototype.addSubWalletId(user_wallet_real._id, newAddress.subWalletId);
+            return {
+                address: newAddress.address,
+                currency: user_wallet_real.currency.ticker
             }
         } catch(err) {
             throw err;

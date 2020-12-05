@@ -5,7 +5,7 @@ import { ETH } from "./eth";
 class Trustology {
     constructor(listCurrencies){
         this.listCurrencies = listCurrencies;
-        const trustVault    = new TrustVault({ apiKey: "<TRUST_VAULT_API_KEY>", environment: "sandbox" });
+        const trustVault    = new TrustVault({ apiKey: "6dYvO5tWl060d79sl7xZm4q5Lp261Mx58dbrXLG4", environment: "sandbox" });
         this.__setSettings(trustVault);
     }
     method(ticker){
@@ -15,8 +15,8 @@ class Trustology {
         return this.listCurrencies;
     }
     __setSettings(trustVault){
-        for(let item of this.methods()){
-            item.__setSettings(trustVault);
+        for(let item in this.methods()){
+            this.methods()[item].__setSettings(trustVault);
         }
     }
 }

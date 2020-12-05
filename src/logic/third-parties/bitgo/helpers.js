@@ -1,6 +1,5 @@
-import Web3 from 'web3';
-import CurrencyRepository from '../../../db/repos/currency';
-const web3 = new Web3(new Web3.providers.HttpProvider("https://mainnet.infura.io/v3/811fe4fa5c4b41cb9b92f9656aaeaa3b"));
+// import Web3 from 'web3';
+// const web3 = new Web3(new Web3.providers.HttpProvider("https://mainnet.infura.io/v3/811fe4fa5c4b41cb9b92f9656aaeaa3b"));
 import { throwError } from "../../../controllers/Errors/ErrorManager";
 import { maxWithdrawPolicyPerDay, maxWithdrawPolicyPerTransaction, maxWithdrawPolicyPerHour } from "./const";
 import { generateRandomID } from "../../services/services";
