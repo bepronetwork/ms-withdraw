@@ -151,17 +151,15 @@ const processActions = {
         return params;
     },
     __addCurrencyWallet : async (params) => {
-        var { currency_id, app, passphrase } = params;
-        if(passphrase.length <10){
-            throwError("MINIMUM_PASSWORD_LENGTH");
-        }
+        var { currency_id, app, address, subWalletId } = params;
         app = await AppRepository.prototype.findAppByIdAddCurrencyWallet(app);
         if(!app){throwError('APP_NOT_EXISTENT')}
         let currency = await CurrencyRepository.prototype.findById(currency_id);
         return  {
             currency,
-            passphrase,
-            app : app
+            app : app,
+            address,
+            subWalletId
         }
     }
 }
@@ -256,9 +254,8 @@ const progressActions = {
         return res;
     },
     __addCurrencyWallet : async (params) => {
-        const { currency, passphrase, app } = params;
-        var wallet, bitgo_wallet, receiveAddress, keys;
-
+        const { currency, address, app, subWalletId } = params;
+        var wallet;
         if(currency.virtual){
             /* Save Wallet on DB */
             wallet = (await (new Wallet({
@@ -271,75 +268,27 @@ const progressActions = {
                     }
                 })
             })).register())._doc;
-        }else{  
-            console.log("currency", currency)
+        }else{
             if(currency.erc20){
-                /* Don't create wallet for bitgo for the platform again */
-                /* Get ETH Wallet */
                 let wallet_eth = app.wallet.find( w => w.currency.ticker == 'ETH');
-
                 /* No Eth Wallet was created */
                 if(!wallet_eth){throwError('NO_ETH_WALLET')};
-
                 /* Save Wallet on DB */
                 wallet = (await (new Wallet({
                     currency : currency._id,
-                    bitgo_id : wallet_eth.bitgo_id,
                     virtual : false,
                     bank_address : wallet_eth.bank_address,
-                    hashed_passphrase : Security.prototype.encryptData(passphrase)
+                    subWalletId  : wallet_eth.subWalletId
                 })).register())._doc;
-
             }else{
-                /* Create Wallet on Bitgo */
-                let params = await BitGoSingleton.createWallet({
-                    label : `${app._id}-${currency.ticker}`,
-                    passphrase,
-                    currency : currency.ticker
-                })
-                bitgo_wallet = params.wallet;
-                receiveAddress = params.receiveAddress;
-                keys = params.keys;
-
-
-                /* Record webhooks */
-                await BitGoSingleton.addAppDepositWebhook({wallet : bitgo_wallet, id : app._id, currency_id : currency._id, ticker: currency.ticker});
-                /* Create Policy for Day */
-                await BitGoSingleton.addPolicyToWallet({
-                    ticker : currency.ticker,
-                    bitGoWalletId : bitgo_wallet.id(),
-                    timeWindow : 'day'
-                })
-
-                /* Create Policy for Transaction */
-                await BitGoSingleton.addPolicyToWallet({
-                    ticker : currency.ticker,
-                    bitGoWalletId : bitgo_wallet.id(),
-                    timeWindow : 'hour',
-                })
-
-                /* Create Policy for Hour */
-                await BitGoSingleton.addPolicyToWallet({
-                    ticker : currency.ticker,
-                    bitGoWalletId : bitgo_wallet.id(),
-                    timeWindow : 'transaction',
-                })
-
-                /* No Bitgo Wallet created */
-                if(!bitgo_wallet.id() || !receiveAddress){throwError('UNKNOWN')};
-                /* Save Wallet on DB */
                 wallet = (await (new Wallet({
                     currency : currency._id,
-                    bitgo_id : bitgo_wallet.id(),
                     virtual : false,
-                    bank_address : receiveAddress,
-                    hashed_passphrase : Security.prototype.encryptData(passphrase)
+                    bank_address : address,
+                    subWalletId
                 })).register())._doc;
-
             }
-         
             let virtualWallet = app.wallet.find( w => w.currency.virtual == true);
-
             if(virtualWallet){
                 /* Add Deposit Currency to Virtual Currency */
                 await WalletsRepository.prototype.addCurrencyDepositToVirtualCurrency(virtualWallet._id, currency._id);
@@ -386,8 +335,7 @@ const progressActions = {
 
         return {
             currency_id : currency._id,
-            keys : keys,
-            bank_address : receiveAddress
+            bank_address : address
         }
     }
 }

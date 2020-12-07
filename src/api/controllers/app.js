@@ -107,10 +107,8 @@ async function addCurrencyWallet(req, res) {
         let params = req.body;
         let app = new App(params);
         let data = await app.addCurrencyWallet();
-        MiddlewareSingleton.log({ type: "admin", req, code: 200 });
         MiddlewareSingleton.respond(res, req, data);
     } catch (err) {
-        MiddlewareSingleton.log({ type: "admin", req, code: err.code });
         MiddlewareSingleton.respondError(res, err, req);
     }
 }
