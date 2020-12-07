@@ -1,11 +1,11 @@
-import { IS_DEVELOPMENT } from "../../../config";
+import { TRUSTOLOGY_API_KEY, TRUSTOLOGY_URL } from "../../../config";
 const axios = require('axios');
 export class Prototype {
     constructor(){}
     __setSettings(trustVault){
         this.trustVault = trustVault;
-        this.url    = IS_DEVELOPMENT ? "https://tapi-sandbox.trustology-test.com/graphql": "" ;
-        this.apiKey = "6dYvO5tWl060d79sl7xZm4q5Lp261Mx58dbrXLG4";
+        this.url    = TRUSTOLOGY_URL ;
+        this.apiKey = TRUSTOLOGY_API_KEY;
     }
     getSettings(){
         return this.trustVault;

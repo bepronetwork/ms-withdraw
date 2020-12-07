@@ -1,11 +1,12 @@
 import { TrustVault } from "@trustology/trustvault-nodejs-sdk";
+import { IS_DEVELOPMENT, TRUSTOLOGY_API_KEY } from "../../../config";
 import { BTC } from "./btc";
 import { ETH } from "./eth";
 
 class Trustology {
     constructor(listCurrencies){
         this.listCurrencies = listCurrencies;
-        const trustVault    = new TrustVault({ apiKey: "6dYvO5tWl060d79sl7xZm4q5Lp261Mx58dbrXLG4", environment: "sandbox" });
+        const trustVault    = new TrustVault(IS_DEVELOPMENT ? { apiKey: TRUSTOLOGY_API_KEY, environment: "sandbox" } : { apiKey: TRUSTOLOGY_API_KEY });
         this.__setSettings(trustVault);
     }
     method(ticker){

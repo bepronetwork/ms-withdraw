@@ -42,6 +42,12 @@ export const SENDINBLUE_EMAIL_TO = process.env.SENDINBLUE_EMAIL_TO;
 
 export const MONGO_CONNECTION_STRING = process.env.MONGO_CONNECTION_STRING;
 
+export const TRUSTOLOGY_PRIVATE_KEY = process.env.TRUSTOLOGY_PRIVATE_KEY;
+
+export const TRUSTOLOGY_API_KEY = process.env.TRUSTOLOGY_API_KEY;
+
+export const TRUSTOLOGY_URL = process.env.TRUSTOLOGY_URL;
+
 export const ENV = process.env.ENV;
 
 /* Variables */

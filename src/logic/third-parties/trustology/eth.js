@@ -1,5 +1,6 @@
 import { Prototype } from "./prototype";
 import { TrustVaultGraphQLClient } from "@trustology/trustvault-nodejs-sdk/api-client";
+import { TRUSTOLOGY_PRIVATE_KEY } from "../../../config";
 const { ec: EC } = require("elliptic");
 const axios = require('axios');
 const keyPair = new EC("p256").keyFromPrivate(TRUSTOLOGY_PRIVATE_KEY);
