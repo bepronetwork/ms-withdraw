@@ -1,4 +1,5 @@
 import { TRUSTOLOGY_API_KEY, TRUSTOLOGY_URL } from "../../../config";
+import { TrustVaultGraphQLClient } from "@trustology/trustvault-nodejs-sdk/api-client";
 const axios = require('axios');
 export class Prototype {
     constructor(){}
@@ -6,6 +7,7 @@ export class Prototype {
         this.trustVault = trustVault;
         this.url    = TRUSTOLOGY_URL ;
         this.apiKey = TRUSTOLOGY_API_KEY;
+        this.apiClient = new TrustVaultGraphQLClient(this.apiKey, this.url);
     }
     getSettings(){
         return this.trustVault;
