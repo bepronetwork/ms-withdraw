@@ -19,7 +19,6 @@ async function requestWithdraw (req, res) {
         MiddlewareSingleton.respondError(res, err);
 	}
 }
-
 async function requestAffiliateWithdraw (req, res) {
     try{
         SecuritySingleton.verify({type : 'user', req});
@@ -31,19 +30,6 @@ async function requestAffiliateWithdraw (req, res) {
         MiddlewareSingleton.respondError(res, err);
 	}
 }
-
-async function finalizeWithdraw (req, res) {
-    try{
-        SecuritySingleton.verify({type : 'admin', req, permissions: ["super_admin", "user_withdraw"]});
-        let params = req.body;
-		let user = new User(params);
-        let data = await user.finalizeWithdraw();
-        MiddlewareSingleton.respond(res, req, data);
-	}catch(err){
-        MiddlewareSingleton.respondError(res, err);
-	}
-}
-
 async function cancelWithdraw (req, res) {
     try{
         SecuritySingleton.verify({type : 'admin', req, permissions: ["super_admin"]});
@@ -142,7 +128,6 @@ async function getDepositAddress(req, res) {
 export {
     getDepositAddress,
     requestWithdraw,
-    finalizeWithdraw,
     requestAffiliateWithdraw,
     cancelWithdraw,
     webhookDeposit

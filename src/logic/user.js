@@ -505,10 +505,12 @@ const progressActions = {
         var withdraw_obj_id = withdrawSaveObject._id
         var currency_id = params.currency._id
         if (params.isAutomaticWithdraw.verify) {
+            console.log(20)
             let params = { app: app_id, user: user_id, withdraw_id: withdraw_obj_id, currency: currency_id, isAutoWithdraw: true }
             let user = new User(params);
             await user.finalizeWithdraw();
         } else {
+            console.log(10)
             let params = { app: app_id, user: user_id, withdraw_id: withdraw_obj_id, currency: currency_id, isAutoWithdraw: false }
             let user = new User(params);
             await user.finalizeWithdraw();
@@ -572,6 +574,7 @@ const progressActions = {
             if (!params.isAutoWithdraw) {
                 switch (params.ticker.toUpperCase()) {
                     case 'BTC':
+                        console.log(1)
                         transaction = await TrustologySingleton.method('BTC').sendTransaction(
                             params.userWallet.subWalletId,
                             params.withdrawAddress,
@@ -580,6 +583,7 @@ const progressActions = {
                         break;
 
                     default:
+                        console.log(2)
                         transaction = await TrustologySingleton.method('ETH').sendETHtransaction(
                             params.userAddress.address,
                             params.withdrawAddress,

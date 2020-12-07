@@ -219,37 +219,6 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-  /users/finalizeWithdraw:
-    x-swagger-router-controller: user
-    post:
-      tags:
-      - user
-      summary: Request for User Finalize Withdraw
-      operationId: finalizeWithdraw
-      description: Request Finalize Withdraw
-      consumes:
-        - application/json
-      produces:
-        - application/json
-      parameters:
-        - in: body
-          name: user
-          description: User Information
-          required: true
-          schema:
-            $ref: '#/definitions/UserFinalizeWithdrawRequest'
-      responses:
-        "200":
-          description: Success
-          schema:
-            # a pointer to a definition
-            $ref: "#/definitions/GeneralResponse"
-        # responses may fall through to errors
-        default:
-          description: Error
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-
   /users/cancelWithdraw:
     x-swagger-router-controller: user
     post:
@@ -269,36 +238,6 @@ paths:
           required: true
           schema:
             $ref: '#/definitions/UserCancelWithdrawRequest'
-      responses:
-        "200":
-          description: Success
-          schema:
-            # a pointer to a definition
-            $ref: "#/definitions/GeneralResponse"
-        # responses may fall through to errors
-        default:
-          description: Error
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-  /app/finalizeWithdraw:
-    x-swagger-router-controller: app
-    post:
-      tags:
-      - app
-      summary: Request for App Finalize Withdraw
-      operationId: finalizeAppWithdraw
-      description: Request Finalize Withdraw
-      consumes:
-        - application/json
-      produces:
-        - application/json
-      parameters:
-        - in: body
-          name: app
-          description: App Information
-          required: true
-          schema:
-            $ref: '#/definitions/AppFinalizeWithdrawRequest'
       responses:
         "200":
           description: Success
@@ -330,36 +269,6 @@ paths:
           required: true
           schema:
             $ref: '#/definitions/UserWithdrawRequest'
-      responses:
-        "200":
-          description: Success
-          schema:
-            # a pointer to a definition
-            $ref: "#/definitions/GeneralResponse"
-        # responses may fall through to errors
-        default:
-          description: Error
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-  /app/requestWithdraw: 
-    x-swagger-router-controller: app
-    post:
-      tags:
-      - app
-      summary: Request for User Withdraw
-      operationId: requestAppWithdraw
-      description: Update Wallet Amount for the User
-      consumes:
-        - application/json
-      produces:
-        - application/json
-      parameters:
-        - in: body
-          name: app
-          description: App Information
-          required: true
-          schema:
-            $ref: '#/definitions/AppRequestWithdrawRequest'
       responses:
         "200":
           description: Success
@@ -540,44 +449,6 @@ definitions:
         type : string
         description: |
           ID app
-
-  AppRequestWithdrawRequest : 
-    type: object
-    required:
-      - app
-      - address
-      - tokenAmount
-      - nonce
-      - currency
-    properties:
-      tokenAmount : 
-        type : number
-        example: 203
-        description: |
-          Amount of Tokens to be Withdraw
-      nonce:
-        type : number
-        example: 3245
-        description: |
-          Use Nonce
-      app :
-        type : string
-        format : name
-        example : "5cuedgq7e6t334t34" 
-        description: |
-          App ID
-      address :
-        type : string
-        format: name
-        example: "0xe8rghwe8rghwe9r87ynw987eyncwre"
-        description: |
-          User Address
-      currency :
-        type : string
-        format: name
-        example: "0xe8rghwe8rghwe9r87ynw987eyncwre"
-        description: |
-          User Address
   UserWithdrawRequest : 
     type: object
     required:
@@ -661,63 +532,6 @@ definitions:
         example: "Test Test"
         description: |
           Note text
-  UserFinalizeWithdrawRequest :
-    type: object
-    required:
-      - app
-      - user
-      - withdraw_id
-      - currency
-    properties:
-      app :
-        type : string
-        format : name
-        example : "5cuedgq7e6t334t34" 
-        description: |
-          App ID
-      user :
-        type : string
-        format: name
-        example : "5cuedgq7e6t334t34" 
-        description: |
-          User ID
-      withdraw_id :
-        type : string
-        format: name
-        example: "65f76st8vdsb3181"
-        description: |
-            Withdraw Id
-      currency :
-        type : string
-        format: name
-        example: "0xe8rghwe8rghwe9r87ynw987eyncwre"
-        description: |
-          User Address
-  AppFinalizeWithdrawRequest : 
-    type: object
-    required:
-      - app
-      - withdraw_id
-      - currency
-    properties:
-      app :
-        type : string
-        format : name
-        example : "5cuedgq7e6t334t34" 
-        description: |
-          App ID
-      withdraw_id :
-        type : string
-        format: name
-        example: "53746tcuhn324"
-        description: |
-          Withdraw Id
-      currency :
-        type : string
-        format: name
-        example: "0xe8rghwe8rghwe9r87ynw987eyncwre"
-        description: |
-          User Address
   GetAllUsersAppWithdraws : 
     type: object
     required:

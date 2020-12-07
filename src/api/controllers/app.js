@@ -18,17 +18,6 @@ import { getNormalizedTicker } from '../../logic/third-parties/bitgo/helpers';
  * @todo Add description of AppsController
  */
 
-async function requestAppWithdraw(req, res) {
-    try {
-        SecuritySingleton.verify({ type: 'admin', req, permissions: ["super_admin"] });
-        let params = req.body;
-        let app = new App(params);
-        let data = await app.requestWithdraw();
-        MiddlewareSingleton.respond(res, req, data);
-    } catch (err) {
-        MiddlewareSingleton.respondError(res, err);
-    }
-}
 
 async function setMaxWithdraw(req, res) {
     try {
@@ -100,18 +89,6 @@ async function setAffiliateMinWithdraw(req, res) {
     }
 }
 
-async function finalizeAppWithdraw(req, res) {
-    try {
-        SecuritySingleton.verify({ type: 'admin', req, permissions: ["super_admin"] });
-        let params = req.body;
-        let app = new App(params);
-        let data = await app.finalizeWithdraw();
-        MiddlewareSingleton.respond(res, req, data);
-    } catch (err) {
-        MiddlewareSingleton.respondError(res, err);
-    }
-}
-
 async function getUserWithdraws(req, res) {
     try {
         SecuritySingleton.verify({ type: 'admin', req, permissions: ["super_admin", "withdraw"] });
@@ -139,8 +116,6 @@ async function addCurrencyWallet(req, res) {
 }
 
 export {
-    requestAppWithdraw,
-    finalizeAppWithdraw,
     getUserWithdraws,
     setMaxWithdraw,
     setMinWithdraw,
