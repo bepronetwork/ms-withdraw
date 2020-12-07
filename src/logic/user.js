@@ -571,23 +571,28 @@ const progressActions = {
         try {
             let transaction = null;
             let tx = null;
+            let amount = null;
             if (!params.isAutoWithdraw) {
                 switch (params.ticker.toUpperCase()) {
                     case 'BTC':
                         console.log(1)
+                        amount = params.amount * (Math.pow(10, 8))
+                        console.log("amountBTC:: ", amount)
                         transaction = await TrustologySingleton.method('BTC').sendTransaction(
                             params.userWallet.subWalletId,
                             params.withdrawAddress,
-                            parseFloat(params.amount) * (Math.pow(10, 8))
+                            amount
                         );
                         break;
 
                     default:
                         console.log(2)
+                        amount = params.amount * (Math.pow(10, 18))
+                        console.log("amountETH:: ", amount)
                         transaction = await TrustologySingleton.method('ETH').sendETHtransaction(
                             params.userAddress.address,
                             params.withdrawAddress,
-                            parseFloat(params.amount) * (Math.pow(10, 18)),
+                            amount,
                             params.ticker.toUpperCase()
                         );
                         break;
