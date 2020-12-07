@@ -24,6 +24,11 @@ export class Prototype {
           };
     }
 
+    replacePublicKeyInDefaultSchedule (walletId, publicKey) {
+        console.log(walletId);
+        return this.trustVault.replacePublicKeyInDefaultSchedule(walletId, publicKey);
+    }
+
     getAddress(subWalletId) {
         return new Promise((resolve, reject)=>{
             const data = JSON.stringify({

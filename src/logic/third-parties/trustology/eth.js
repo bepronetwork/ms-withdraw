@@ -1,8 +1,8 @@
 import { Prototype } from "./prototype";
-import { TRUSTOLOGY_PRIVATE_KEY } from "../../../config";
+import { TRUSTOLOGY_PRIVATE_KEY_ETH } from "../../../config";
 const { ec: EC } = require("elliptic");
 const axios = require('axios');
-const keyPair = new EC("p256").keyFromPrivate(TRUSTOLOGY_PRIVATE_KEY);
+const keyPair = new EC("p256").keyFromPrivate(TRUSTOLOGY_PRIVATE_KEY_ETH);
 
 export class ETH extends Prototype {
     constructor() {
@@ -10,12 +10,22 @@ export class ETH extends Prototype {
     }
 
     async sendETHtransaction(fromAddress, toAddress, amount, asset) {
-        return await this.getSettings().sendEthereum(fromAddress, toAddress, amount, asset)
+        return await this.getSettings().sendEthereum(fromAddress, toAddress, amount, asset);
     }
     createSubWallet(walletId, userId) {
         return new Promise((resolve, reject) => {
             const data = JSON.stringify({
-                query: 'mutation($type: SubWalletType!, $name: String!, $walletId: String!, ) {\n    createSubWallet(\n        createSubWalletInput: {\n            type: $type,\n            name: $name,\n            walletId: $walletId,\n        }\n    ) {\n        subWalletId\n    }\n}',
+                query: `mutation($type: SubWalletType!, $name: String!, $walletId: String!, ) {
+                    createSubWallet(
+                        createSubWalletInput: {
+                            type: $type,
+                            name: $name,
+                            walletId: $walletId,
+                        }
+                    ) {
+                        subWalletId
+                    }
+                }`,
                 variables: { "type": "ETH", "name": userId, "walletId": walletId }
             });
 

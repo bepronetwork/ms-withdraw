@@ -7,6 +7,7 @@
         "node": "10.13.0"
     },
     "scripts": {
+        "setAutoWallet": "babel-node commands.js",
         "start": "babel-node app --nopresets es2015,stage-2",
         "pm2": "pm2-runtime start ./app.js --interpreter ./node_modules/babel-cli/bin/babel-node.js",
         "build": "babel src -d build",

@@ -1,8 +1,8 @@
 import { Prototype } from "./prototype";
 const { ec: EC } = require("elliptic");
-import { TRUSTOLOGY_PRIVATE_KEY } from "../../../config";
+import { TRUSTOLOGY_PRIVATE_KEY_BTC } from "../../../config";
 const axios = require('axios');
-const keyPair = new EC("p256").keyFromPrivate(TRUSTOLOGY_PRIVATE_KEY);
+const keyPair = new EC("p256").keyFromPrivate(TRUSTOLOGY_PRIVATE_KEY_BTC);
 export class BTC extends Prototype {
     constructor() {
         super();
