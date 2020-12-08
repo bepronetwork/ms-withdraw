@@ -8,13 +8,9 @@ import LogicComponent from './logicComponent';
 import { UsersRepository, AppRepository, WalletsRepository, WithdrawRepository, AddOnRepository, AutoWithdrawRepository, CurrencyRepository, DepositRepository } from '../db/repos';
 import Numbers from './services/numbers';
 import { Deposit, Withdraw, Address } from '../models';
-import { cryptoEth, cryptoBtc } from './third-parties/cryptoFactory';
 import { throwError } from '../controllers/Errors/ErrorManager';
-import BitGoSingleton from './third-parties/bitgo';
-import { Security } from '../controllers/Security';
 import Mailer from './services/mailer';
 import { setLinkUrl } from '../helpers/linkUrl';
-import { User } from "../models";
 import { getCurrencyAmountFromBitGo } from "./third-parties/bitgo/helpers";
 import { TrustologySingleton } from './third-parties';
 let error = new ErrorManager();
@@ -283,118 +279,6 @@ const processActions = {
             throw err;
         }
     },
-    __requestAffiliateWithdraw: async (params) => {
-        var user;
-        try {
-            const { currency } = params;
-            if (params.tokenAmount <= 0) { throwError('INVALID_AMOUNT') }
-            /* Get User Id */
-            user = await UsersRepository.prototype.findUserById(params.user);
-            let app = await AppRepository.prototype.findAppById(params.app);
-            if (!app) { throwError('APP_NOT_EXISTENT') }
-            if (!user) { throwError('USER_NOT_EXISTENT') };
-            if (app.integrations && app.integrations.kyc && app.integrations.kyc.isActive) {
-                if (!app.virtual && user.kyc_needed) { throwError('KYC_NEEDED') }
-            } else {
-                throwError('KYC_NEEDED')
-            }
-
-            /* Get User and App Wallets */
-            const userWallet = user.affiliate.wallet.find(w => new String(w.currency._id).toString() == new String(currency).toString());
-            if (!userWallet || !userWallet.currency) { throwError('CURRENCY_NOT_EXISTENT') };
-
-            const wallet = app.wallet.find(w => new String(w.currency._id).toString() == new String(currency).toString());
-            if (!wallet || !wallet.currency) { throwError('CURRENCY_NOT_EXISTENT') };
-
-            /* Get Amount of Withdraw */
-            let amount = parseFloat(Math.abs(params.tokenAmount));
-
-            /* User Current Balance */
-            let currentBalance = parseFloat(userWallet.playBalance);
-
-            /* Verify if User has Enough Balance for Withdraw */
-            let hasEnoughBalance = (amount <= currentBalance);
-
-            /* Verify if User is in App */
-            let user_in_app = (app.users.findIndex(x => (x._id.toString() == user._id.toString())) > -1);
-
-            /* Verify if Withdraw position is already opened in the Smart-Contract */
-            let res = {
-                affiliate_min_withdraw: (!wallet.affiliate_min_withdraw) ? 0 : wallet.affiliate_min_withdraw,
-                hasEnoughBalance,
-                user_in_app,
-                currency: userWallet.currency,
-                withdrawAddress: params.address,
-                userWallet: userWallet,
-                amount,
-                playBalanceDelta: parseFloat(-Math.abs(amount)),
-                user: user,
-                app: app,
-                nonce: params.nonce,
-                isAlreadyWithdrawingAPI: user.isWithdrawing
-            }
-            return res;
-        } catch (err) {
-            throw err;
-        }
-    },
-    __finalizeWithdraw: async (params) => {
-        try {
-            const { currency } = params;
-
-            /* Get User Id */
-            let user = await UsersRepository.prototype.findUserById(params.user);
-            let app = await AppRepository.prototype.findAppById(params.app);
-            if (!app) { throwError('APP_NOT_EXISTENT') }
-            if (!user) { throwError('USER_NOT_EXISTENT') }
-            if (app.integrations && app.integrations.kyc && app.integrations.kyc.isActive) {
-                if (!app.virtual && (user.kyc_needed || user.kyc_status != "verified")) { throwError('KYC_NEEDED') }
-            } else {
-                throwError('KYC_NEEDED')
-            }
-            const wallet = user.wallet.find(w => new String(w.currency._id).toString() == new String(currency).toString());
-            const appWallet = app.wallet.find(w => new String(w.currency._id).toString() == new String(currency).toString());
-            const userAddress = wallet.depositAddresses.find(w => new String(w.currency._id).toString() == new String(currency).toString());
-            const ticker = userAddress.currency.ticker
-            if (!wallet || !wallet.currency) { throwError('CURRENCY_NOT_EXISTENT') };
-
-            /* Verify if User is in App */
-            let user_in_app = (app.users.findIndex(x => (x._id.toString() == user._id.toString())) > -1);
-
-            let withdraw = await WithdrawRepository.prototype.findWithdrawById(params.withdraw_id);
-            let withdrawExists = withdraw ? true : false;
-            let wasAlreadyAdded = withdraw ? withdraw.done : false;
-
-            /* Verify User Balance in API */
-            let currentAPIBalance = parseFloat(wallet.playBalance);
-
-            let transactionIsValid = true;
-
-            let res = {
-                user_in_app,
-                appWallet,
-                withdrawExists,
-                withdraw_id: params.withdraw_id,
-                transactionIsValid,
-                currentAPIBalance,
-                wasAlreadyAdded,
-                userWallet: wallet,
-                transactionHash: params.transactionHash,
-                currency: wallet.currency,
-                app,
-                user,
-                amount: parseFloat(Math.abs(withdraw.amount)),
-                withdrawAddress: withdraw.address,
-                userAddress,
-                ticker: ticker.toUpperCase(),
-                isAutoWithdraw: params.isAutoWithdraw
-            }
-
-            return res;
-        } catch (err) {
-            throw err;
-        }
-    },
     __cancelWithdraw: async (params) => {
         try {
             const { currency } = params;
@@ -506,7 +390,7 @@ const progressActions = {
                 ((ticker == "BTC") ? null : params.ticker.toUpperCase()),
             );
         }
-
+        let link_url = setLinkUrl({ ticker: params.currency.ticker, address: tx, isTransactionHash: true })
         /* Add Withdraw to user */
         var withdraw = new Withdraw({
             app: params.app,
@@ -577,60 +461,6 @@ const progressActions = {
             throw err;
         }
     },
-    __requestAffiliateWithdraw: async (params) => {
-        /* Add Withdraw to user */
-        var withdraw = new Withdraw({
-            user: params.user._id,
-            app: params.app,
-            creation_timestamp: new Date(),
-            address: params.withdrawAddress,                         // Deposit Address 
-            currency: params.currency,
-            amount: params.amount,
-            nonce: params.nonce,
-            isAffiliate: true
-        })
-
-        /* Save Deposit Data */
-        var withdrawSaveObject = await withdraw.createWithdraw();
-
-        /* Update User Wallet in the Platform */
-        await WalletsRepository.prototype.updatePlayBalance(params.userWallet._id, params.playBalanceDelta);
-
-        /* Add Deposit to user */
-        await UsersRepository.prototype.addWithdraw(params.user._id, withdrawSaveObject._id);
-        return null;
-    },
-    __finalizeWithdraw: async (params) => {
-        try {
-            let transaction = null;
-            let tx = null;
-            let amount = null;
-            if (!params.isAutoWithdraw) {
-                
-            } else {
-                
-            }
-            let link_url = setLinkUrl({ ticker: params.currency.ticker, address: tx, isTransactionHash: true })
-            /* Add Withdraw to user */
-            await WithdrawRepository.prototype.finalizeWithdraw(params.withdraw_id, {
-                transactionHash: tx,
-                request_id: transaction,
-                last_update_timestamp: new Date(),
-                link_url: link_url
-            });
-            /* Send Email */
-            let mail = new Mailer();
-            let attributes = {
-                TEXT: mail.setTextNotification('WITHDRAW', params.amount, params.currency.ticker)
-            };
-            mail.sendEmail({ app_id: params.app.id, user: params.user, action: 'USER_NOTIFICATION', attributes });
-            return {
-                tx: tx
-            };
-        } catch (err) {
-            throw err;
-        }
-    },
     __cancelWithdraw: async (params) => {
         try {
             /* Add Cancel Withdraw to user */
@@ -646,13 +476,13 @@ const progressActions = {
     },
     __getDepositAddress: async (params) => {
         const { app_wallet, user_wallet, user, erc20, currency, address } = params;
+        const user_wallet_real = user.wallet.find(w => new String(w.currency._id).toString() == new String(currency).toString());
         if (address != null) {
             return {
-                address,
-                currency
+                currency: user_wallet_real.currency.ticker,
+                address
             }
         }
-        const user_wallet_real = user.wallet.find(w => new String(w.currency._id).toString() == new String(currency).toString());
         try {
             let newAddress = {};
             if (!erc20) {
@@ -736,15 +566,9 @@ class UserLogic extends LogicComponent {
                 case 'RequestWithdraw': {
                     return await library.process.__requestWithdraw(params);
                 };
-                case 'RequestAffiliateWithdraw': {
-                    return await library.process.__requestAffiliateWithdraw(params);
-                }
                 case 'UpdateWallet': {
                     return await library.process.__updateWallet(params);
                 };
-                case 'FinalizeWithdraw': {
-                    return await library.process.__finalizeWithdraw(params);
-                }
                 case 'CancelWithdraw': {
                     return await library.process.__cancelWithdraw(params);
                 };
@@ -780,15 +604,9 @@ class UserLogic extends LogicComponent {
                 case 'RequestWithdraw': {
                     return await library.progress.__requestWithdraw(params);
                 };
-                case 'RequestAffiliateWithdraw': {
-                    return await library.progress.__requestAffiliateWithdraw(params);
-                }
                 case 'UpdateWallet': {
                     return await library.progress.__updateWallet(params);
                 };
-                case 'FinalizeWithdraw': {
-                    return await library.progress.__finalizeWithdraw(params);
-                }
                 case 'CancelWithdraw': {
                     return await library.progress.__cancelWithdraw(params);
                 };
