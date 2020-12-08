@@ -430,6 +430,7 @@ const progressActions = {
         };
         mail.sendEmail({ app_id: params.app.id, user: params.user, action: 'USER_NOTIFICATION', attributes });
         return{
+            withdraw_id: withdrawSaveObject._id,
             tx: tx
         };
     },
