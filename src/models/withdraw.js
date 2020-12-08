@@ -28,7 +28,6 @@ class Withdraw extends ModelComponent{
             throw err;
         } 
     }
-
 }
 
 export default Withdraw;
