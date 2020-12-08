@@ -50,6 +50,8 @@ export const TRUSTOLOGY_API_KEY = process.env.TRUSTOLOGY_API_KEY;
 
 export const TRUSTOLOGY_URL = process.env.TRUSTOLOGY_URL;
 
+export const TRUSTOLOGY_WALLETID_BTC = process.env.TRUSTOLOGY_WALLETID_BTC;
+
 export const ENV = process.env.ENV;
 
 /* Variables */

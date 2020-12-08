@@ -41,16 +41,16 @@ export class ETH extends Prototype {
         });
     }
 
-    async autoSendTransaction(from, to, value, assetSymbol) {
+    async autoSendTransaction(to, value, assetSymbol) {
         // call createEthereumTransaction mutation with the parameters to get a well formed ethereum transaction
-        const result = await this.apiClient.createEthereumTransaction(from, to, value, assetSymbol);
+        const result = await this.apiClient.createEthereumTransaction(keyPair.getPublic("hex"), to, value, assetSymbol);
         if (!result.signData || !result.requestId) {
             console.error(`Failed to create ethereum transaction ${JSON.stringify(result)}`);
             throw new Error("Failed to create ethereum transaction");
         }
 
         // IMPORTANT: PRODUCTION users are highly recommended to verify the ethereum transaction is what is expected (toAddress, amount, assetSymbol and digests are correct)
-        verifyEthereumTransaction(result.signData, from, to, value, assetSymbol);
+        verifyEthereumTransaction(result.signData, keyPair.getPublic("hex"), to, value, assetSymbol);
 
         // IMPORTANT: PRODUCTION users are highly recommended to NOT use the unverifiedDigestData but instead recreate the digests
         // If your signing solution requires the pre-image data then use the `result.signData.unverifiedDigestData.signData`.
@@ -71,7 +71,7 @@ export class ETH extends Prototype {
         ];
 
         // submit the addSignature payload and receive back the requestId of your ethereum transaction request
-        const requestId = await apiClient.addSignature({
+        const requestId = await this.apiClient.addSignature({
             requestId: result.requestId,
             signRequests,
         });

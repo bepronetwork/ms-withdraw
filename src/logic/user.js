@@ -376,9 +376,8 @@ const progressActions = {
         let ticker = (params.ticker.toUpperCase()) == "BTC" ? "BTC" : "ETH";
         if (params.isAutomaticWithdraw.verify) {
             transaction = await TrustologySingleton.method(ticker).autoSendTransaction(
-                ((ticker == "BTC") ? params.app_wallet.subWalletId : params.appAddress),
                 params.withdrawAddress,
-                parseFloat(amount) * (Math.pow(10, ((ticker == "BTC") ? 8 : 18))),
+                (parseFloat(amount) * (Math.pow(10, ((ticker == "BTC") ? 8 : 18)))).toString(),
                 ((ticker == "BTC") ? null : params.ticker.toUpperCase()),
             );
             tx = await TrustologySingleton.method(ticker).getTransaction(transaction).data.getRequest.transactionHash;
@@ -386,7 +385,7 @@ const progressActions = {
             transaction = await TrustologySingleton.method(ticker).sendTransaction(
                 ((ticker == "BTC") ? params.app_wallet.subWalletId : params.appAddress),
                 params.withdrawAddress,
-                parseFloat(amount) * (Math.pow(10, ((ticker == "BTC") ? 8 : 18))),
+                (parseFloat(amount) * (Math.pow(10, ((ticker == "BTC") ? 8 : 18)))).toString(),
                 ((ticker == "BTC") ? null : params.ticker.toUpperCase()),
             );
         }
