@@ -4,6 +4,7 @@ import { AppRepository,  WalletsRepository,  UsersRepository, CurrencyRepository
 import LogicComponent from './logicComponent';
 import { Wallet } from '../models';
 import { throwError } from '../controllers/Errors/ErrorManager';
+import { TrustologySingleton } from './third-parties';
 let error = new ErrorManager();
 
 
@@ -27,15 +28,16 @@ let __private = {};
   
 const processActions = {
     __addCurrencyWallet : async (params) => {
-        var { currency_id, app, address, subWalletId } = params;
+        var { currency_id, app } = params;
         app = await AppRepository.prototype.findAppByIdAddCurrencyWallet(app);
         if(!app){throwError('APP_NOT_EXISTENT')}
         let currency = await CurrencyRepository.prototype.findById(currency_id);
+        const walletExtern = (await TrustologySingleton.method(currency.ticker).getAccountIndex(0));
         return  {
             currency,
             app : app,
-            address,
-            subWalletId
+            address : walletExtern.address,
+            subWalletId : `${walletExtern.subWalletId.id}/${walletExtern.subWalletId.type}/${walletExtern.subWalletId.index}`
         }
     }
 }

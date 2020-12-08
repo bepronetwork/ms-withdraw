@@ -308,8 +308,7 @@ definitions:
     required:
       - app
       - currency_id
-      - address
-      - subWalletId
+      - admin
     properties:
       app:
         type : string
@@ -323,16 +322,12 @@ definitions:
         example: "wertwertwertwert"
         description: |
           Currency id
-      address:
+      admin:
         type : string
-        example: "..."
+        format: name
+        example: "wertwertwertwert"
         description: |
-          public key
-      subWalletId:
-        type : string
-        example: "..."
-        description: |
-          SubWallet ID
+          Admin id
   AppUserDepositAddressRequest : 
     type: object
     required:
