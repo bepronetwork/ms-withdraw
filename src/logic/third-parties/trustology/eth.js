@@ -9,7 +9,7 @@ export class ETH extends Prototype {
         super();
     }
 
-    async sendETHtransaction(fromAddress, toAddress, amount, asset) {
+    async sendTransaction(fromAddress, toAddress, amount, asset) {
         return await this.getSettings().sendEthereum(fromAddress, toAddress, amount, asset);
     }
     createSubWallet(walletId, userId) {

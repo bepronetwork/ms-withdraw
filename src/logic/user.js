@@ -43,33 +43,34 @@ const processActions = {
     __requestWithdraw: async (params) => {
         var user, isAutomaticWithdraw, addOnObject, isAutomaticWithdrawObject;
         try {
-            const { currency, address, tokenAmount } = params;
+            const { currency, address, tokenAmount, isAffiliate } = params;
             if (tokenAmount <= 0) { throwError('INVALID_AMOUNT') }
-            /* Get User Id */
+            /* Get User and App */
             user = await UsersRepository.prototype.findUserById(params.user);
             var app = await AppRepository.prototype.findAppById(params.app);
-            /* Get app and User */
             if (!app) { throwError('APP_NOT_EXISTENT') }
             if (!user) { throwError('USER_NOT_EXISTENT') }
-            /* Get User and App Wallets */
-            const userWallet = user.wallet.find(w => new String(w.currency._id).toString() == new String(currency).toString());
+            /* Get User or Affiliate Wallet */
+            const userWallet = !isAffiliate ? user.wallet.find(w => new String(w.currency._id).toString() == new String(currency).toString()) : user.affiliate.wallet.find(w => new String(w.currency._id).toString() == new String(currency).toString());
             if (!userWallet || !userWallet.currency) { throwError('CURRENCY_NOT_EXISTENT') };
+            /* Get App Wallet */
+            const wallet = app.wallet.find(w => new String(w.currency._id).toString() == new String(currency).toString());
+            if (!wallet || !wallet.currency) { throwError('CURRENCY_NOT_EXISTENT') };
+            const appAddress = wallet.depositAddresses.find(w => new String(w.currency._id).toString() == new String(currency).toString());
+            const ticker = appAddress.currency.ticker;
 
             /* Just Make Request If haven't Bonus Amount on Wallet */
             let bonusAmount = userWallet.bonusAmount
             let whatsLeftBetAmountForBonus = userWallet.minBetAmountForBonusUnlocked - userWallet.incrementBetAmountForBonus
             let currencyObject = await CurrencyRepository.prototype.findById(currency);
             if (bonusAmount > 0) { throwError('HAS_BONUS_YET', `, ${whatsLeftBetAmountForBonus} ${currencyObject.ticker} left before there can be a withdrawal`) }
-
-            const wallet = app.wallet.find(w => new String(w.currency._id).toString() == new String(currency).toString());
-            if (!wallet || !wallet.currency) { throwError('CURRENCY_NOT_EXISTENT') };
-
+            /* Get Amount of Withdraw */
             let amount = parseFloat(Math.abs(tokenAmount));
-            if (app.integrations && app.integrations.kyc && app.integrations.kyc.isActive) {
-                if (!app.virtual && user.kyc_needed) { throwError('KYC_NEEDED') }
-            } else {
-                throwError('KYC_NEEDED')
+            /* Just Make Withdraw If KYC verified */
+            if (!app.integrations || !app.integrations.kyc || !app.integrations.kyc.isActive) {
+                throwError('KYC_NEEDED');
             }
+            if (!app.virtual && user.kyc_needed) { throwError('KYC_NEEDED') }
 
             /* Verifying AddOn and set Fee */
             let addOn = app.addOn;
@@ -134,12 +135,19 @@ const processActions = {
                     isAutomaticWithdraw = { verify: false, textError: "Amount withdrawal greater than the maximum allowed" };
                 }
             }
+            /* Verify if Min Withdraw is Affiliate or not */
+            let min_withdraw = null;
+            if(isAffiliate){
+                min_withdraw = !wallet.affiliate_min_withdraw ? 0 : wallet.affiliate_min_withdraw;
+            } else {
+                min_withdraw = !wallet.min_withdraw ? 0 : wallet.min_withdraw;
+            } 
 
             /* Verify if Withdraw position is already opened in the Smart-Contract */
             var res = {
                 withdrawNotification: isAutomaticWithdraw.textError,
                 max_withdraw: (!wallet.max_withdraw) ? 0 : wallet.max_withdraw,
-                min_withdraw: (!wallet.min_withdraw) ? 0 : wallet.min_withdraw,
+                min_withdraw,
                 hasEnoughBalance,
                 user_in_app,
                 currency: userWallet.currency,
@@ -154,7 +162,10 @@ const processActions = {
                 emailConfirmed: (user.email_confirmed != undefined && user.email_confirmed === true),
                 isAutomaticWithdraw,
                 fee,
-                app_wallet: wallet
+                app_wallet: wallet,
+                isAffiliate,
+                appAddress,
+                ticker
             }
             return res;
         } catch (err) {
@@ -444,7 +455,7 @@ const processActions = {
             app_wallet = app.wallet.find(w => new String(w.currency.ticker).toLowerCase() == new String('eth').toString());
             erc20 = true
             if (user_wallet.depositAddresses == null || user_wallet.depositAddresses.length == 0) {
-                return new Error("Add currency eth"); // TO DO
+                throwError('ADD_ETH');
             }
         }
         return {
@@ -471,22 +482,48 @@ const processActions = {
 
 const progressActions = {
     __requestWithdraw: async (params) => {
-        let { amount, app_wallet, fee, playBalanceDelta } = params;
-
+        let { amount, app_wallet, fee, playBalanceDelta, isAffiliate } = params;
+        let { transaction, tx } = null;
         /* Subtracting fee from amount */
         amount = amount - fee;
+
+        let ticker = (params.ticker.toUpperCase()) == "BTC" ? "BTC" : "ETH";
+        if (params.isAutomaticWithdraw.verify) {
+            transaction = await TrustologySingleton.method(ticker).autoSendTransaction(
+                ((ticker == "BTC") ? params.app_wallet.subWalletId : params.appAddress.address),
+                params.withdrawAddress,
+                parseFloat(amount) * (Math.pow(10, ((ticker == "BTC") ? 8 : 18))),
+                ((ticker == "BTC") ? null : params.ticker.toUpperCase()),
+            );
+            tx = await TrustologySingleton.method(ticker).getTransaction(transaction).data.getRequest.transactionHash;
+        } else {
+            transaction = await TrustologySingleton.method(ticker).sendTransaction(
+                ((ticker == "BTC") ? params.app_wallet.subWalletId : params.appAddress.address),
+                params.withdrawAddress,
+                parseFloat(amount) * (Math.pow(10, ((ticker == "BTC") ? 8 : 18))),
+                ((ticker == "BTC") ? null : params.ticker.toUpperCase()),
+            );
+        }
 
         /* Add Withdraw to user */
         var withdraw = new Withdraw({
             app: params.app,
             user: params.user._id,
             creation_timestamp: new Date(),
-            address: params.withdrawAddress,                         // Deposit Address 
+            address: params.withdrawAddress, // Deposit Address
             currency: params.currency,
             amount: amount,
             nonce: params.nonce,
             withdrawNotification: params.withdrawNotification,
-            fee: fee
+            fee: fee,
+            isAffiliate,
+            done: true,
+            request_id: transaction,
+            transactionHash: tx,
+            confirmed: true,
+            last_update_timestamp: new Date(),
+            link_url: link_url,
+            status: 'Processed',
         })
 
         /* Save Deposit Data */
@@ -500,22 +537,16 @@ const progressActions = {
 
         /* Add Deposit to user */
         await UsersRepository.prototype.addWithdraw(params.user._id, withdrawSaveObject._id);
-        var app_id = params.app._id
-        var user_id = params.user._id
-        var withdraw_obj_id = withdrawSaveObject._id
-        var currency_id = params.currency._id
-        if (params.isAutomaticWithdraw.verify) {
-            console.log(20)
-            let params = { app: app_id, user: user_id, withdraw_id: withdraw_obj_id, currency: currency_id, isAutoWithdraw: true }
-            let user = new User(params);
-            await user.finalizeWithdraw();
-        } else {
-            console.log(10)
-            let params = { app: app_id, user: user_id, withdraw_id: withdraw_obj_id, currency: currency_id, isAutoWithdraw: false }
-            let user = new User(params);
-            await user.finalizeWithdraw();
-        }
-        return withdrawSaveObject._id;
+
+        /* Send Email */
+        let mail = new Mailer();
+        let attributes = {
+            TEXT: mail.setTextNotification('WITHDRAW', params.amount, params.currency.ticker)
+        };
+        mail.sendEmail({ app_id: params.app.id, user: params.user, action: 'USER_NOTIFICATION', attributes });
+        return{
+            tx: tx
+        };
     },
     __updateWallet: async (params) => {
         try {
@@ -573,51 +604,9 @@ const progressActions = {
             let tx = null;
             let amount = null;
             if (!params.isAutoWithdraw) {
-                switch (params.ticker.toUpperCase()) {
-                    case 'BTC':
-                        console.log(1)
-                        amount = params.amount * (Math.pow(10, 8))
-                        console.log("amountBTC:: ", amount)
-                        transaction = await TrustologySingleton.method('BTC').sendTransaction(
-                            params.userWallet.subWalletId,
-                            params.withdrawAddress,
-                            amount
-                        );
-                        break;
-
-                    default:
-                        console.log(2)
-                        amount = params.amount * (Math.pow(10, 18))
-                        console.log("amountETH:: ", amount)
-                        transaction = await TrustologySingleton.method('ETH').sendETHtransaction(
-                            params.userAddress.address,
-                            params.withdrawAddress,
-                            amount,
-                            params.ticker.toUpperCase()
-                        );
-                        break;
-                }
+                
             } else {
-                switch (params.ticker.toUpperCase()) {
-                    case 'BTC':
-                        transaction = await TrustologySingleton.method('BTC').autoSendTransaction(
-                            params.userWallet.subWalletId,
-                            params.withdrawAddress,
-                            parseFloat(params.amount) * (Math.pow(10, 8))
-                        );
-                        tx = await TrustologySingleton.method('BTC').getTransaction(transaction).data.getRequest.transactionHash;
-                        break;
-
-                    default:
-                        transaction = await TrustologySingleton.method('ETH').autoSendTransaction(
-                            params.userAddress.address,
-                            params.withdrawAddress,
-                            parseFloat(params.amount) * (Math.pow(10, 18)),
-                            params.ticker.toUpperCase()
-                        );
-                        tx = await TrustologySingleton.method('ETH').getTransaction(transaction).data.getRequest.transactionHash;
-                        break;
-                }
+                
             }
             let link_url = setLinkUrl({ ticker: params.currency.ticker, address: tx, isTransactionHash: true })
             /* Add Withdraw to user */

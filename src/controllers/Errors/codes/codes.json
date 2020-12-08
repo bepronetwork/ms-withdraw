@@ -366,5 +366,9 @@
     "095" : {
         "key" : "DEPLOY_ERROR",
         "message"   : "The Platform was not able to be deployed, please contact support"
+    },
+    "096" : {
+        "key" : "ADD_ETH",
+        "message"   : "Add Currency ETH"
     }
 }

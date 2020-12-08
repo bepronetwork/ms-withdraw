@@ -105,7 +105,8 @@ ErrorHandler.prototype.KEYS =  {
     'DEPOSIT_MODE_IN_API'                   : "092",
     'INSUFFICIENT_AGE'                      : "093",
     'COUNTRY_RESTRICTED'                    : "094",
-    'DEPLOY_ERROR'                          : "095"
+    'DEPLOY_ERROR'                          : "095",
+    'ADD_ETH'                               : "096",
 };
 
 

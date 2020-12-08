@@ -308,8 +308,9 @@ definitions:
     type: object
     required:
       - app
-      - passphrase
       - currency_id
+      - address
+      - subWalletId
     properties:
       app:
         type : string
@@ -323,11 +324,16 @@ definitions:
         example: "wertwertwertwert"
         description: |
           Currency id
-      passphrase:
+      address:
         type : string
-        example: "pass!,*%%a,,"
+        example: "..."
         description: |
-          Passphrase to protect the wallet
+          public key
+      subWalletId:
+        type : string
+        example: "..."
+        description: |
+          SubWallet ID
   AppUserDepositAddressRequest : 
     type: object
     required:
