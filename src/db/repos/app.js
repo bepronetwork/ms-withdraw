@@ -20,7 +20,8 @@ import {
     populate_app_auth,
     populate_app_simple,
     populate_app_wallet,
-    populate_app_address
+    populate_app_address,
+    populate_app_add_currency_wallet
 } from './populates';
 import { throwError } from '../../controllers/Errors/ErrorManager';
 
