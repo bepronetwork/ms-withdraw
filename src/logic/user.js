@@ -56,8 +56,8 @@ const processActions = {
             /* Get App Wallet */
             const wallet = app.wallet.find(w => new String(w.currency._id).toString() == new String(currency).toString());
             if (!wallet || !wallet.currency) { throwError('CURRENCY_NOT_EXISTENT') };
-            const appAddress = wallet.depositAddresses.find(w => new String(w.currency._id).toString() == new String(currency).toString());
-            const ticker = appAddress.currency.ticker;
+            const appAddress = wallet.bank_address;
+            const ticker = wallet.currency.ticker;
 
             /* Just Make Request If haven't Bonus Amount on Wallet */
             let bonusAmount = userWallet.bonusAmount
