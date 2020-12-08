@@ -484,7 +484,8 @@ const processActions = {
 const progressActions = {
     __requestWithdraw: async (params) => {
         let { amount, app_wallet, fee, playBalanceDelta, isAffiliate } = params;
-        let { transaction, tx } = null;
+        let transaction = null;
+        let tx = null;
         /* Subtracting fee from amount */
         amount = amount - fee;
 
