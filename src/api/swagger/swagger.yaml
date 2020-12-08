@@ -226,7 +226,6 @@ definitions:
       - tokenAmount
       - nonce
       - currency
-      - isAffiliate
     properties:
       tokenAmount : 
         type : number

@@ -43,7 +43,8 @@ const processActions = {
     __requestWithdraw: async (params) => {
         var user, isAutomaticWithdraw, addOnObject, isAutomaticWithdrawObject;
         try {
-            const { currency, address, tokenAmount, isAffiliate } = params;
+            const { currency, address, tokenAmount } = params;
+            let isAffiliate = false
             if (tokenAmount <= 0) { throwError('INVALID_AMOUNT') }
             /* Get User and App */
             user = await UsersRepository.prototype.findUserById(params.user);
