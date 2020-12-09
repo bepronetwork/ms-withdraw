@@ -4,7 +4,7 @@
     "private": true,
     "main": "app.js",
     "engines": {
-        "node": "10.13.0"
+        "node": "8.13.0"
     },
     "scripts": {
         "setAutoWallet": "babel-node commands.js",
