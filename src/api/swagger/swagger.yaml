@@ -106,6 +106,36 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+  /user/transactions:
+    x-swagger-router-controller: user
+    post:
+      tags:
+      - user
+      summary: Get Transactions From User
+      operationId: getTransactions
+      description: Get Data From User Transactions 
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: user
+          description: Get Data From User Transactions
+          required: true
+          schema:
+            $ref: '#/definitions/GetTransactionsRequest'
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/GeneralResponse"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
   /users/cancelWithdraw:
     x-swagger-router-controller: user
     post:
@@ -264,6 +294,28 @@ definitions:
       isAffiliate:
             type : boolean
             example: true
+  GetTransactionsRequest : 
+    type: object
+    required:
+      - app
+      - user
+    properties:
+      app :
+        type : string
+        format : name
+        example : "5cuedgq7e6t334t34" 
+        description: |
+          App ID
+      size :
+        type : number
+      user :
+        type : string
+        format : name
+        example : "5cuedgq7e6t334t34" 
+        description: |
+          User Id
+      offset :
+        type : number
   UserCancelWithdrawRequest :
     type: object
     required:

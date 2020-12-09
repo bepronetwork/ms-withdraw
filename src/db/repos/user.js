@@ -10,6 +10,7 @@ import {
 } from './pipelines/user';
 import { populate_user, populate_user_simple, populate_user_wallet } from './populates';
 import { throwError } from '../../controllers/Errors/ErrorManager';
+import populate_wallet_all from './populates/wallet/all';
 /**
  * Accounts database interaction class.
  *
@@ -49,6 +50,32 @@ class UsersRepository extends MongoComponent{
             return new Promise( (resolve, reject) => {
                 UsersRepository.prototype.schema.model.findById(_id)
                 .populate(populate_type)
+                .exec( (err, user) => {
+                    if(err) { resolve(null)}
+                    resolve(user);
+                });
+            });
+        }catch(err){
+            throw (err)
+        }
+    }
+
+    async findUserByIdAndApp(_id, app){
+        try{
+            return new Promise( (resolve, reject) => {
+                UsersRepository.prototype.schema.model.findById({
+                    _id: _id,
+                    app_id: app
+                })
+                .populate([
+                    {
+                        path : 'wallet',
+                        model : 'Wallet',
+                        select : { '__v': 0},
+                        populate : populate_wallet_all
+                    }
+                ])
+                .lean()
                 .exec( (err, user) => {
                     if(err) { resolve(null)}
                     resolve(user);

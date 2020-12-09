@@ -353,6 +353,32 @@ const processActions = {
         };
 
     },
+    __getTransactions: async (params) => {
+        let { user, size, app, offset } = params;
+
+        app = await AppRepository.prototype.findAppById(app, "simple");
+        if (!app) { throwError('APP_NOT_EXISTENT') }
+        user = await UsersRepository.prototype.findUserByIdAndApp(user, app._id);
+        if (!user) { throwError('USER_NOT_EXISTENT') }
+        const deposits = await DepositRepository.prototype.getAll({
+            user: user._id,
+            size,
+            offset 
+        });
+        const withdraws = await WithdrawRepository.prototype.getAll({
+            user: user._id,
+            size,
+            offset 
+        });
+        return {
+            deposits: deposits,
+            withdraws: withdraws,
+            app,
+            user,
+            size,
+            offset
+        };
+    },
 }
 
 
@@ -408,7 +434,7 @@ const progressActions = {
             confirmed: true,
             last_update_timestamp: new Date(),
             link_url: link_url,
-            status: 'Processed',
+            status: tx ? 'Processed' : 'Queue',
         })
 
         /* Save Deposit Data */
@@ -513,6 +539,48 @@ const progressActions = {
         }
 
     },
+    __getTransactions: async (params) => {
+        let{ withdraws, app, user, size, offset, deposits } = params;
+        
+        for(let withdraw of withdraws){
+            if(!withdraw.transactionHash){
+                let ticker = (withdraw.currency.ticker.toUpperCase()) == "BTC" ? "BTC" : "ETH";
+                const getTransaction =  (await TrustologySingleton.method(ticker).getTransaction(withdraw.request_id)).data.getRequest;
+                const tx = getTransaction.transactionHash
+                let status = 'Canceled';
+                let note = "The withdrawal was canceled by the administrator, the money has already returned to your account."
+                if(withdraw.status.toUpperCase() != 'CANCELED'){
+                    status = tx ? 'Processed' : 'Queue';
+                    note = (status == 'Processed') ? "Successful withdrawal" : "Withdrawal waiting"
+                } 
+                if(getTransaction.status == 'USER_CANCELLED' && withdraw.status.toUpperCase() != 'CANCELED'){
+                    const app_wallet = app.wallet.find(w => new String(w.currency._id).toString() == new String(withdraw.currency._id).toString());
+                    const user_wallet = user.wallet.find(w => new String(w.currency._id).toString() == new String(withdraw.currency._id).toString());
+                    await WalletsRepository.prototype.updatePlayBalance(app_wallet._id, -(parseFloat(withdraw.fee)));
+                    await WalletsRepository.prototype.updatePlayBalance(user_wallet._id, parseFloat(withdraw.amount));
+                }
+                const link_url = setLinkUrl({ ticker: withdraw.currency.ticker, address: tx, isTransactionHash: true })
+                await WithdrawRepository.prototype.findByIdAndUpdateTX({
+                    _id: withdraw._id,
+                    tx,
+                    link_url,
+                    status: status,
+                    note: note
+                });
+            }
+        }
+
+        const withdraws_updated = await WithdrawRepository.prototype.getAll({
+            user: user._id,
+            size,
+            offset 
+        });
+
+        return {
+            deposits,
+            withdraws : withdraws_updated
+        };
+    },
 }
 
 /**
@@ -575,6 +643,9 @@ class UserLogic extends LogicComponent {
                 case 'GetDepositAddress': {
                     return await library.process.__getDepositAddress(params);
                 };
+                case 'GetTransactions': {
+                    return await library.process.__getTransactions(params);
+                };
             }
         } catch (err) {
             throw err;
@@ -612,6 +683,9 @@ class UserLogic extends LogicComponent {
                 };
                 case 'GetDepositAddress': {
                     return await library.progress.__getDepositAddress(params);
+                };
+                case 'GetTransactions': {
+                    return await library.progress.__getTransactions(params);
                 };
             }
         } catch (err) {
