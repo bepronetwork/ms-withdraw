@@ -98,6 +98,15 @@ class User extends ModelComponent{
         }
     }
 
+    async getTransactions() {
+        try{
+            let res = await this.process('GetTransactions');
+            return res;
+        }catch(err){
+            throw err;
+        }
+    }
+
 }
 
 export default User;

@@ -154,12 +154,35 @@ class WithdrawRepository extends MongoComponent{
         })
     }
 
-    getAll = async() => {
+    async getAll({user, size, offset}){
         return new Promise( (resolve,reject) => {
-            WithdrawRepository.prototype.schema.model.find().lean().populate(foreignKeys)
-            .exec( (err, docs) => {
+            WithdrawRepository.prototype.schema.model.find({user: user})
+            .populate(['currency'])
+            .skip(offset == undefined ? 0 : offset)
+            .limit((size > 10 || !size || size <= 0) ? 10 : size)
+            .lean()
+            .exec( (err, item) => {
                 if(err){reject(err)}
-                resolve(docs);
+                resolve(item);
+            })
+        })
+    }
+
+    findByIdAndUpdateTX({_id, tx, link_url, status}){
+        return new Promise( (resolve,reject) => {
+            WithdrawRepository.prototype.schema.model.findByIdAndUpdate(
+                {_id: _id},
+                { $set: { 
+                    transactionHash : tx, 
+                    link_url : link_url,
+                    status: status
+                }},
+                { new: true }
+            )
+            .lean()
+            .exec( (err, item) => {
+                if(err){reject(err)}
+                resolve(item);
             })
         })
     }

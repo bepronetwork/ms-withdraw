@@ -81,7 +81,19 @@ async function getDepositAddress(req, res) {
     }
 }
 
+async function getTransactions(req, res) {
+    try {
+        let params = req.body;
+        let user = new User(params);
+        let data = await user.getTransactions();
+        MiddlewareSingleton.respond(res, req, data);
+    } catch (err) {
+        MiddlewareSingleton.respondError(res, err, req);
+    }
+}
+
 export {
+    getTransactions,
     getDepositAddress,
     requestWithdraw,
     cancelWithdraw,
