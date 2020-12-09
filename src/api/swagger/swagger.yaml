@@ -49,7 +49,7 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-  /user/webhookDeposit:
+  /user/credit:
     x-swagger-router-controller: user
     post:
       tags:

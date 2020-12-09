@@ -12,7 +12,8 @@ import { throwError } from '../controllers/Errors/ErrorManager';
 import Mailer from './services/mailer';
 import { setLinkUrl } from '../helpers/linkUrl';
 import { getCurrencyAmountFromBitGo } from "./third-parties/bitgo/helpers";
-import { TrustologySingleton } from './third-parties';
+import { PusherSingleton, TrustologySingleton } from './third-parties';
+import { getVirtualAmountFromRealCurrency } from '../helpers/virtualWallet';
 let error = new ErrorManager();
 
 
@@ -171,34 +172,22 @@ const processActions = {
     },
     __updateWallet: async (params) => {
         try {
-            var { currency, id } = params;
+            // data: {amount,tx,subWalletIdString,transactionType,symbol}
+            var {data} = params;
 
+            let walletReal = await WalletsRepository.prototype.findWalletBySubWalletId(data.subWalletIdString);
+            let userTemp   = await UsersRepository.prototype.findByWallet(walletReal._id);
             /* Get User Info */
-            let user = await UsersRepository.prototype.findUserById(id);
+            let user = await UsersRepository.prototype.findUserById(userTemp._id);
             if (!user) { throwError('USER_NOT_EXISTENT') }
+            let currency = String(walletReal.currency).toString();
             const wallet = user.wallet.find(w => new String(w.currency._id).toString() == new String(currency).toString());
             if (!wallet || !wallet.currency) { throwError('CURRENCY_NOT_EXISTENT') };
 
             /* Get App Info */
             var app = await AppRepository.prototype.findAppById(user.app_id._id, "simple");
             if (!app) { throwError('APP_NOT_EXISTENT') }
-            let ticker = params.ticker;
-            var amount = null;
-            switch (ticker.toLowerCase()) {
-                case 'eth':
-                    if (params.token_symbol == null || params.token_symbol == undefined) {
-                        amount = getCurrencyAmountFromBitGo({
-                            amount: params.payload.value,
-                            ticker
-                        });
-                    } else {
-                        amount = parseFloat(params.payload.token_transfers[0].value)
-                    }
-                    break;
-                default:
-                    amount = params.payload.value
-                    break;
-            }
+            var amount = data.amount;
             const app_wallet = app.wallet.find(w => new String(w.currency._id).toLowerCase() == new String(currency).toLowerCase());
             currency = app_wallet.currency._id;
             if (!app_wallet || !app_wallet.currency) { throwError('CURRENCY_NOT_EXISTENT') };
@@ -207,19 +196,11 @@ const processActions = {
             if (addOn && addOn.txFee && addOn.txFee.isTxFee) {
                 fee = addOn.txFee.deposit_fee.find(c => new String(c.currency).toString() == new String(currency).toString()).amount;
             }
-            // /* Verify if the transactionHash was created */
-            // const { state, entries, value: amount, type, txid: transactionHash, wallet: bitgo_id, label } = wBT;
 
-            const from = params.payload.from;
-            const to = params.payload.to;
             var isPurchase = false, virtualWallet = null, appVirtualWallet = null;
-            const isValid = (params.payload.status === "0x1");
-
-            if (ETH_FEE_VARIABLE == from) { throwError('PAYMENT_FORWARDING_TRANSACTION') }
-            if (wallet.depositAddresses.find(c => new String(c.currency).toString() == new String(currency).toString()).address == from) { throwError('PAYMENT_FORWARDING_TRANSACTION') }
 
             /* Verify if this transactionHashs was already added */
-            let deposit = await DepositRepository.prototype.getDepositByTransactionHash(params.txHash);
+            let deposit = await DepositRepository.prototype.getDepositByTransactionHash(data.tx);
             let wasAlreadyAdded = deposit ? true : false;
 
             /* Verify if User is in App */
@@ -263,8 +244,7 @@ const processActions = {
                 user_id: user._id,
                 wallet: wallet,
                 creationDate: new Date(),
-                transactionHash: params.txHash,
-                from: from,
+                transactionHash: data.tx,
                 currencyTicker: wallet.currency.ticker,
                 amount,
                 isValid,
@@ -435,27 +415,75 @@ const progressActions = {
         };
     },
     __updateWallet: async (params) => {
+
         try {
+            let { virtualWallet, appVirtualWallet, isPurchase, wallet, amount, fee, app_wallet, depositBonusValue, hasBonus, minBetAmountForBonusUnlocked } = params;
+            var message;
+
+            /* Condition to set value of deposit amount and fee */
+            if(amount <= fee){
+                fee = amount;
+                amount = 0;
+            }else{
+                amount = amount - fee;
+            }
+            const options = {
+                purchaseAmount : isPurchase ? getVirtualAmountFromRealCurrency({
+                    currency : wallet.currency,
+                    currencyAmount : amount,
+                    virtualWallet : appVirtualWallet
+                }) : amount,
+                isPurchase : isPurchase,
+            }
+
             /* Create Deposit Object */
             let deposit = new Deposit({
-                user: params.user,
+                user: params.user_id,
                 transactionHash: params.transactionHash,
                 creation_timestamp: params.creationDate,
+                isPurchase : options.isPurchase,
                 last_update_timestamp: params.creationDate,
-                address: params.from, // Deposit Address
-                currency: params.currencyTicker,
-                amount: params.amount,
+                purchaseAmount : options.purchaseAmount,
+                currency: wallet.currency._id,
+                amount: amount,
+                fee: fee,
+                hasBonus: hasBonus,
+                bonusAmount: depositBonusValue
             })
 
             /* Save Deposit Data */
             let depositSaveObject = await deposit.createDeposit();
 
-            /* Update Balance of App */
-            await WalletsRepository.prototype.updatePlayBalance(params.wallet, Numbers.toFloat(params.amount));
-
+            if(isPurchase){
+                /* User Purchase - Virtual */
+                await WalletsRepository.prototype.updatePlayBalance(virtualWallet, options.purchaseAmount);
+                message = `Bought ${options.purchaseAmount} ${virtualWallet.currency.ticker} in your account with ${amount} ${wallet.currency.ticker}`
+            }else{
+                /* Add bonus amount */
+                await WalletsRepository.prototype.updatePlayBalanceBonus(wallet._id, depositBonusValue);
+                await WalletsRepository.prototype.updateMinBetAmountForBonusUnlocked(wallet._id, minBetAmountForBonusUnlocked);
+                /* User Deposit - Real */
+                await WalletsRepository.prototype.updatePlayBalance(app_wallet._id, fee);
+                await WalletsRepository.prototype.updatePlayBalance(wallet._id, amount);
+                message = `Deposited ${amount} ${wallet.currency.ticker} in your account`
+            }
             /* Add Deposit to user */
             await UsersRepository.prototype.addDeposit(params.user_id, depositSaveObject._id);
+            /* Push Webhook Notification */
+            PusherSingleton.trigger({
+                channel_name: params.user_id,
+                isPrivate: true,
+                message,
+                eventType: 'DEPOSIT'
+            });
 
+            /* Send Email */
+            let mail = new Mailer();
+            let attributes = {
+                TEXT: mail.setTextNotification('DEPOSIT', amount, params.wallet.currency.ticker)
+            };
+
+            mail.sendEmail({app_id : params.app.id, user : params.user, action : 'USER_NOTIFICATION', attributes});
             return params;
         } catch (err) {
             throw err;

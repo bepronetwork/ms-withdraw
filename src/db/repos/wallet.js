@@ -28,6 +28,31 @@ class WalletsRepository extends MongoComponent{
         return WalletsRepository.prototype.schema.model(Wallet)
     }
 
+    findWalletBySubWalletId(subWalletId) {
+        return new Promise( (resolve, reject) => {
+            WalletsRepository.prototype.schema.model.findOne(
+                {subWalletId}
+            )
+            .exec( (err, wallet) => {
+                if(err) { reject(err)}
+                resolve(wallet);
+            });
+        });
+    }
+
+    updatePlayBalanceBonus(id, amount){
+        return new Promise( (resolve, reject) => {
+            WalletsRepository.prototype.schema.model.findByIdAndUpdate(id,
+                { $inc : { bonusAmount : parseFloat(amount) } } ,{ new: true }
+            )
+            .lean()
+            .exec( (err, wallet) => {
+                if(err) { reject(err)}
+                resolve(wallet);
+            });
+        });
+    }
+
     updateCurrencyAmount(id, currency, amount){
         return new Promise( (resolve, reject) => {
             WalletsRepository.prototype.schema.model.findByIdAndUpdate(id,
