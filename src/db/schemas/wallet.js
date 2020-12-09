@@ -7,6 +7,7 @@ class WalletSchema{};
 WalletSchema.prototype.name = 'Wallet';
 
 WalletSchema.prototype.schema = {
+    subWalletId                 : { type: String },
     playBalance                 : { type: Number, required : true, default : 0},
     currency                    : { type : mongoose.Schema.Types.ObjectId, ref: 'Currency', required : true },
     max_deposit                 : { type: Number, default: 1},

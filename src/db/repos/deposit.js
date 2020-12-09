@@ -1,6 +1,5 @@
 import MongoComponent from './MongoComponent';
 import { DepositSchema } from '../schemas/deposit';
-import { populate_deposit } from './populates';
 import { pipeline_transactions_app } from './pipelines/transactions';
 
 /**
@@ -43,19 +42,21 @@ class DepositRepository extends MongoComponent{
         });
     }
 
-    getTransactionsByApp(app, filters=[]){
+    getTransactionsByApp(app, filters=[], size, offset){
         try{
-            let pipeline =  pipeline_transactions_app(app, filters);
+            let pipeline =  pipeline_transactions_app(app, filters, size, offset);
             return new Promise( (resolve, reject) => {
                 DepositRepository.prototype.schema.model
                 .aggregate(pipeline)
                 .exec( (err, deposits) => {
-                    if(err) { reject(err)}
+                    if(err) { 
+                        deposits=[]
+                        reject(err)}
                     resolve(deposits);
                 });
             });
         }catch(err){
-            throw err
+            throw err;
         }
     }
 
@@ -63,6 +64,19 @@ class DepositRepository extends MongoComponent{
         return new Promise( (resolve, reject) => {
             DepositRepository.prototype.schema.model
             .findOne({ transactionHash })
+            .lean()
+            .exec( (err, Deposit) => {
+                if(err) { reject(err)}
+                resolve(Deposit)            
+            });
+        });
+    }
+
+    deleteDepositByTransactionHash(transactionHash){
+        return new Promise( (resolve, reject) => {
+            DepositRepository.prototype.schema.model
+            .findOneAndDelete({ transactionHash })
+            .lean()
             .exec( (err, Deposit) => {
                 if(err) { reject(err)}
                 resolve(Deposit)            
@@ -85,6 +99,7 @@ class DepositRepository extends MongoComponent{
                         last_update_timestamp   : new_deposit_params.last_update_timestamp
                 }},{ new: true }
             )
+            .lean()
             .exec( (err, Deposit) => {
                 if(err) { reject(err)}
                 resolve(Deposit);
@@ -92,14 +107,21 @@ class DepositRepository extends MongoComponent{
         });
     }
 
-    getAll = async() => {
-        return new Promise( (resolve,reject) => {
-            DepositRepository.prototype.schema.model.find().lean().populate(foreignKeys)
-            .exec( (err, docs) => {
-                if(err){reject(err)}
-                resolve(docs);
-            })
-        })
+    async getAll({user, size, offset}) {
+        try {
+            return new Promise((resolve, reject) => {
+                DepositRepository.prototype.schema.model.find({user: user})
+                    .skip(offset == undefined ? 0 : offset)
+                    .limit((size > 10 || !size || size <= 0) ? 10 : size)
+                    .lean()
+                    .exec((err, user) => {
+                        if (err) { reject(err) }
+                        resolve(user);
+                    });
+            });
+        } catch (err) {
+            throw (err)
+        }
     }
 }
 

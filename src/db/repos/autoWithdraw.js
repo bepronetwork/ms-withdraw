@@ -37,6 +37,74 @@ class AutoWithdrawRepository extends MongoComponent{
             });
         });
     }
+
+    pushNewCurrency(_id, currency) {
+        return new Promise( (resolve, reject) => {
+            AutoWithdrawRepository.prototype.schema.model.update(
+                {_id},
+                { $push: {
+                    "maxWithdrawAmountCumulative"     : { currency, amount: 0 },
+                    "maxWithdrawAmountPerTransaction" : { currency, amount: 0 }
+                }} 
+                )
+            .exec( async (err, item) => {
+                if(err) { reject(err)}
+                resolve(item);
+            });
+        });
+    }
+
+    findByIdAndUpdate(_id, currency, newStructure){ 
+        return new Promise( (resolve, reject) => {
+            AutoWithdrawRepository.prototype.schema.model.findByIdAndUpdate(
+                _id,
+                { $set: {
+                    "isAutoWithdraw"  : newStructure.isAutoWithdraw,
+                    "verifiedKYC" : newStructure.verifiedKYC,
+                }} 
+                )
+            .exec( async (err, item) => {
+                await this.findByIdAndUpdateMaxWithdrawAmountCumulative(_id, currency, newStructure.maxWithdrawAmountCumulative)
+                await this.findByIdAndUpdateMaxWithdrawAmountPerTransaction(_id, currency, newStructure.maxWithdrawAmountPerTransaction)
+                if(err) { reject(err)}
+                resolve(item);
+            });
+        });
+    }
+
+    findByIdAndUpdateMaxWithdrawAmountCumulative(_id, currency, amount){
+        return new Promise( (resolve,reject) => {
+            AutoWithdrawRepository.prototype.schema.model.updateOne(
+                {_id, "maxWithdrawAmountCumulative.currency": currency},
+                {
+                    $set: {
+                        "maxWithdrawAmountCumulative.$.amount" : parseFloat(amount)
+                    }
+                }
+            )
+            .exec( async (err, item) => {
+                if(err){reject(err)}
+                resolve(item);
+            })
+        });
+    }
+
+    findByIdAndUpdateMaxWithdrawAmountPerTransaction(_id, currency, amount){
+        return new Promise( (resolve,reject) => {
+            AutoWithdrawRepository.prototype.schema.model.updateOne(
+                {_id, "maxWithdrawAmountPerTransaction.currency": currency},
+                {
+                    $set: {
+                        "maxWithdrawAmountPerTransaction.$.amount" : parseFloat(amount)
+                    }
+                }
+            )
+            .exec( async (err, item) => {
+                if(err){reject(err)}
+                resolve(item);
+            })
+        });
+    }
 }
 
 AutoWithdrawRepository.prototype.schema = new AutoWithdrawSchema();

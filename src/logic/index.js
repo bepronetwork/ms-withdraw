@@ -6,7 +6,9 @@ import IntegrationsLogic from './integrations';
 import MailSenderLogic from './mailSender';
 import ChatLogic from './chat';
 import CurrencyLogic from "./currency";
-import KycLogic from "./kyc"
+import DepositLogic from "./deposit";
+import KycLogic from "./kyc";
+import AddressLogic from "./address";
 
 
 export {
@@ -18,6 +20,8 @@ export {
     IntegrationsLogic,
     MailSenderLogic,
     ChatLogic,
-    CurrencyLogic
+    CurrencyLogic,
+    DepositLogic,
+    AddressLogic
 }
 

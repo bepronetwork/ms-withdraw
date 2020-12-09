@@ -1,0 +1,1 @@
+export const compareCurrencyId = (c1_id , c2_id)  => (new String(c1_id).toString() == new String(c2_id).toString());

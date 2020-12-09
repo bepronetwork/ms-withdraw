@@ -1,12 +1,10 @@
 import _ from 'lodash';
 import { ErrorManager } from '../controllers/Errors';
-import { AppRepository,  WalletsRepository,  UsersRepository, WithdrawRepository } from '../db/repos';
+import { AppRepository,  WalletsRepository,  UsersRepository, CurrencyRepository, GamesRepository, JackpotRepository, PointSystemRepository, AutoWithdrawRepository, TxFeeRepository, BalanceRepository, DepositBonusRepository, FreeCurrencyRepository } from '../db/repos';
 import LogicComponent from './logicComponent';
-import { Withdraw } from '../models';
+import { Wallet } from '../models';
 import { throwError } from '../controllers/Errors/ErrorManager';
-import BitGoSingleton from './third-parties/bitgo';
-import { Security } from '../controllers/Security';
-import { setLinkUrl } from '../helpers/linkUrl';
+import { TrustologySingleton } from './third-parties';
 let error = new ErrorManager();
 
 
@@ -29,92 +27,18 @@ let __private = {};
 
   
 const processActions = {
-    __requestWithdraw : async (params) => {
-        var app;
-        try{
-            const { currency, address } = params;
-            if(params.tokenAmount <= 0){throwError('INVALID_AMOUNT')}
-
-            /* Get App Id */
-            app = await AppRepository.prototype.findAppById(params.app);
-            if(!app){throwError('APP_NOT_EXISTENT')}
-            const wallet = app.wallet.find( w => new String(w.currency._id).toString() == new String(currency).toString());
-            if(!wallet || !wallet.currency){throwError('CURRENCY_NOT_EXISTENT')};
-
-            let amount = parseFloat(Math.abs(params.tokenAmount));
-            let appBalance = parseFloat(wallet.playBalance);
-
-            /* Get list ownerAddress */
-            let listAddress = app.whitelistedAddresses.find(w => new String(w.currency).toString() == new String(currency).toString());
-            listAddress = (!listAddress) ? [] : listAddress.addresses;
-            /* Get All Users Balance */
-            let allUsersBalance = (await UsersRepository.prototype.getAllUsersBalance({app : app._id, currency : wallet.currency._id})).balance;
-            if(typeof allUsersBalance != 'number'){throwError('UNKNOWN')}
-            /* Verify if App has Enough Balance for Withdraw */
-            let hasEnoughBalance = (amount <= appBalance);
-
-            let res = {
-                max_withdraw: (!wallet.max_withdraw) ? 0 : wallet.max_withdraw,
-                min_withdraw: (!wallet.min_withdraw) ? 0 : wallet.min_withdraw,
-                listAddress,
-                allUsersBalance,
-                appBalance,
-                hasEnoughBalance,
-                wallet : wallet,
-                currency : wallet.currency,
-                withdrawAddress : address,
-                amount : amount,
-                playBalanceDelta : parseFloat(-Math.abs(amount)),
-                app         : app,
-                nonce       : params.nonce,
-            }
-
-            return res;
-        }catch(err){
-            throw err;
-        }
-    },
-    __finalizeWithdraw : async (params) => {
-
-        const { currency } = params;
-
-        /* Get App By Id */
-        let app = await AppRepository.prototype.findAppById(params.app);
+    __addCurrencyWallet : async (params) => {
+        var { currency_id, app } = params;
+        app = await AppRepository.prototype.findAppByIdAddCurrencyWallet(app);
         if(!app){throwError('APP_NOT_EXISTENT')}
-        const wallet = app.wallet.find( w => new String(w.currency._id).toString() == new String(currency).toString());
-        if(!wallet || !wallet.currency){throwError('CURRENCY_NOT_EXISTENT')};
-
-        /* Verify if this transactionHashs was already added */
-        
-        let withdraw = await WithdrawRepository.prototype.findWithdrawById(params.withdraw_id);
-        let withdrawExists = withdraw ? true : false;
-        let wasAlreadyAdded = withdraw ? withdraw.done : false;
-
-        /* Verify App Balance in API */
-        let currentAPIBalance = parseFloat(wallet.playBalance);
-    
-        /* Verify if Ap Address is Valid */
-        let isValidAddress = true;
-
-        let res = {
-            withdrawExists,
-            withdraw_id : params.withdraw_id,
-            isValidAddress,
-            amount : withdraw.amount,
-            currentAPIBalance,
-            wallet : wallet,
-            wasAlreadyAdded,
-            transactionHash     : params.transactionHash,
-            currency            : wallet.currency,
-            creationDate        : new Date(),
-            app,
-            withdrawAddress     : withdraw.address
+        let currency = await CurrencyRepository.prototype.findById(currency_id);
+        const walletExtern = (await TrustologySingleton.method(currency.ticker).getAccountIndex(0));
+        return  {
+            currency,
+            app : app,
+            address : walletExtern.address,
+            subWalletId : `${walletExtern.subWalletId.id}/${walletExtern.subWalletId.type}/${walletExtern.subWalletId.index}`
         }
-
-        return res;
-    },
-    __getUsersWithdraws : async (params) => {
-        return params;
     }
 }
 
@@ -130,57 +54,90 @@ const processActions = {
 
   
 const progressActions = {
-    __requestWithdraw : async (params) => {
+    __addCurrencyWallet : async (params) => {
+        const { currency, address, app, subWalletId } = params;
+        var wallet;
+        if(currency.virtual){
+            /* Save Wallet on DB */
+            wallet = (await (new Wallet({
+                currency : currency._id,
+                virtual : true,
+                price : app.currencies.map( c => {
+                    return {
+                        currency : c._id,
+                        amount : PRICE_VIRTUAL_CURRENCY_GLOBAL
+                    }
+                })
+            })).register())._doc;
+        }else{
+            if(currency.erc20){
+                let wallet_eth = app.wallet.find( w => w.currency.ticker == 'ETH');
+                /* No Eth Wallet was created */
+                if(!wallet_eth){throwError('NO_ETH_WALLET')};
+                /* Save Wallet on DB */
+                wallet = (await (new Wallet({
+                    currency : currency._id,
+                    virtual : false,
+                    bank_address : wallet_eth.bank_address,
+                    subWalletId  : wallet_eth.subWalletId
+                })).register())._doc;
+            }else{
+                wallet = (await (new Wallet({
+                    currency : currency._id,
+                    virtual : false,
+                    bank_address : address,
+                    subWalletId
+                })).register())._doc;
+            }
+            let virtualWallet = app.wallet.find( w => w.currency.virtual == true);
+            if(virtualWallet){
+                /* Add Deposit Currency to Virtual Currency */
+                await WalletsRepository.prototype.addCurrencyDepositToVirtualCurrency(virtualWallet._id, currency._id);
+            }
+        }
 
-        /* Add Withdraw to user */
-        var withdraw = new Withdraw({
-            app                     : params.app,
-            creation_timestamp      : new Date(),                    
-            address                 : params.withdrawAddress,                         // Deposit Address 
-            currency                : params.currency._id,
-            amount                  : params.amount,
-            nonce                   : params.nonce,
-        })
+        /* Add Currency to Platform */
+        await AppRepository.prototype.addCurrency(app._id, currency._id);
+        await AppRepository.prototype.addCurrencyWallet(app._id, wallet);
 
-        /* Save Deposit Data */
-        var withdrawSaveObject = await withdraw.createWithdraw();
+        /* Add LimitTable to all Games */
+        if(app.games!=undefined) {
+            for(let game of app.games) {
+                await GamesRepository.prototype.addTableLimitWallet({
+                    game    : game._id,
+                    wallet  : wallet._id
+                });
+            }
+        }
 
-        /* Update App Wallet in the Platform */
-        await WalletsRepository.prototype.updatePlayBalance(params.wallet._id, params.playBalanceDelta);
+        /* add currencies in addons */
+        if(app.addOn.jackpot)         await JackpotRepository.prototype.pushNewCurrency(app.addOn.jackpot._id, currency._id);
+        if(app.addOn.pointSystem)     await PointSystemRepository.prototype.pushNewCurrency(app.addOn.pointSystem._id, currency._id);
+        if(app.addOn.autoWithdraw)    await AutoWithdrawRepository.prototype.pushNewCurrency(app.addOn.autoWithdraw._id, currency._id);
+        if(app.addOn.txFee)           await TxFeeRepository.prototype.pushNewCurrency(app.addOn.txFee._id, currency._id);
+        if(app.addOn.balance)         await BalanceRepository.prototype.pushNewCurrency(app.addOn.balance._id, currency._id);
+        if(app.addOn.depositBonus)    await DepositBonusRepository.prototype.pushNewCurrency(app.addOn.depositBonus._id, currency._id);
+        if(app.addOn.freeCurrency)    await FreeCurrencyRepository.prototype.pushNewCurrency(app.addOn.freeCurrency._id, currency._id);
+        console.log("setting user")
 
-        /* Add Withdraw to App */
-        await AppRepository.prototype.addWithdraw(params.app._id, withdrawSaveObject._id);
+        /* Add Wallet to all Users */
+        await Promise.all(await app.users.map( async u => {
+            let w = (await (new Wallet({
+                currency : currency._id,
+            })).register())._doc;
+            await UsersRepository.prototype.addCurrencyWallet(u._id, w);
 
-        return withdrawSaveObject;
+            let wAffiliate = (await (new Wallet({
+                currency : currency._id,
+            })).register())._doc;
+            await AffiliateRepository.prototype.addCurrencyWallet(u.affiliate, wAffiliate);
+        }));
         
-    },
-    __finalizeWithdraw : async (params) => {
-
-        let bitgo_tx = await BitGoSingleton.sendTransaction({
-            wallet_id : params.wallet.bitgo_id, 
-            ticker : params.currency.ticker, 
-            amount : params.amount, 
-            address : params.withdrawAddress, 
-            passphrase : Security.prototype.decryptData(params.wallet.hashed_passphrase)
-        });
-        
-        let link_url = setLinkUrl({ticker : params.currency.ticker, address : bitgo_tx.txid, isTransactionHash : true })
-
-        /* Add Withdraw to user */
-        let text = await WithdrawRepository.prototype.finalizeWithdraw(params.withdraw_id, {
-            transactionHash         :   bitgo_tx.txid,
-            bitgo_id                :   bitgo_tx.transfer.id,
-            last_update_timestamp   :   new Date(),
-            link_url                :   link_url                      
-        })
 
         return {
-            tx : bitgo_tx.txid
-        };
-    },
-    __getUsersWithdraws : async (params) => {
-        let res = await WithdrawRepository.prototype.getAppFiltered(params);
-        return res;
+            currency_id : currency._id,
+            bank_address : address
+        }
     }
 }
 
@@ -232,15 +189,9 @@ class AppLogic extends LogicComponent{
 	async objectNormalize(params, processAction) {
 		try{			
 			switch(processAction) {
-                case 'RequestWithdraw' : {
-					return await library.process.__requestWithdraw(params); 
+                case 'AddCurrencyWallet' : {
+					return await library.process.__addCurrencyWallet(params);
                 };
-                case 'FinalizeWithdraw' : {
-					return await library.process.__finalizeWithdraw(params); 
-                };
-                case 'GetUsersWithdraws' : {
-					return await library.process.__getUsersWithdraws(params); 
-                }
             }
 		}catch(error){
 			throw error
@@ -266,15 +217,9 @@ class AppLogic extends LogicComponent{
 	async progress(params, progressAction){
 		try{			
 			switch(progressAction) {
-                case 'RequestWithdraw' : {
-					return await library.progress.__requestWithdraw(params); 
+                case 'AddCurrencyWallet' : {
+					return await library.progress.__addCurrencyWallet(params);
                 };
-                case 'FinalizeWithdraw' : {
-					return await library.progress.__finalizeWithdraw(params); 
-                };
-                case 'GetUsersWithdraws' : {
-					return await library.progress.__getUsersWithdraws(params); 
-                }
             }
 		}catch(error){
 			throw error;

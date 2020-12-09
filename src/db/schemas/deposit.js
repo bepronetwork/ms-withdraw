@@ -12,7 +12,7 @@ DepositSchema.prototype.schema = {
     creation_timestamp      : { type: Date, required : true},                           // Timestamp
     last_update_timestamp   : { type: Date, required : true},                           // Last Update Timestamp
     address                 : { type: String, required : true},                         // Deposit Address 
-    currency                : { type: String, required : true},
+    currency                : { type: mongoose.Schema.Types.ObjectId, ref: 'Currency'},      // App Integrated Id for Company
     transactionHash         : { type: String, required : true},
     amount                  : { type: Number, required : true},
     deposit_external_id     : { type: String},                                          // App Integrated Id Unique for Deposit
@@ -20,7 +20,14 @@ DepositSchema.prototype.schema = {
     callback_URL            : { type: String},
     confirmations           : { type: Number, required : true, default : 0},
     maxConfirmations        : { type: Number, required : true, default : 0},
-    confirmed               : { type: Boolean, default : false}
+    confirmed               : { type: Boolean, default : true},
+    link_url                : { type: String, default : null},
+    /* If Purchase */
+    isPurchase              : { type: Boolean, default : false, required : true},
+    purchaseAmount          : { type: Number, default : 0},
+    fee                     : { type: Number },
+    hasBonus                : { type: Boolean, default : false, required : true},
+    bonusAmount             : { type: Number, default : 0}
 }
 
 // db o only allows once per type

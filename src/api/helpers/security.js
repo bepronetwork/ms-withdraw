@@ -1,5 +1,6 @@
 import MiddlewareSingleton from "./middleware";
 import { AdminsRepository, PermissionRepository } from "../../db/repos";
+import * as crypto from "crypto";
 
 class Security{
 
@@ -18,6 +19,17 @@ class Security{
         }
         throw new Error();
     };
+
+    checkWebhook = (request, key) => {
+        const hmac = crypto.createHmac("SHA256", key);
+        const computedHashSignature = hmac.update(request.body).digest("hex");
+        const expectedHashSignature = request.headers["X-Sha2-Signature"];
+
+        if (computedHashSignature !== expectedHashSignature) {
+        throw new Error("Webhook hash signature mismatch");
+        }
+        return true;
+    }
 
     verify = ({type, req, permissions=[]}) => {
         try{

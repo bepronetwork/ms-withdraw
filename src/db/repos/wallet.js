@@ -28,6 +28,31 @@ class WalletsRepository extends MongoComponent{
         return WalletsRepository.prototype.schema.model(Wallet)
     }
 
+    findWalletBySubWalletId(subWalletId) {
+        return new Promise( (resolve, reject) => {
+            WalletsRepository.prototype.schema.model.findOne(
+                {subWalletId}
+            )
+            .exec( (err, wallet) => {
+                if(err) { reject(err)}
+                resolve(wallet);
+            });
+        });
+    }
+
+    updatePlayBalanceBonus(id, amount){
+        return new Promise( (resolve, reject) => {
+            WalletsRepository.prototype.schema.model.findByIdAndUpdate(id,
+                { $inc : { bonusAmount : parseFloat(amount) } } ,{ new: true }
+            )
+            .lean()
+            .exec( (err, wallet) => {
+                if(err) { reject(err)}
+                resolve(wallet);
+            });
+        });
+    }
+
     updateCurrencyAmount(id, currency, amount){
         return new Promise( (resolve, reject) => {
             WalletsRepository.prototype.schema.model.findByIdAndUpdate(id,
@@ -52,6 +77,84 @@ class WalletsRepository extends MongoComponent{
         });
     }
 
+    addCurrencyDepositToVirtualCurrency(virtual_wallet_id, currency_id){
+        return new Promise( (resolve, reject) => {
+            WalletsRepository.prototype.schema.model.findOneAndUpdate( 
+                { _id: virtual_wallet_id }, 
+                { $push: { "price" : {
+                    currency        : currency_id,
+                    amount          : PRICE_VIRTUAL_CURRENCY_GLOBAL
+                } } },
+                { 'new': true }
+            )
+            .lean()
+            .exec( (err, wallet) => {
+                if(err) { reject(err)}
+                resolve(wallet);
+            });
+        });
+    }
+
+    updateBitgoIdNotWebhook(_id, bitgoIdNotWebhook) {
+        return new Promise( (resolve, reject) => {
+            WalletsRepository.prototype.schema.model.findByIdAndUpdate(_id,
+                { $set: {
+                    "bitgo_id_not_webhook" : bitgoIdNotWebhook
+                } },
+                { new: true }
+            )
+            .lean()
+            .exec( (err, wallet) => {
+                if(err) { reject(err)}
+                resolve(wallet);
+            });
+        });
+    }
+
+    updateAddress2(id, address) {
+        return new Promise( (resolve, reject) => {
+            WalletsRepository.prototype.schema.model.findByIdAndUpdate(id,
+                { $set: {
+                    "bank_address_not_webhook" : address
+                } },
+                { new: true }
+            )
+            .lean()
+            .exec( (err, wallet) => {
+                if(err) { reject(err)}
+                resolve(wallet);
+            });
+        });
+    }
+
+    addDepositAddress(wallet_id, address){        
+        return new Promise( (resolve,reject) => {
+            WalletsRepository.prototype.schema.model.findOneAndUpdate(
+                { _id: wallet_id, "depositAddresses" : {$nin : [address] } }, 
+                { $push: { "depositAddresses" : address } },
+                { 'new': true })
+                .lean()
+                .exec( (err, item) => {
+                    if(err){reject(err)}
+                    resolve(true);
+                }
+            )
+        });
+    }
+
+    addSubWalletId(wallet_id, subWalletId){        
+        return new Promise( (resolve,reject) => {
+            WalletsRepository.prototype.schema.model.findOneAndUpdate(
+                { _id: wallet_id }, 
+                { $set: { subWalletId } },
+                { 'new': true })
+                .exec( (err, item) => {
+                    if(err){reject(err)}
+                    resolve(true);
+                }
+            )
+        });
+    }
     updateMinWithdraw(wallet_id, amount){
         return new Promise( (resolve, reject) => {
             WalletsRepository.prototype.schema.model.findByIdAndUpdate(wallet_id, {

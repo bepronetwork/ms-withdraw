@@ -8,8 +8,9 @@ import {
     pipeline_all_users_balance,
     pipeline_my_bets
 } from './pipelines/user';
-import { populate_user } from './populates';
+import { populate_user, populate_user_simple, populate_user_wallet } from './populates';
 import { throwError } from '../../controllers/Errors/ErrorManager';
+import populate_wallet_all from './populates/wallet/all';
 /**
  * Accounts database interaction class.
  *
@@ -39,16 +40,96 @@ class UsersRepository extends MongoComponent{
         return UsersRepository.prototype.schema.model(user)
     }
     
-    async findUserById(_id){ 
+    async findUserById(_id, populate_type=populate_user){
+        switch(populate_type){
+            case 'simple' : { populate_type=populate_user_simple; break; }
+            case 'wallet' : { populate_type=populate_user_wallet; break; }
+        }
+
         try{
             return new Promise( (resolve, reject) => {
                 UsersRepository.prototype.schema.model.findById(_id)
-                .populate(populate_user)
+                .populate(populate_type)
                 .exec( (err, user) => {
                     if(err) { resolve(null)}
                     resolve(user);
                 });
             });
+        }catch(err){
+            throw (err)
+        }
+    }
+
+    updateMinBetAmountForBonusUnlocked(id, amount){
+        return new Promise( (resolve, reject) => {
+            WalletsRepository.prototype.schema.model.findByIdAndUpdate(id,
+                { $inc : { minBetAmountForBonusUnlocked : parseFloat(amount) } } ,{ new: true }
+            )
+            .lean()
+            .exec( (err, wallet) => {
+                if(err) { reject(err)}
+                resolve(wallet);
+            });
+        });
+    }
+
+    findByWallet(wallet){
+        return new Promise( (resolve, reject) => {
+            UsersRepository.prototype.schema.model.findOne(
+                {"wallet._id": wallet})
+                .exec( (err, item) => {
+                    if(err){reject(err)}
+                    resolve(item);
+                }
+            )
+        })
+    }
+
+    findUserByIdAndApp(_id, app){
+        try{
+            return new Promise( (resolve, reject) => {
+                UsersRepository.prototype.schema.model.findById({
+                    _id: _id,
+                    app_id: app
+                })
+                .populate([
+                    {
+                        path : 'wallet',
+                        model : 'Wallet',
+                        select : { '__v': 0},
+                        populate : populate_wallet_all
+                    }
+                ])
+                .lean()
+                .exec( (err, user) => {
+                    if(err) { resolve(null)}
+                    resolve(user);
+                });
+            });
+        }catch(err){
+            throw (err)
+        }
+    }
+
+    changeDepositPosition(_id, state){
+        try{
+            return new Promise( (resolve, reject) => {
+                UsersRepository.prototype.schema.model.findByIdAndUpdate(
+                    { _id: _id },
+                    { $set: { "isDepositing" : state} })
+                    .lean() 
+                    .exec( (err, item) => {
+                        if(err){reject(err)}
+                        try{
+                            if((state == true) && (item.isDepositing == true)){throwError('DEPOSIT_MODE_IN_API')}
+                            resolve(item);
+                        }catch(err){
+                            reject(err);
+                        }
+
+                    }
+                )
+            })
         }catch(err){
             throw (err)
         }
@@ -235,6 +316,21 @@ class UsersRepository extends MongoComponent{
         }catch(err){
             throw (err)
         }
+    }
+
+    addCurrencyWallet(user_id, wallet){
+        return new Promise( (resolve,reject) => {
+            UsersRepository.prototype.schema.model.findOneAndUpdate(
+                { _id: user_id, wallet : {$nin : [wallet._id] } }, 
+                { $push: { "wallet" : wallet} },
+                { 'new': true })
+                .lean()
+                .exec( (err, item) => {
+                    if(err){reject(err)}
+                    resolve(item);
+                }
+            )
+        });
     }
 
 

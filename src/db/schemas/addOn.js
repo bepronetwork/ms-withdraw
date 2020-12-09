@@ -6,8 +6,13 @@ class AddOnSchema{};
 AddOnSchema.prototype.name = 'AddOn';
 
 AddOnSchema.prototype.schema =  {
+    jackpot       : { type : mongoose.Schema.Types.ObjectId, ref: 'Jackpot' },
     autoWithdraw  : { type : mongoose.Schema.Types.ObjectId, ref: 'AutoWithdraw' },
-    txFee         : { type : mongoose.Schema.Types.ObjectId, ref: 'TxFee' }
+    balance       : { type : mongoose.Schema.Types.ObjectId, ref: 'Balance' },
+    txFee         : { type : mongoose.Schema.Types.ObjectId, ref: 'TxFee' },
+    depositBonus  : { type : mongoose.Schema.Types.ObjectId, ref: 'DepositBonus' },
+    pointSystem   : { type : mongoose.Schema.Types.ObjectId, ref: 'PointSystem' },
+    freeCurrency  : { type : mongoose.Schema.Types.ObjectId, ref: 'FreeCurrency' },
 }
 
 

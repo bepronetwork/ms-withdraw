@@ -42,6 +42,18 @@ export const SENDINBLUE_EMAIL_TO = process.env.SENDINBLUE_EMAIL_TO;
 
 export const MONGO_CONNECTION_STRING = process.env.MONGO_CONNECTION_STRING;
 
+export const TRUSTOLOGY_PRIVATE_KEY_BTC = process.env.TRUSTOLOGY_PRIVATE_KEY_BTC;
+
+export const TRUSTOLOGY_PRIVATE_KEY_ETH = process.env.TRUSTOLOGY_PRIVATE_KEY_ETH;
+
+export const TRUSTOLOGY_API_KEY = process.env.TRUSTOLOGY_API_KEY;
+
+export const TRUSTOLOGY_URL = process.env.TRUSTOLOGY_URL;
+
+export const TRUSTOLOGY_WALLETID_BTC = process.env.TRUSTOLOGY_WALLETID_BTC;
+
+export const TRUSTOLOGY_WEBHOOK_KEY = process.env.TRUSTOLOGY_WEBHOOK_KEY;
+
 export const ENV = process.env.ENV;
 
 /* Variables */

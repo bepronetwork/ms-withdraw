@@ -28,34 +28,6 @@ class Wallet extends ModelComponent{
             throw err;
         }
     }
-
-    async setMaxWithdraw(){
-        try {
-            let res = await this.process('UpdateMaxWithdraw');
-            return UpdateMaxWithdrawSingleton.output('UpdateMaxWithdraw', res);
-        }catch(err){
-            throw err;
-        }
-    }
-
-    async setMinWithdraw(){
-        try {
-            let res = await this.process('UpdateMinWithdraw');
-            return UpdateMinWithdrawSingleton.output('UpdateMinWithdraw', res);
-        }catch(err){
-            throw err;
-        }
-    }
-
-    async setAffiliateMinWithdraw(){
-        try {
-            let res = await this.process('UpdateAffiliateMinWithdraw');
-            return UpdateAffiliateMinWithdrawSingleton.output('UpdateAffiliateMinWithdraw', res);
-        }catch(err){
-            throw err;
-        }
-    }
-
 }
 
 export default Wallet;

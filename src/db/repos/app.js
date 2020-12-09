@@ -13,7 +13,16 @@ import {
     pipeline_popular_numbers
 } from './pipelines/app';
 
-import { populate_app_all, populate_app_affiliates } from './populates';
+import { 
+    populate_app_all,
+    populate_app_affiliates,
+    populate_app_game,
+    populate_app_auth,
+    populate_app_simple,
+    populate_app_wallet,
+    populate_app_address,
+    populate_app_add_currency_wallet
+} from './populates';
 import { throwError } from '../../controllers/Errors/ErrorManager';
 
 
@@ -55,6 +64,21 @@ class AppRepository extends MongoComponent{
                 .exec( (err, item) => {
                     if(err){reject(err)}
                     resolve(true);
+                }
+            )
+        });
+    }
+
+    addCurrency(app_id, currency){
+        return new Promise( (resolve,reject) => {
+            AppRepository.prototype.schema.model.findOneAndUpdate(
+                { _id: app_id, currencies : {$nin : [currency._id] } }, 
+                { $push: { "currencies" : currency} },
+                { 'new': true })
+                .lean()
+                .exec( (err, item) => {
+                    if(err){reject(err)}
+                    resolve(item);
                 }
             )
         });
@@ -172,9 +196,17 @@ class AppRepository extends MongoComponent{
     }
 
     findAppById(_id, populate_type=populate_app_all){
+        let type = populate_type;
         switch(populate_type){
+            case 'get_game' : { populate_type = populate_app_game; break; }
+            case 'get_app_auth' : { populate_type = populate_app_auth; break; }
             case 'affiliates' : { populate_type = populate_app_affiliates; break; }
-        }        
+            case 'simple' : { populate_type = populate_app_simple; break; }
+            case 'wallet' : { populate_type = populate_app_wallet; break; }
+            case 'address' : { populate_type = populate_app_address; break; }
+            case 'none' : { populate_type = []; break; }
+        }
+
         try{
             return new Promise( (resolve, reject) => {
                 AppRepository.prototype.schema.model.findById(_id)
@@ -349,6 +381,44 @@ class AppRepository extends MongoComponent{
                 resolve(item);
             });
         });
+    }
+
+    addCurrencyWallet(app_id, wallet){
+        return new Promise( (resolve,reject) => {
+            AppRepository.prototype.schema.model.findOneAndUpdate(
+                { _id: app_id, wallet : {$nin : [wallet._id] } }, 
+                { $push: { "wallet" : wallet._id} },
+                { 'new': true })
+                .lean()
+                .exec( (err, item) => {
+                    if(err){reject(err)}
+                    resolve(item);
+                }
+            )
+        });
+    }
+
+    findAppByIdAddCurrencyWallet(_id){
+        try{
+            return new Promise( (resolve, reject) => {
+                AppRepository.prototype.schema.model.findById(_id, {
+                    '_id': 1,
+                    'currencies': 1,
+                    'games': 1,
+                    'users': 1,
+                    'wallet': 1,
+                    'addOn': 1,
+                    'virtual': 1
+                })
+                .populate(populate_app_add_currency_wallet)
+                .exec( (err, App) => {
+                    if(err) { reject(err)}
+                    resolve(App);
+                });
+            });
+        }catch(err){
+            throw err;
+        }
     }
 
     getAll = async() => {
