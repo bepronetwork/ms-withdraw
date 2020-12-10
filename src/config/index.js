@@ -52,6 +52,8 @@ export const TRUSTOLOGY_URL = process.env.TRUSTOLOGY_URL;
 
 export const TRUSTOLOGY_WALLETID_BTC = process.env.TRUSTOLOGY_WALLETID_BTC;
 
+export const ETHEREUM_ADDRESS_ENV = process.env.ETHEREUM_ADDRESS_ENV;
+
 export const ENV = process.env.ENV;
 
 /* Variables */
