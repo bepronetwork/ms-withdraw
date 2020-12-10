@@ -24,9 +24,8 @@ export class Prototype {
           };
     }
 
-    replacePublicKeyInDefaultSchedule (walletId, publicKey) {
-        console.log(walletId);
-        return this.trustVault.replacePublicKeyInDefaultSchedule(walletId, publicKey);
+    replacePublicKeyInDefaultSchedule (walletId, publicKey, sign) {
+        return this.trustVault.replacePublicKeyInDefaultSchedule(walletId, publicKey, sign);
     }
 
     getAddress(subWalletId) {

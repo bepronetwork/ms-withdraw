@@ -3,7 +3,7 @@ import {
 } from '../../models';
 import MiddlewareSingleton from '../helpers/middleware';
 import SecuritySingleton from '../helpers/security';
-import {TRUSTOLOGY_WEBHOOK_KEY} from "../../config"
+import {TRUSTOLOGY_WEBHOOK_KEY_ETH, TRUSTOLOGY_WEBHOOK_KEY_BTC} from "../../config"
 import { convertDataSingleton } from '../helpers/convertData';
 import { UsersRepository, WalletsRepository } from '../../db/repos';
 
@@ -32,11 +32,9 @@ async function cancelWithdraw (req, res) {
 }
 async function webhookDeposit(req, res) {
     try {
-        // Verify auth of webhook
-        // SecuritySingleton.checkWebhook(req, TRUSTOLOGY_WEBHOOK_KEY);
 
         const params = convertDataSingleton.getDataWebHook(req);
-
+        SecuritySingleton.checkWebhook(req, params.type=="BTC" ? TRUSTOLOGY_WEBHOOK_KEY_BTC : TRUSTOLOGY_WEBHOOK_KEY_ETH);
         let data = [];
 
         let listTransactions = params.isToken ? params.data.tokensData.map((item)=> {
