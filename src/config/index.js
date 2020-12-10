@@ -62,6 +62,8 @@ export const PUSHER_APP_KEY = process.env.PUSHER_APP_KEY;
 
 export const PUSHER_APP_SECRET = process.env.PUSHER_APP_SECRET;
 
+export const ETHEREUM_ADDRESS_ENV = process.env.ETHEREUM_ADDRESS_ENV;
+
 export const ENV = process.env.ENV;
 
 /* Variables */

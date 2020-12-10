@@ -1,5 +1,5 @@
 import { Prototype } from "./prototype";
-import { TRUSTOLOGY_PRIVATE_KEY_ETH } from "../../../config";
+import { ETHEREUM_ADDRESS_ENV, TRUSTOLOGY_PRIVATE_KEY_ETH } from "../../../config";
 const { ec: EC } = require("elliptic");
 const axios = require('axios');
 const keyPair = new EC("p256").keyFromPrivate(TRUSTOLOGY_PRIVATE_KEY_ETH);
@@ -110,14 +110,14 @@ export class ETH extends Prototype {
 
     async autoSendTransaction(to, value, assetSymbol) {
         // call createEthereumTransaction mutation with the parameters to get a well formed ethereum transaction
-        const result = await this.apiClient.createEthereumTransaction(keyPair.getPublic("hex"), to, value, assetSymbol);
+        const result = await this.apiClient.createEthereumTransaction(ETHEREUM_ADDRESS_ENV, to, value, assetSymbol);
         if (!result.signData || !result.requestId) {
             console.error(`Failed to create ethereum transaction ${JSON.stringify(result)}`);
             throw new Error("Failed to create ethereum transaction");
         }
 
         // IMPORTANT: PRODUCTION users are highly recommended to verify the ethereum transaction is what is expected (toAddress, amount, assetSymbol and digests are correct)
-        verifyEthereumTransaction(result.signData, keyPair.getPublic("hex"), to, value, assetSymbol);
+        verifyEthereumTransaction(result.signData, ETHEREUM_ADDRESS_ENV, to, value, assetSymbol);
 
         // IMPORTANT: PRODUCTION users are highly recommended to NOT use the unverifiedDigestData but instead recreate the digests
         // If your signing solution requires the pre-image data then use the `result.signData.unverifiedDigestData.signData`.
