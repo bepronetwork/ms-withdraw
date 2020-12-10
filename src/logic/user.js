@@ -300,6 +300,7 @@ const processActions = {
         var { currency, id, app } = params;
         /* Get User Id */
         const user = await UsersRepository.prototype.findUserById(id);
+        console.log(user);
         app = await AppRepository.prototype.findAppById(app, "simple");
         if (!app) { throwError('APP_NOT_EXISTENT') }
         if (!user) { throwError('USER_NOT_EXISTENT') }
@@ -309,6 +310,7 @@ const processActions = {
         if (user_wallet.depositAddresses != null && user_wallet.depositAddresses.length > 0) {
             console.log(user_wallet.depositAddresses[0]);
             return {
+                user,
                 address: user_wallet.depositAddresses[0].address,
                 currency: String(currency).toString()
             }
