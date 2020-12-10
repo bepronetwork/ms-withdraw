@@ -52,7 +52,9 @@ export const TRUSTOLOGY_URL = process.env.TRUSTOLOGY_URL;
 
 export const TRUSTOLOGY_WALLETID_BTC = process.env.TRUSTOLOGY_WALLETID_BTC;
 
-export const TRUSTOLOGY_WEBHOOK_KEY = process.env.TRUSTOLOGY_WEBHOOK_KEY;
+export const TRUSTOLOGY_WEBHOOK_KEY_ETH = process.env.TRUSTOLOGY_WEBHOOK_KEY_ETH;
+
+export const TRUSTOLOGY_WEBHOOK_KEY_BTC = process.env.TRUSTOLOGY_WEBHOOK_KEY_BTC;
 
 export const PUSHER_APP_ID = process.env.PUSHER_APP_ID;
 
