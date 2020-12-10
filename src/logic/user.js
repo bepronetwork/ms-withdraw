@@ -247,7 +247,6 @@ const processActions = {
                 transactionHash: data.tx,
                 currencyTicker: wallet.currency.ticker,
                 amount,
-                isValid,
                 fee,
                 depositBonusValue,
                 hasBonus,
@@ -300,7 +299,6 @@ const processActions = {
         var { currency, id, app } = params;
         /* Get User Id */
         const user = await UsersRepository.prototype.findUserById(id);
-        console.log(user);
         app = await AppRepository.prototype.findAppById(app, "simple");
         if (!app) { throwError('APP_NOT_EXISTENT') }
         if (!user) { throwError('USER_NOT_EXISTENT') }
@@ -308,7 +306,6 @@ const processActions = {
         var app_wallet = app.wallet.find(w => new String(w.currency._id).toString() == new String(currency).toString());
         var user_wallet = user.wallet.find(w => new String(w.currency._id).toString() == new String(currency).toString());
         if (user_wallet.depositAddresses != null && user_wallet.depositAddresses.length > 0) {
-            console.log(user_wallet.depositAddresses[0]);
             return {
                 user,
                 address: user_wallet.depositAddresses[0].address,

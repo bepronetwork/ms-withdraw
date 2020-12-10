@@ -53,6 +53,19 @@ class WalletsRepository extends MongoComponent{
         });
     }
 
+    updateMinBetAmountForBonusUnlocked(id, amount){
+        return new Promise( (resolve, reject) => {
+            WalletsRepository.prototype.schema.model.findByIdAndUpdate(id,
+                { $inc : { minBetAmountForBonusUnlocked : parseFloat(amount) } } ,{ new: true }
+            )
+            .lean()
+            .exec( (err, wallet) => {
+                if(err) { reject(err)}
+                resolve(wallet);
+            });
+        });
+    }
+
     updateCurrencyAmount(id, currency, amount){
         return new Promise( (resolve, reject) => {
             WalletsRepository.prototype.schema.model.findByIdAndUpdate(id,

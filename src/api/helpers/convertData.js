@@ -2,7 +2,7 @@ class ConvertData {
     getDataWebHook(req) {
         const data   = req.body;
         const header = {
-            type    : data.payload.type,
+            type    : data.payload.subWalletId.type,
             isToken : (data.payload.tokensData!=null && data.payload.tokensData.length > 0)
         }
 

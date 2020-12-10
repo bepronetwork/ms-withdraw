@@ -206,6 +206,22 @@ class ErrorManager {
         }
     }
 
+    deposit = function (deposit, type){
+        try{
+            switch(type){
+                case 'ConfirmDeposit' : {  
+                    // Verify App (Syntax Error)
+                    if(typeof deposit == 'undefined' || Object.is(deposit, null))
+                        throw libraries.throwError(libraries.handler.getError(libraries.handler.KEYS.USER_NOT_EXISTENT));
+                    // TO DO : Add Security , verify if it was already confirmed
+                    break;
+                }
+            }
+        }catch(err){
+            throw err
+        }
+    }
+
     mailSender = function (object, type){
         try{
             switch(type){
