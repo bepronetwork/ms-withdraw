@@ -11,8 +11,9 @@ CurrencySchema.prototype.schema = {
     address             : { type: String},
     decimals            : { type: Number, required : true},
     image               : { type: String},
+    erc20               : { type: Boolean, default : false},
     /* For virtual currencies */
-    virtual             : { type: Boolean, default : false}
+    virtual             : { type: Boolean, default : false},
 }
 
 // Mongoose only allows once per type

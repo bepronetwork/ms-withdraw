@@ -32,7 +32,7 @@ const processActions = {
         app = await AppRepository.prototype.findAppByIdAddCurrencyWallet(app);
         if(!app){throwError('APP_NOT_EXISTENT')}
         let currency = await CurrencyRepository.prototype.findById(currency_id);
-        const walletExtern = (await TrustologySingleton.method(currency.ticker).getAccountIndex(0));
+        const walletExtern = (await TrustologySingleton.method(currency.erc20 ? "ETH" : currency.ticker).getAccountIndex(0));
         return  {
             currency,
             app : app,
