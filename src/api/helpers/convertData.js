@@ -9,7 +9,7 @@ class ConvertData {
         let filter = {};
         switch (header.type) {
             case "BTC":
-                filter["amount"]            = ParseFloat(data.payload.transactionAmountInBtc);
+                filter["amount"]            = data.payload.transactionAmountInBtc;
                 filter["tx"]                = data.payload.transactionId;
                 filter["subWalletIdString"] = data.payload.subWalletIdString;
                 filter["transactionType"]   = data.payload.transactionType;
