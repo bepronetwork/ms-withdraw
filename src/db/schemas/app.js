@@ -19,6 +19,7 @@ AppSchema.prototype.schema =  {
     listAdmins          : [{ type: mongoose.Schema.Types.ObjectId, ref: 'Admin', required : true}],
     services            : [{type: Number}],
     currencyTicker      : {type : String},
+    currencies          : [{ type: mongoose.Schema.Types.ObjectId, ref: 'Currency'}],
     users               : [{ type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
     external_users      : [{type: String}],
     decimals            : {type : Number},

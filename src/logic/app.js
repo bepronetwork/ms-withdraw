@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { ErrorManager } from '../controllers/Errors';
-import { AppRepository,  WalletsRepository,  UsersRepository, CurrencyRepository, GamesRepository, JackpotRepository, PointSystemRepository, AutoWithdrawRepository, TxFeeRepository, BalanceRepository, DepositBonusRepository, FreeCurrencyRepository } from '../db/repos';
+import { AppRepository,  WalletsRepository,  UsersRepository, CurrencyRepository, GamesRepository, JackpotRepository, PointSystemRepository, AutoWithdrawRepository, TxFeeRepository, BalanceRepository, DepositBonusRepository, FreeCurrencyRepository, AffiliateRepository } from '../db/repos';
 import LogicComponent from './logicComponent';
 import { Wallet } from '../models';
 import { throwError } from '../controllers/Errors/ErrorManager';

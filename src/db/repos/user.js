@@ -76,12 +76,12 @@ class UsersRepository extends MongoComponent{
     findByWallet(wallet){
         return new Promise( (resolve, reject) => {
             UsersRepository.prototype.schema.model.findOne(
-                {"wallet._id": wallet})
-                .exec( (err, item) => {
-                    if(err){reject(err)}
-                    resolve(item);
-                }
+                {wallet}
             )
+            .exec( (err, item) => {
+                if(err){reject(err)}
+                resolve(item);
+            })
         })
     }
 

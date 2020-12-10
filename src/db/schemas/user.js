@@ -31,6 +31,7 @@ UserSchema.prototype.schema = {
     email_confirmed     : { type : Boolean, default : false, required : true },
     kyc_needed          : { type : Boolean, default : false },
     kyc_status          : { type : String, default : "no kyc" },
+    isDepositing        : { type : Boolean, default : false, required : true },
 }
 
 

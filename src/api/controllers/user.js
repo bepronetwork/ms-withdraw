@@ -5,6 +5,7 @@ import MiddlewareSingleton from '../helpers/middleware';
 import SecuritySingleton from '../helpers/security';
 import {TRUSTOLOGY_WEBHOOK_KEY} from "../../config"
 import { convertDataSingleton } from '../helpers/convertData';
+import { UsersRepository, WalletsRepository } from '../../db/repos';
 
 
 async function requestWithdraw (req, res) {
@@ -51,13 +52,15 @@ async function webhookDeposit(req, res) {
                 }
             }
         }) : [
-            params.data
+            params
         ];
 
+        let walletReal = await WalletsRepository.prototype.findWalletBySubWalletId(params.data.subWalletIdString);
+        let userTemp   = await UsersRepository.prototype.findByWallet(walletReal._id);
         for(let transaction of listTransactions) {
             if(transaction.data.transactionType=="RECEIVED"){
                 try {
-                    let user = new User(transaction);
+                    let user = new User({...transaction, id: userTemp._id});
                     data.push((await user.updateWallet()));
                 } catch(error) {
                     console.log("error ", error);

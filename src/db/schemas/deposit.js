@@ -11,7 +11,7 @@ DepositSchema.prototype.schema = {
     app                     : { type: mongoose.Schema.Types.ObjectId, ref: 'App'},      // App Integrated Id for Company
     creation_timestamp      : { type: Date, required : true},                           // Timestamp
     last_update_timestamp   : { type: Date, required : true},                           // Last Update Timestamp
-    address                 : { type: String, required : true},                         // Deposit Address 
+    address                 : { type: String},                         // Deposit Address 
     currency                : { type: mongoose.Schema.Types.ObjectId, ref: 'Currency'},      // App Integrated Id for Company
     transactionHash         : { type: String, required : true},
     amount                  : { type: Number, required : true},
