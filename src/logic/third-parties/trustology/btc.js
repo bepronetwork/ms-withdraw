@@ -10,6 +10,7 @@ export class BTC extends Prototype {
 
     async sendTransaction(fromSubWalletId, toAddress, amount) {
         try {
+            console.log("amount:: ",amount)
             return await this.getSettings().sendBitcoin(fromSubWalletId, toAddress, new String(amount));
         } catch (error) {
             console.log(error)
