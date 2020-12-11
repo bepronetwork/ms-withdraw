@@ -36,7 +36,9 @@ async function webhookDeposit(req, res) {
         const params = convertDataSingleton.getDataWebHook(req);
         console.log(">>>>>>> 1 checkWebhook");
         console.log(params.type);
+        console.log("1 req.body", req.body);
         SecuritySingleton.checkWebhook(req, params.type=="BTC" ? TRUSTOLOGY_WEBHOOK_KEY_BTC : TRUSTOLOGY_WEBHOOK_KEY_ETH);
+        console.log("3 req.body", req.body);
         console.log(">>>>>>> 2 checkWebhook");
         let data = [];
 
