@@ -40,6 +40,18 @@ class WalletsRepository extends MongoComponent{
         });
     }
 
+    findWalletBySubWalletIdAndCurrency(subWalletId, currency) {
+        return new Promise( (resolve, reject) => {
+            WalletsRepository.prototype.schema.model.findOne(
+                {subWalletId, currency}
+            )
+            .exec( (err, wallet) => {
+                if(err) { reject(err)}
+                resolve(wallet);
+            });
+        });
+    }
+
     updatePlayBalanceBonus(id, amount){
         return new Promise( (resolve, reject) => {
             WalletsRepository.prototype.schema.model.findByIdAndUpdate(id,
