@@ -22,6 +22,9 @@ class Security{
 
     checkWebhook = (request, key) => {
         try {
+            console.log(request.headers);
+            console.log("2 req.body", request.body);
+            console.log("request>>>>>>>>>", request);
             console.log(">>>>>>> checkWebhook");
             console.log(request.headers["X-Sha2-Signature"]);
             const hmac = crypto.createHmac("SHA256", key);
