@@ -71,6 +71,7 @@ async function webhookDeposit(req, res) {
 
         MiddlewareSingleton.respond(res, req, data);
     } catch (err) {
+        console.log("error 2", err);
         MiddlewareSingleton.respondError(res, err, req);
     }
 }

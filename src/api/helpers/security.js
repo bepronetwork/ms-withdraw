@@ -21,15 +21,20 @@ class Security{
     };
 
     checkWebhook = (request, key) => {
-        console.log(">>>>>>> checkWebhook");
-        const hmac = crypto.createHmac("SHA256", key);
-        const computedHashSignature = hmac.update(request.body).digest("hex");
-        const expectedHashSignature = request.headers["X-Sha2-Signature"];
-        console.log(`${computedHashSignature} !== ${expectedHashSignature}`);
-        if (computedHashSignature !== expectedHashSignature) {
-        throw new Error("Webhook hash signature mismatch");
+        try {
+            console.log(">>>>>>> checkWebhook");
+            console.log(request.headers["X-Sha2-Signature"]);
+            const hmac = crypto.createHmac("SHA256", key);
+            const computedHashSignature = hmac.update(request.body).digest("hex");
+            const expectedHashSignature = request.headers["X-Sha2-Signature"];
+            console.log(`${computedHashSignature} !== ${expectedHashSignature}`);
+            if (computedHashSignature !== expectedHashSignature) {
+                throw new Error("Webhook hash signature mismatch");
+            }
+        } catch(err) {
+            console.log("error 1", err);
+            throw err;
         }
-        return true;
     }
 
     verify = ({type, req, permissions=[]}) => {
