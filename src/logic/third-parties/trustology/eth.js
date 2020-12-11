@@ -107,47 +107,18 @@ export class ETH extends Prototype {
             });
         });
     }
-
-    async autoSendTransaction(to, value, assetSymbol) {
-        // call createEthereumTransaction mutation with the parameters to get a well formed ethereum transaction
-        const result = await this.apiClient.createEthereumTransaction(ETHEREUM_ADDRESS_ENV, to, value, assetSymbol);
-        if (!result.signData || !result.requestId) {
-            console.error(`Failed to create ethereum transaction ${JSON.stringify(result)}`);
-            throw new Error("Failed to create ethereum transaction");
-        }
-
-        // IMPORTANT: PRODUCTION users are highly recommended to verify the ethereum transaction is what is expected (toAddress, amount, assetSymbol and digests are correct)
-        verifyEthereumTransaction(result.signData, ETHEREUM_ADDRESS_ENV, to, value, assetSymbol);
-
-        // IMPORTANT: PRODUCTION users are highly recommended to NOT use the unverifiedDigestData but instead recreate the digests
-        // If your signing solution requires the pre-image data then use the `result.signData.unverifiedDigestData.signData`.
-        const signDigest = result.signData.unverifiedDigestData.shaSignData;
-        // using you private key pair, sign the digest.
-        const { r, s } = keyPair.sign(signDigest);
-
-        // create the signRequests payload
-        const signRequests = [
-            {
-                publicKeySignaturePairs: [
-                    {
-                        publicKey: keyPair.getPublic("hex"), // should be in hex string format
-                        signature: r.toString("hex", 64) + s.toString("hex", 64), // convert the r, s bytes signature to hex format
-                    },
-                ],
-            },
-        ];
-
-        // submit the addSignature payload and receive back the requestId of your ethereum transaction request
-        const requestId = await this.apiClient.addSignature({
-            requestId: result.requestId,
-            signRequests,
-        });
-
-        // Check that your transaction was successfully submitted to the network
-        const expectedStatus = "SUBMITTED";
-        const status = await pollRequestStatus(requestId, expectedStatus);
-        console.info(`request (${requestId}) - status: ${status}`);
-
-        return requestId;
+    
+    async autoSendTransaction(toAddress, amount, asset) {
+        const sign = async ({ shaSignData }) => {
+            const { r, s } = keyPair.sign(shaSignData);
+            const hexSignature = r.toString("hex", 64) + s.toString("hex", 64);
+            const publicKeySignaturePair = {
+              publicKey: Buffer.from(keyPair.getPublic("hex"), "hex"),
+              signature: Buffer.from(hexSignature, "hex"),
+            };
+            console.log("publicKeySignaturePair: ", publicKeySignaturePair);
+            return publicKeySignaturePair;
+        };
+        return await this.getSettings().sendEthereum(ETHEREUM_ADDRESS_ENV, toAddress, amount, asset, "MEDIUM", "GBP", sign);
     }
 }

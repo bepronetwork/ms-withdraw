@@ -379,13 +379,15 @@ const progressActions = {
         amount = amount - fee;
 
         let ticker = (params.ticker.toUpperCase()) == "BTC" ? "BTC" : "ETH";
+        let autoWithdraw = null;
         if (params.isAutomaticWithdraw.verify) {
             transaction = await TrustologySingleton.method(ticker).autoSendTransaction(
                 params.withdrawAddress,
                 (parseFloat(amount) * (Math.pow(10, ((ticker == "BTC") ? 8 : 18)))).toString(),
                 ((ticker == "BTC") ? null : params.ticker.toUpperCase()),
             );
-            tx = await TrustologySingleton.method(ticker).getTransaction(transaction).data.getRequest.transactionHash;
+            tx = (await TrustologySingleton.method(ticker).getTransaction(transaction)).data.getRequest.transactionHash;
+            autoWithdraw = true;
         } else {
             transaction = await TrustologySingleton.method(ticker).sendTransaction(
                 ((ticker == "BTC") ? params.app_wallet.subWalletId : params.appAddress),
@@ -393,6 +395,7 @@ const progressActions = {
                 (parseFloat(amount) * (Math.pow(10, ((ticker == "BTC") ? 8 : 18)))).toString(),
                 ((ticker == "BTC") ? null : params.ticker.toUpperCase()),
             );
+            autoWithdraw = false;
         }
         let link_url = setLinkUrl({ ticker: params.currency.ticker, address: tx, isTransactionHash: true })
         /* Add Withdraw to user */
@@ -436,7 +439,8 @@ const progressActions = {
         mail.sendEmail({ app_id: params.app.id, user: params.user, action: 'USER_NOTIFICATION', attributes });
         return{
             withdraw_id: withdrawSaveObject._id,
-            tx: tx
+            tx: tx,
+            autoWithdraw
         };
     },
     __updateWallet: async (params) => {
