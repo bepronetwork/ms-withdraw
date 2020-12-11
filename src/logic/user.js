@@ -174,8 +174,8 @@ const processActions = {
         try {
             // data: {amount,tx,subWalletIdString,transactionType,symbol}
             var {data} = params;
-
-            let walletReal = await WalletsRepository.prototype.findWalletBySubWalletId(data.subWalletIdString);
+            let currencyData   = await CurrencyRepository.prototype.findByTicker( params.isToken ? String(data.symbol).toUpperCase() : String(params.type).toUpperCase());
+            let walletReal = await WalletsRepository.prototype.findWalletBySubWalletIdAndCurrency(data.subWalletIdString, currencyData._id);
             let userTemp   = await UsersRepository.prototype.findByWallet(walletReal._id);
             /* Get User Info */
             let user = await UsersRepository.prototype.findUserById(userTemp._id);

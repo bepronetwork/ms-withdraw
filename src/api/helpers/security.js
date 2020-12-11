@@ -22,20 +22,13 @@ class Security{
 
     checkWebhook = (request, key) => {
         try {
-            console.log(request.headers);
-            console.log("2 req.body", request.body);
-            console.log("request>>>>>>>>>", request);
-            console.log(">>>>>>> checkWebhook");
-            console.log(request.headers["x-sha2-signature"]);
             const hmac = crypto.createHmac("SHA256", key);
             const computedHashSignature = hmac.update(JSON.stringify(request.body)).digest("hex");
             const expectedHashSignature = request.headers["x-sha2-signature"];
-            console.log(`${computedHashSignature} !== ${expectedHashSignature}`);
             if (computedHashSignature !== expectedHashSignature) {
                 throw new Error("Webhook hash signature mismatch");
             }
         } catch(err) {
-            console.log("error 1", err);
             throw err;
         }
     }
