@@ -99,48 +99,16 @@ export class BTC extends Prototype {
     }
 
     async autoSendTransaction(toAddress, amount) {
-        // call createBitcoinTransaction mutation with the parameters to get a well formed bitcoin transaction
-        const result = await this.apiClient.createBitcoinTransaction(TRUSTOLOGY_WALLETID_BTC, toAddress, amount);
-        if (!result.signData || !result.requestId) {
-            console.error(`Failed to create bitcoin transaction ${JSON.stringify(result)}`);
-            throw new Error("Failed to create bitcoin transaction");
-        }
-        // IMPORTANT: PRODUCTION users are highly recommended to verify the bitcoin transaction (input/outputs are correct and were sent by TrustVault)
-        verifyBitcoinTransaction(result.signData, TRUSTOLOGY_WALLETID_BTC, toAddress, amount);
-
-        // IMPORTANT: PRODUCTION users are highly recommended to NOT use the unverifiedDigestData but instead recreate the digests
-        const unverifiedSignedDataDigests = result.signData.transaction.inputs.map(
-            // If your signing solution requires the pre-image data then use the `input.unverifiedDigestData.signData`.
-            (input) => input.unverifiedDigestData.shaSignData,
-        );
-
-        // Sign each signRequest with your key pair
-        const signRequests = unverifiedSignedDataDigests.map((signedDigest) => {
-            // using you private key pair, sign the digest.
-            const { r, s } = keyPair.sign(signedDigest);
-            // convert the r, s bytes signature to hex format
+        const sign = async ({ shaSignData }) => {
+            const { r, s } = keyPair.sign(shaSignData);
             const hexSignature = r.toString("hex", 64) + s.toString("hex", 64);
-            return {
-                publicKeySignaturePairs: [
-                    {
-                        publicKey: keyPair.getPublic("hex"), // should be in hex string format
-                        signature: hexSignature, // should be in hex string format
-                    },
-                ],
+            const publicKeySignaturePair = {
+              publicKey: Buffer.from(keyPair.getPublic("hex"), "hex"),
+              signature: Buffer.from(hexSignature, "hex"),
             };
-        });
-
-        // submit the addSignature payload and receive back the requestId of your bitcoin transaction request
-        const requestId = await this.apiClient.addSignature({
-            requestId: result.requestId,
-            signRequests,
-        });
-
-        // Check that your transaction was successfully submitted to the network
-        const expectedStatus = "SUBMITTED";
-        const status = await pollRequestStatus(requestId, expectedStatus);
-        console.info(`request (${requestId}) - status: ${status}`);
-
-        return requestId;
+            console.log("publicKeySignaturePair: ", publicKeySignaturePair);
+            return publicKeySignaturePair;
+        };
+        return await this.getSettings().sendBitcoin(TRUSTOLOGY_WALLETID_BTC, toAddress, amount, "MEDIUM", sign);
     }
 }
