@@ -50,6 +50,7 @@ async function webhookDeposit(req, res) {
         }) : [
             params
         ];
+        console.log("0 ", req.body);
         console.log("1 ", params);
         console.log("2 ",params.data);
         console.log("3 ",params.data.subWalletIdString);
