@@ -269,6 +269,28 @@ class UsersRepository extends MongoComponent{
         }
     }
 
+    async changeWithdrawPositionGetAddress(_id, state){
+        try{
+            return new Promise( (resolve, reject) => {
+                UsersRepository.prototype.schema.model.findByIdAndUpdate(
+                    _id,
+                    { $set: { "isWithdrawing" : state} }) 
+                    .exec( (err, item) => {
+                        if(err){reject(err)}
+                        try{
+                            if((state == true) && (item.isWithdrawing == true)){throwError('WALLET_WAIT')}
+                            resolve(item);
+                        }catch(err){
+                            reject(err);
+                        }
+
+                    }
+                )
+            })
+        }catch(err){
+            throw (err)
+        }
+    }
 
     async findUserByExternalId(external_id){
         try{
