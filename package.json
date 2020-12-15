@@ -23,7 +23,7 @@
     "dependencies": {
         "@google-cloud/storage": "^5.6.0",
         "@logowl/adapter-nodejs": "^2.0.3",
-        "@trustology/trustvault-nodejs-sdk": "^1.1.1",
+        "@trustology/trustvault-nodejs-sdk": "1.1.1",
         "abi-decoder": "^1.2.0",
         "accounting": "^0.4.1",
         "asymmetric-crypto": "^1.0.1",
