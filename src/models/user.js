@@ -88,12 +88,21 @@ class User extends ModelComponent{
     }
     
     async getDepositAddress() {
-        const { app } = this.self.params;
-        /* Mutex In */
+        // Output = Null
+        const { user } = this.self.params;
         try{
+            /* Close Mutex */
+            await UsersRepository.prototype.changeWithdrawPositionGetAddress(user, true);
             let res = await this.process('GetDepositAddress');
+            /* Open Mutex */
+            await UsersRepository.prototype.changeWithdrawPositionGetAddress(user, false);
             return res;
         }catch(err){
+            if(parseInt(err.code) != 14){
+                /* If not withdrawing atm */
+                /* Open Mutex */
+                await UsersRepository.prototype.changeWithdrawPositionGetAddress(user, false);
+            }
             throw err;
         }
     }
