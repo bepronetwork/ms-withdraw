@@ -258,43 +258,6 @@ const processActions = {
             throw err;
         }
     },
-    __cancelWithdraw: async (params) => {
-        try {
-            const { currency } = params;
-
-            /* Get User Id */
-            let user = await UsersRepository.prototype.findUserById(params.user);
-            let app = await AppRepository.prototype.findAppById(params.app);
-            if (!app) { throwError('APP_NOT_EXISTENT') }
-            if (!user) { throwError('USER_NOT_EXISTENT') }
-            const wallet = user.wallet.find(w => new String(w.currency._id).toString() == new String(currency).toString());
-            if (!wallet || !wallet.currency) { throwError('CURRENCY_NOT_EXISTENT') };
-
-            /* Verify if User is in App */
-            let user_in_app = (app.users.findIndex(x => (x._id.toString() == user._id.toString())) > -1);
-
-            let withdraw = await WithdrawRepository.prototype.findWithdrawById(params.withdraw_id);
-            let withdrawExists = withdraw ? true : false;
-            let wasAlreadyAdded = withdraw ? withdraw.done : false;
-
-            // let transactionIsValid = true;
-
-            let res = {
-                wallet_id: wallet._id,
-                amount: withdraw.amount,
-                note: params.note,
-                user_in_app,
-                withdrawExists,
-                withdraw_id: params.withdraw_id,
-                wasAlreadyAdded,
-                app,
-                user
-            }
-            return res;
-        } catch (err) {
-            throw err;
-        }
-    },
     __getDepositAddress: async (params) => {
         var { currency, id, app } = params;
         /* Get User Id */
@@ -518,19 +481,6 @@ const progressActions = {
             throw err;
         }
     },
-    __cancelWithdraw: async (params) => {
-        try {
-            /* Add Cancel Withdraw to user */
-            await WithdrawRepository.prototype.cancelWithdraw(params.withdraw_id, {
-                last_update_timestamp: new Date(),
-                note: params.note
-            });
-            await WalletsRepository.prototype.updatePlayBalance(params.wallet_id, params.amount);
-            return true;
-        } catch (err) {
-            throw err;
-        }
-    },
     __getDepositAddress: async (params) => {
         const { app_wallet, user_wallet, user, erc20, currency, address } = params;
         const user_wallet_real = user.wallet.find(w => new String(w.currency._id).toString() == new String(currency).toString());
@@ -668,9 +618,6 @@ class UserLogic extends LogicComponent {
                 case 'UpdateWallet': {
                     return await library.process.__updateWallet(params);
                 };
-                case 'CancelWithdraw': {
-                    return await library.process.__cancelWithdraw(params);
-                };
                 case 'GetDepositAddress': {
                     return await library.process.__getDepositAddress(params);
                 };
@@ -708,9 +655,6 @@ class UserLogic extends LogicComponent {
                 };
                 case 'UpdateWallet': {
                     return await library.progress.__updateWallet(params);
-                };
-                case 'CancelWithdraw': {
-                    return await library.progress.__cancelWithdraw(params);
                 };
                 case 'GetDepositAddress': {
                     return await library.progress.__getDepositAddress(params);

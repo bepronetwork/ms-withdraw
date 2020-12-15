@@ -76,7 +76,7 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-  /users/requestWithdraw: 
+  /user/withdraw: 
     x-swagger-router-controller: user
     post:
       tags:
@@ -125,36 +125,6 @@ paths:
           required: true
           schema:
             $ref: '#/definitions/GetTransactionsRequest'
-      responses:
-        "200":
-          description: Success
-          schema:
-            # a pointer to a definition
-            $ref: "#/definitions/GeneralResponse"
-        # responses may fall through to errors
-        default:
-          description: Error
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-  /users/cancelWithdraw:
-    x-swagger-router-controller: user
-    post:
-      tags:
-      - user
-      summary: Request for User Cancel Withdraw
-      operationId: cancelWithdraw
-      description: Request Cancel Withdraw
-      consumes:
-        - application/json
-      produces:
-        - application/json
-      parameters:
-        - in: body
-          name: user
-          description: User Information
-          required: true
-          schema:
-            $ref: '#/definitions/UserCancelWithdrawRequest'
       responses:
         "200":
           description: Success
@@ -316,45 +286,6 @@ definitions:
           User Id
       offset :
         type : number
-  UserCancelWithdrawRequest :
-    type: object
-    required:
-      - app
-      - user
-      - withdraw_id
-      - currency
-      - note
-    properties:
-      app :
-        type : string
-        format : name
-        example : "5cuedgq7e6t334t34"
-        description: |
-          App ID
-      user :
-        type : string
-        format: name
-        example : "5cuedgq7e6t334t34"
-        description: |
-          User ID
-      withdraw_id :
-        type : string
-        format: name
-        example: "65f76st8vdsb3181"
-        description: |
-            Withdraw Id
-      currency :
-        type : string
-        format: name
-        example: "0xe8rghwe8rghwe9r87ynw987eyncwre"
-        description: |
-          User Address
-      note :
-        type : string
-        format: name
-        example: "Test Test"
-        description: |
-          Note text
   AppAddCurrencyWallet : 
     type: object
     required:

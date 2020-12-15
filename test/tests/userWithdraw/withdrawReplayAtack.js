@@ -1,6 +1,6 @@
 import { mochaAsync, detectValidationErrors } from "../../utils/testing";
 import { createEthAccount, registerUser, loginUser, depositWallet } from "../../utils/env";
-import { requestUserWithdraw, finalizeUserWithdraw, cancelUserWithdraw } from "../../methods";
+import { requestUserWithdraw, finalizeUserWithdraw } from "../../methods";
 import chai from 'chai';
 
 const expect = chai.expect;
@@ -105,51 +105,6 @@ context('Withdraw Replay Atack', async () => {
                     expect(status_1).to.be.equal(14);
                     expect(status).to.be.equal(200);
                 }
-            }));
-            it('should be able to cancel withdraw only once', mochaAsync(async () => {
-                let request = await requestUserWithdraw({
-                    tokenAmount : global.test.depositAmounts[ticker]/5,
-                    nonce : 2123427,
-                    app : app.id,
-                    address : user_eth_account.getAddress(),
-                    user : user.id,
-                    currency : currency._id
-                }, user.bearerToken , {id : user.id});
-
-                let idWithdraw = request.data.message;
-
-                let res = cancelUserWithdraw({
-                    app : app.id,
-                    admin : admin.id,
-                    user : user.id,
-                    withdraw_id : idWithdraw,
-                    currency : currency._id,
-                    note     : "test"
-                }, admin.bearerToken , {id : admin.id});
-
-
-                let res_replay_atack = await cancelUserWithdraw({
-                    app : app.id,
-                    admin : admin.id,
-                    user : user.id,
-                    withdraw_id : idWithdraw,
-                    currency : currency._id,
-                    note     : "test"
-                }, admin.bearerToken , {id : admin.id});
-
-                let ret = await Promise.resolve(await res);
-                let status_1 = ret.data.status;
-                const { status } = res_replay_atack.data;
-
-                // Confirm either one or the other tx got phroibited
-                if(status_1 == 200){
-                    expect(status_1).to.be.equal(200);
-                    expect(status).to.be.equal(14);
-                }else{
-                    expect(status_1).to.be.equal(14);
-                    expect(status).to.be.equal(200);
-                }
-
             }));
         });
     });
