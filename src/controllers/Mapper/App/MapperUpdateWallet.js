@@ -29,7 +29,6 @@ let outputs = {
                     "name": object.wallet.currency.name,
                     "address": object.wallet.currency.address,
                 },
-                "bitgo_id": object.wallet.bitgo_id,
                 "bank_address": object.wallet.bank_address
             },
             "creationDate": object.creationDate,

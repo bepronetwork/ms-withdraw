@@ -11,7 +11,6 @@ import { Deposit, Withdraw, Address } from '../models';
 import { throwError } from '../controllers/Errors/ErrorManager';
 import Mailer from './services/mailer';
 import { setLinkUrl } from '../helpers/linkUrl';
-import { getCurrencyAmountFromBitGo } from "./third-parties/bitgo/helpers";
 import { PusherSingleton, TrustologySingleton } from './third-parties';
 import { getVirtualAmountFromRealCurrency } from '../helpers/virtualWallet';
 let error = new ErrorManager();

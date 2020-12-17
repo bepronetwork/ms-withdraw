@@ -10,7 +10,7 @@ import { UsersRepository, WalletsRepository } from '../../db/repos';
 
 async function finalizeWithdraw (req, res) {
     try{
-        SecuritySingleton.verify({type : 'user', req});
+        SecuritySingleton.verifyServeToServe(req.headers, req.body);
         let params = req.body;
         let user = new User(params);
         let data = await user.finalizeWithdraw();
@@ -39,8 +39,12 @@ async function webhookDeposit(req, res) {
         }) : [
             params
         ];
-
+        console.log("0 ", req.body);
+        console.log("1 ", params);
+        console.log("2 ",params.data);
+        console.log("3 ",params.data.subWalletIdString);
         let walletReal = await WalletsRepository.prototype.findWalletBySubWalletId(params.data.subWalletIdString);
+        console.log("4 ",walletReal);
         let userTemp   = await UsersRepository.prototype.findByWallet(walletReal._id);
         for(let transaction of listTransactions) {
             if(transaction.data.transactionType=="RECEIVED"){
