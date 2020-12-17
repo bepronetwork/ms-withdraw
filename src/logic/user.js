@@ -4,8 +4,6 @@
 const _ = require('lodash');
 import { ErrorManager } from '../controllers/Errors';
 import LogicComponent from './logicComponent';
-
-import { UsersRepository, AppRepository, WalletsRepository, WithdrawRepository, AddOnRepository, AutoWithdrawRepository, CurrencyRepository, DepositRepository } from '../db/repos';
 import Numbers from './services/numbers';
 import { Deposit, Withdraw, Address } from '../models';
 import { throwError } from '../controllers/Errors/ErrorManager';
@@ -13,6 +11,7 @@ import Mailer from './services/mailer';
 import { setLinkUrl } from '../helpers/linkUrl';
 import { PusherSingleton, TrustologySingleton } from './third-parties';
 import { getVirtualAmountFromRealCurrency } from '../helpers/virtualWallet';
+import { WithdrawRepository } from '../db/repos';
 let error = new ErrorManager();
 
 
@@ -232,8 +231,9 @@ const progressActions = {
         }
         
         let link_url = setLinkUrl({ ticker: ticker.toUpperCase(), address: tx, isTransactionHash: true })
+
         /* Add Withdraw to user */
-        var withdraw = new Withdraw({
+        var withdraw = {
             app,
             user,
             creation_timestamp: new Date(),
@@ -251,10 +251,10 @@ const progressActions = {
             last_update_timestamp: new Date(),
             link_url: link_url,
             status: tx ? 'Processed' : 'Queue',
-        })
+        }
 
-        /* Save Deposit Data */
-        var withdrawSaveObject = await withdraw.createWithdraw();
+        const withdrawSaveObject = await WithdrawRepository.save(withdraw)
+        console.log("withdrawSaveObject:: ",withdrawSaveObject);
 
         return{
             withdraw_id: withdrawSaveObject._id,

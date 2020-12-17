@@ -27,32 +27,14 @@ Withdraw.init({
   transactionHash: {
     type: DataTypes.STRING
   },
-  logId: {
-    type: DataTypes.STRING
-  },
   amount: {
-    type: DataTypes.NUMBER
-  },
-  withdraw_external_id: {
-    type: DataTypes.STRING
-  },
-  usd_amount: {
     type: DataTypes.NUMBER
   },
   nonce: {
     type: DataTypes.NUMBER
   },
-  callback_URL: {
-    type: DataTypes.STRING
-  },
   request_id: {
     type: DataTypes.STRING
-  },
-  confirmations: {
-    type: DataTypes.NUMBER
-  },
-  maxConfirmations: {
-    type: DataTypes.NUMBER
   },
   confirmed: {
     type: DataTypes.BOOLEAN
