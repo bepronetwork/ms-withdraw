@@ -1,8 +1,8 @@
-import { Withdraw } from "../models/withdraw";
-class WithdrawRepository {
+import { Wallet } from "../models/wallet";
+class WalletRepository {
     save(data){
         return new Promise((resolve, reject)=>{
-            Withdraw.create(data)
+            Wallet.create(data)
             .then((res)=>{
                 resolve(res);
             })
@@ -13,6 +13,6 @@ class WithdrawRepository {
     }
 }
 
-WithdrawRepository = new WithdrawSchema();
+WalletRepository = new WithdrawSchema();
 
-export { WithdrawRepository };
+export { WalletRepository };
