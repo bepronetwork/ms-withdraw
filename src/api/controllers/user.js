@@ -8,12 +8,12 @@ import { convertDataSingleton } from '../helpers/convertData';
 import { UsersRepository, WalletsRepository } from '../../db/repos';
 
 
-async function requestWithdraw (req, res) {
+async function finalizeWithdraw (req, res) {
     try{
         SecuritySingleton.verify({type : 'user', req});
         let params = req.body;
         let user = new User(params);
-        let data = await user.requestWithdraw();
+        let data = await user.finalizeWithdraw();
         MiddlewareSingleton.respond(res, req, data);
 	}catch(err){
         MiddlewareSingleton.respondError(res, err);
@@ -84,6 +84,6 @@ async function getTransactions(req, res) {
 export {
     getTransactions,
     getDepositAddress,
-    requestWithdraw,
+    finalizeWithdraw,
     webhookDeposit
 }

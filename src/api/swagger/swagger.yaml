@@ -76,14 +76,14 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
-  /user/withdraw: 
+  /user/payment/withdraw: 
     x-swagger-router-controller: user
     post:
       tags:
       - user
-      summary: Request for User Withdraw
-      operationId: requestWithdraw
-      description: Update Wallet Amount for the User
+      summary: Finalize User Withdraw
+      operationId: finalizeWithdraw
+      description: Send Funds To Address
       consumes:
         - application/json
       produces:
@@ -94,7 +94,7 @@ paths:
           description: User Information
           required: true
           schema:
-            $ref: '#/definitions/UserWithdrawRequest'
+            $ref: '#/definitions/UserWithdrawFinalize'
       responses:
         "200":
           description: Success
@@ -217,26 +217,21 @@ definitions:
         example: "24234g234g23g"
         description: |
           APP ID
-  UserWithdrawRequest : 
+  UserWithdrawFinalize : 
     type: object
     required:
       - app
       - user
-      - address
-      - tokenAmount
-      - nonce
-      - currency
+      - sendTo
+      - amount
+      - ticker
+      - isAutoWithdraw
     properties:
-      tokenAmount : 
+      amount : 
         type : number
         example: 203
         description: |
-          Amount of Tokens to be Withdraw
-      nonce:
-        type : number
-        example: 3245
-        description: |
-          Use Nonce
+          Amount to be Withdraw
       app :
         type : string
         format : name
@@ -249,21 +244,42 @@ definitions:
         example : "5cuedgq7e6t334t34" 
         description: |
           User ID
-      address :
+      sendTo :
         type : string
         format: name
         example: "0xe8rghwe8rghwe9r87ynw987eyncwre"
         description: |
-          User Address
-      currency :
+          Address To Send Funds
+      ticker :
         type : string
         format: name
-        example: "0xe8rghwe8rghwe9r87ynw987eyncwre"
+        example: "ETH"
         description: |
-          User Address
+          Ticker Of Crypto Coin
+      isAutoWithdraw:
+            type : boolean
+            example: true
+            description: |
+              Use to say if is withdraw automatic or not
+      nonce:
+        type : number
+        example: 3245
+        description: |
+          Use Nonce
       isAffiliate:
             type : boolean
             example: true
+      fee : 
+        type : number
+        example: 203
+        description: |
+          Fee amount that was charged for the withdrawal
+      withdrawNotification :
+        type : string
+        format: name
+        example: "ETH"
+        description: |
+          If you have any Notification to tore on Local database
   GetTransactionsRequest : 
     type: object
     required:

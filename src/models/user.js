@@ -1,7 +1,6 @@
 import {UserLogic} from '../logic';
 import ModelComponent from './modelComponent';
-import {UsersRepository, AppRepository} from '../db/repos';
-import { FinalizeWithdrawUserSingleton } from '../controllers/Mapper';
+import {UsersRepository} from '../db/repos';
 
 class User extends ModelComponent{
 
@@ -25,22 +24,11 @@ class User extends ModelComponent{
 
     
 
-    async requestWithdraw(){
-        // Output = Null
-        const { user } = this.self.params;
+    async finalizeWithdraw(){
         try{
-            /* Close Mutex */
-            await UsersRepository.prototype.changeWithdrawPosition(user, true);
-            let res = await this.process('RequestWithdraw');
-            /* Open Mutex */
-            await UsersRepository.prototype.changeWithdrawPosition(user, false);
+            let res = await this.process('FinalizeWithdraw');
             return res;
         }catch(err){
-            if(parseInt(err.code) != 14){
-                /* If not withdrawing atm */
-                /* Open Mutex */
-                await UsersRepository.prototype.changeWithdrawPosition(user, false);
-            }
             throw err;
         }
     }

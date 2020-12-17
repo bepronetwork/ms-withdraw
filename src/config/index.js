@@ -50,7 +50,7 @@ export const TRUSTOLOGY_API_KEY = process.env.TRUSTOLOGY_API_KEY;
 
 export const TRUSTOLOGY_URL = process.env.TRUSTOLOGY_URL;
 
-export const TRUSTOLOGY_WALLETID_BTC = process.env.TRUSTOLOGY_WALLETID_BTC;
+export const TRUSTOLOGY_AUTO_WALLETID_BTC = process.env.TRUSTOLOGY_AUTO_WALLETID_BTC;
 
 export const TRUSTOLOGY_WEBHOOK_KEY_ETH = process.env.TRUSTOLOGY_WEBHOOK_KEY_ETH;
 
@@ -62,7 +62,11 @@ export const PUSHER_APP_KEY = process.env.PUSHER_APP_KEY;
 
 export const PUSHER_APP_SECRET = process.env.PUSHER_APP_SECRET;
 
-export const ETHEREUM_ADDRESS_ENV = process.env.ETHEREUM_ADDRESS_ENV;
+export const ETHEREUM_AUTO_ADDRESS = process.env.ETHEREUM_AUTO_ADDRESS;
+
+export const TRUSTOLOGY_MANUAL_WALLETID_BTC = process.env.TRUSTOLOGY_MANUAL_WALLETID_BTC;
+
+export const TRUSTOLOGY_MANUAL_ADDRESS_ETH = process.env.TRUSTOLOGY_MANUAL_ADDRESS_ETH;
 
 export const ENV = process.env.ENV;
 

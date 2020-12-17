@@ -37,135 +37,9 @@ let __private = {};
 
 const processActions = {
 
-    __requestWithdraw: async (params) => {
-        var user, isAutomaticWithdraw, addOnObject, isAutomaticWithdrawObject;
+    __finalizeWithdraw: async (params) => {
         try {
-            const { currency, address, tokenAmount } = params;
-            let isAffiliate = false
-            if (tokenAmount <= 0) { throwError('INVALID_AMOUNT') }
-            /* Get User and App */
-            user = await UsersRepository.prototype.findUserById(params.user);
-            var app = await AppRepository.prototype.findAppById(params.app);
-            if (!app) { throwError('APP_NOT_EXISTENT') }
-            if (!user) { throwError('USER_NOT_EXISTENT') }
-            /* Get User or Affiliate Wallet */
-            const userWallet = !isAffiliate ? user.wallet.find(w => new String(w.currency._id).toString() == new String(currency).toString()) : user.affiliate.wallet.find(w => new String(w.currency._id).toString() == new String(currency).toString());
-            if (!userWallet || !userWallet.currency) { throwError('CURRENCY_NOT_EXISTENT') };
-            /* Get App Wallet */
-            const wallet = app.wallet.find(w => new String(w.currency._id).toString() == new String(currency).toString());
-            if (!wallet || !wallet.currency) { throwError('CURRENCY_NOT_EXISTENT') };
-            const appAddress = wallet.bank_address;
-            const ticker = wallet.currency.ticker;
-
-            /* Just Make Request If haven't Bonus Amount on Wallet */
-            let bonusAmount = userWallet.bonusAmount
-            let whatsLeftBetAmountForBonus = userWallet.minBetAmountForBonusUnlocked - userWallet.incrementBetAmountForBonus
-            let currencyObject = await CurrencyRepository.prototype.findById(currency);
-            if (bonusAmount > 0) { throwError('HAS_BONUS_YET', `, ${whatsLeftBetAmountForBonus} ${currencyObject.ticker} left before there can be a withdrawal`) }
-            /* Get Amount of Withdraw */
-            let amount = parseFloat(Math.abs(tokenAmount));
-            /* Just Make Withdraw If KYC verified */
-            if (!app.integrations || !app.integrations.kyc || !app.integrations.kyc.isActive) {
-                throwError('KYC_NEEDED');
-            }
-            if (!app.virtual && user.kyc_needed) { throwError('KYC_NEEDED') }
-
-            /* Verifying AddOn and set Fee */
-            let addOn = app.addOn;
-            let fee = 0;
-            if (addOn && addOn.txFee && addOn.txFee.isTxFee) {
-                fee = addOn.txFee.withdraw_fee.find(c => new String(c.currency).toString() == new String(currency).toString()).amount;
-            }
-
-            /* Verify if amount less than fee */
-            if (amount <= fee) { throwError('WITHDRAW_FEE') }
-
-            /* User Current Balance */
-            let currentBalance = parseFloat(userWallet.playBalance);
-
-            /* Verify if User has Enough Balance for Withdraw */
-            let hasEnoughBalance = (amount <= currentBalance);
-
-            /* Verify if User is in App */
-            let user_in_app = (app.users.findIndex(x => (x._id.toString() == user._id.toString())) > -1);
-
-            /* Verify If Exists AutoWithdraw */
-            if (app.addOn) {
-                addOnObject = await AddOnRepository.prototype.findById(app.addOn);
-                if (addOnObject.autoWithdraw) {
-                    isAutomaticWithdrawObject = await AutoWithdrawRepository.prototype.findById(addOnObject.autoWithdraw);
-                    isAutomaticWithdraw = isAutomaticWithdrawObject.isAutoWithdraw
-                    isAutomaticWithdraw = { verify: isAutomaticWithdraw, textError: isAutomaticWithdraw ? "success" : "Automatic withdrawal set to false" };
-                } else {
-                    isAutomaticWithdraw = { verify: false, textError: "AutoWithdraw as Undefined" };
-                }
-            } else {
-                isAutomaticWithdraw = { verify: false, textError: "AddOn as Undefined" };
-            }
-
-            /* Verify if Email is Confirmed */
-            if (isAutomaticWithdraw.verify) {
-                isAutomaticWithdraw = { verify: user.email_confirmed, textError: user.email_confirmed ? "success" : "Email Not Verified" };
-            }
-
-            /* Verify if Max Withdraw Amount Cumulative was reached */
-            if (isAutomaticWithdraw.verify) {
-                let withdrawPerCurrency = user.withdraws.filter(c => c.currency.toString() == params.currency.toString())
-                let withdrawAcumulative = withdrawPerCurrency.reduce(
-                    (acumulative, withdrawValue) => acumulative + withdrawValue.amount
-                    , 0
-                );
-                withdrawAcumulative = parseFloat(params.tokenAmount + withdrawAcumulative).toFixed(6);
-                let maxWithdrawAmountCumulativePerCurrency = isAutomaticWithdrawObject.maxWithdrawAmountCumulative.find(c => c.currency.toString() == params.currency.toString())
-                if (withdrawAcumulative <= maxWithdrawAmountCumulativePerCurrency.amount) {
-                    isAutomaticWithdraw = { verify: true, textError: "success" };
-                } else {
-                    isAutomaticWithdraw = { verify: false, textError: "Amount accumulated withdrawal greater than the maximum allowed" };
-                }
-            }
-
-            /* Verify if Max Withdraw Per Transaction was reached */
-            if (isAutomaticWithdraw.verify) {
-                let maxWithdrawAmountPerTransactionPerCurrency = isAutomaticWithdrawObject.maxWithdrawAmountPerTransaction.find(c => c.currency.toString() == params.currency.toString())
-                if (params.tokenAmount <= maxWithdrawAmountPerTransactionPerCurrency.amount) {
-                    isAutomaticWithdraw = { verify: true, textError: "success" };
-                } else {
-                    isAutomaticWithdraw = { verify: false, textError: "Amount withdrawal greater than the maximum allowed" };
-                }
-            }
-            /* Verify if Min Withdraw is Affiliate or not */
-            let min_withdraw = null;
-            if(isAffiliate){
-                min_withdraw = !wallet.affiliate_min_withdraw ? 0 : wallet.affiliate_min_withdraw;
-            } else {
-                min_withdraw = !wallet.min_withdraw ? 0 : wallet.min_withdraw;
-            } 
-
-            /* Verify if Withdraw position is already opened in the Smart-Contract */
-            var res = {
-                withdrawNotification: isAutomaticWithdraw.textError,
-                max_withdraw: (!wallet.max_withdraw) ? 0 : wallet.max_withdraw,
-                min_withdraw,
-                hasEnoughBalance,
-                user_in_app,
-                currency: userWallet.currency,
-                withdrawAddress: address,
-                userWallet: userWallet,
-                amount,
-                playBalanceDelta: parseFloat(-Math.abs(amount)),
-                user: user,
-                app: app,
-                nonce: params.nonce,
-                isAlreadyWithdrawingAPI: user.isWithdrawing,
-                emailConfirmed: (user.email_confirmed != undefined && user.email_confirmed === true),
-                isAutomaticWithdraw,
-                fee,
-                app_wallet: wallet,
-                isAffiliate,
-                appAddress,
-                ticker
-            }
-            return res;
+            return params;
         } catch (err) {
             throw err;
         }
@@ -334,44 +208,42 @@ const processActions = {
  **/
 
 const progressActions = {
-    __requestWithdraw: async (params) => {
-        let { amount, app_wallet, fee, playBalanceDelta, isAffiliate } = params;
+    __finalizeWithdraw: async (params) => {
+        let { sendTo, isAutoWithdraw, ticker, isAffiliate, currency, app, user, amount, nonce, withdrawNotification, fee } = params;
         let transaction = null;
         let tx = null;
-        /* Subtracting fee from amount */
-        amount = amount - fee;
-
-        let ticker = (params.ticker.toUpperCase()) == "BTC" ? "BTC" : "ETH";
         let autoWithdraw = null;
-        if (params.isAutomaticWithdraw.verify) {
-            transaction = await TrustologySingleton.method(ticker).autoSendTransaction(
-                params.withdrawAddress,
-                (parseFloat(amount) * (Math.pow(10, ((ticker == "BTC") ? 8 : 18)))).toString(),
-                ((ticker == "BTC") ? null : params.ticker.toUpperCase()),
+        let trustTicker = (ticker.toUpperCase()) == "BTC" ? "BTC" : "ETH";
+        
+        if (isAutoWithdraw) {
+            transaction = await TrustologySingleton.method(trustTicker).autoSendTransaction(
+                sendTo,
+                (parseFloat(amount) * (Math.pow(10, ((trustTicker == "BTC") ? 8 : 18)))).toString(),
+                ((trustTicker == "BTC") ? null : ticker.toUpperCase()),
             );
-            tx = (await TrustologySingleton.method(ticker).getTransaction(transaction)).data.getRequest.transactionHash;
+            tx = (await TrustologySingleton.method(trustTicker).getTransaction(transaction)).data.getRequest.transactionHash;
             autoWithdraw = true;
         } else {
-            transaction = await TrustologySingleton.method(ticker).sendTransaction(
-                ((ticker == "BTC") ? params.app_wallet.subWalletId : params.appAddress),
-                params.withdrawAddress,
-                (parseFloat(amount) * (Math.pow(10, ((ticker == "BTC") ? 8 : 18)))).toString(),
-                ((ticker == "BTC") ? null : params.ticker.toUpperCase()),
+            transaction = await TrustologySingleton.method(trustTicker).sendTransaction(
+                sendTo,
+                (parseFloat(amount) * (Math.pow(10, ((trustTicker == "BTC") ? 8 : 18)))).toString(),
+                ((trustTicker == "BTC") ? null : ticker.toUpperCase()),
             );
             autoWithdraw = false;
         }
-        let link_url = setLinkUrl({ ticker: params.currency.ticker, address: tx, isTransactionHash: true })
+        
+        let link_url = setLinkUrl({ ticker: ticker.toUpperCase(), address: tx, isTransactionHash: true })
         /* Add Withdraw to user */
         var withdraw = new Withdraw({
-            app: params.app,
-            user: params.user._id,
+            app,
+            user,
             creation_timestamp: new Date(),
-            address: params.withdrawAddress, // Deposit Address
-            currency: params.currency,
-            amount: amount,
-            nonce: params.nonce,
-            withdrawNotification: params.withdrawNotification,
-            fee: fee,
+            address: sendTo, // Deposit Address
+            currency,
+            amount,
+            nonce,
+            withdrawNotification,
+            fee,
             isAffiliate,
             done: true,
             request_id: transaction,
@@ -385,21 +257,6 @@ const progressActions = {
         /* Save Deposit Data */
         var withdrawSaveObject = await withdraw.createWithdraw();
 
-        /* Update User Wallet in the Platform */
-        await WalletsRepository.prototype.updatePlayBalance(params.userWallet._id, playBalanceDelta);
-
-        /* Update App Wallet in the Platform */
-        await WalletsRepository.prototype.updatePlayBalance(app_wallet._id, fee);
-
-        /* Add Deposit to user */
-        await UsersRepository.prototype.addWithdraw(params.user._id, withdrawSaveObject._id);
-
-        /* Send Email */
-        let mail = new Mailer();
-        let attributes = {
-            TEXT: mail.setTextNotification('WITHDRAW', params.amount, params.currency.ticker)
-        };
-        mail.sendEmail({ app_id: params.app.id, user: params.user, action: 'USER_NOTIFICATION', attributes });
         return{
             withdraw_id: withdrawSaveObject._id,
             tx: tx,
@@ -612,8 +469,8 @@ class UserLogic extends LogicComponent {
     async objectNormalize(params, processAction) {
         try {
             switch (processAction) {
-                case 'RequestWithdraw': {
-                    return await library.process.__requestWithdraw(params);
+                case 'FinalizeWithdraw': {
+                    return await library.process.__finalizeWithdraw(params);
                 };
                 case 'UpdateWallet': {
                     return await library.process.__updateWallet(params);
@@ -650,8 +507,8 @@ class UserLogic extends LogicComponent {
     async progress(params, progressAction) {
         try {
             switch (progressAction) {
-                case 'RequestWithdraw': {
-                    return await library.progress.__requestWithdraw(params);
+                case 'FinalizeWithdraw': {
+                    return await library.progress.__finalizeWithdraw(params);
                 };
                 case 'UpdateWallet': {
                     return await library.progress.__updateWallet(params);

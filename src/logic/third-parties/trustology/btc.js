@@ -1,6 +1,6 @@
 import { Prototype } from "./prototype";
 const { ec: EC } = require("elliptic");
-import { TRUSTOLOGY_PRIVATE_KEY_BTC, TRUSTOLOGY_WALLETID_BTC } from "../../../config";
+import { TRUSTOLOGY_PRIVATE_KEY_BTC, TRUSTOLOGY_AUTO_WALLETID_BTC, TRUSTOLOGY_MANUAL_WALLETID_BTC } from "../../../config";
 const axios = require('axios');
 const keyPair = new EC("p256").keyFromPrivate(TRUSTOLOGY_PRIVATE_KEY_BTC);
 export class BTC extends Prototype {
@@ -8,10 +8,10 @@ export class BTC extends Prototype {
         super();
     }
 
-    async sendTransaction(fromSubWalletId, toAddress, amount) {
+    async sendTransaction(toAddress, amount) {
         try {
             console.log("amount:: ",amount)
-            return await this.getSettings().sendBitcoin(fromSubWalletId, toAddress, new String(amount));
+            return await this.getSettings().sendBitcoin(TRUSTOLOGY_MANUAL_WALLETID_BTC, toAddress, new String(amount));
         } catch (error) {
             console.log(error)
         }
@@ -106,7 +106,7 @@ export class BTC extends Prototype {
                 console.log("publicKeySignaturePair: ", publicKeySignaturePair);
                 return publicKeySignaturePair;
             };
-            return await this.getSettings().sendBitcoin(TRUSTOLOGY_WALLETID_BTC, toAddress, new String(amount), "MEDIUM", sign);
+            return await this.getSettings().sendBitcoin(TRUSTOLOGY_AUTO_WALLETID_BTC, toAddress, new String(amount), "MEDIUM", sign);
         } catch (error) {
             console.log(error)
         }
