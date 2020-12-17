@@ -16,7 +16,9 @@ export const ETH_TEST_NET = process.env.ETH_NET;
 
 export const INFURA_KEY = process.env.INFURA_KEY; 
 
-export const ETH_NET_NAME = process.env.ETH_NET_NAME; 
+export const ETH_NET_NAME = process.env.ETH_NET_NAME;
+
+export const DB_STRING = process.env.DB_STRING;
 
 export const ETH_RPC_URL = process.env.ETH_RPC_URL;
 
@@ -27,10 +29,6 @@ export const PRIVATE_KEY = process.env.PRIVATE_KEY;
 export const MIN_WITHDRAW = parseFloat(process.env.MIN_WITHDRAW);
 
 export const MS_MASTER_URL = process.env.MS_MASTER_URL;
-
-export const BITGO_ACCESS_TOKEN = process.env.BITGO_KEY;
-
-export const BITGO_ENTERPRISE_ID = process.env.BITGO_ENTERPRISE_ID;
 
 export const QUOTA_GUARD_URL = process.env.QUOTA_GUARD_URL;
 

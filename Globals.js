@@ -1,11 +1,13 @@
 const __config = require('./config/config');
-import { Mongoose } from "mongoose";
+import {DB_STRING} from "./src/config";
 import Web3 from 'web3';
 import CasinoContract from "./logic/eth/CasinoContract";
 import account from "./logic/eth/models/account";
 import interfaces from "./logic/eth/interfaces";
 import ERC20TokenContract from "./logic/eth/ERC20Contract";
 import { Logger } from "./src/helpers/logger";
+
+const { Sequelize } = require('sequelize');
 
 let ETH_NETWORK = process.env.ETH_NETWORK || 'kovan';
 
@@ -99,22 +101,9 @@ class Globals{
     }
 
 
-    connect(){        
-        // Main DB
-        this.main_db = new Mongoose();
-        this.main_db.connect(this.mongo.connection_string + this.mongo.dbs.main, { useNewUrlParser: true, useUnifiedTopology: true})
-        this.main_db.Promise = global.Promise;
-
-        // Ecosystem DB
-        this.ecosystem_db = new Mongoose();
-        this.ecosystem_db.connect(this.mongo.connection_string + this.mongo.dbs.ecosystem, { useNewUrlParser: true, useUnifiedTopology: true})
-        this.ecosystem_db.Promise = global.Promise;
-
-        // Main DB
-        this.default = new Mongoose();
-        this.default.Promise = global.Promise;
+    connect(){
+        this.DB = new Sequelize(DB_STRING);
     }
-    
 }
 
 let globals = new Globals(); // Singleton

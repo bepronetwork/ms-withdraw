@@ -10,7 +10,7 @@ import { UsersRepository, WalletsRepository } from '../../db/repos';
 
 async function requestWithdraw (req, res) {
     try{
-        SecuritySingleton.verify({type : 'user', req});
+        SecuritySingleton.verify(req.headers, req.body);
         let params = req.body;
         let user = new User(params);
         let data = await user.requestWithdraw();
@@ -21,7 +21,7 @@ async function requestWithdraw (req, res) {
 }
 async function cancelWithdraw (req, res) {
     try{
-        SecuritySingleton.verify({type : 'admin', req, permissions: ["super_admin"]});
+        SecuritySingleton.verify(req.headers, req.body);
         let params = req.body;
 		let user = new User(params);
         let data = await user.cancelWithdraw();
