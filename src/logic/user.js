@@ -170,17 +170,15 @@ const processActions = {
     __getTransactions: async (params) => {
         let { user, size, app, offset } = params;
 
-        app = await AppRepository.prototype.findAppById(app, "simple");
-        if (!app) { throwError('APP_NOT_EXISTENT') }
-        user = await UsersRepository.prototype.findUserByIdAndApp(user, app._id);
-        if (!user) { throwError('USER_NOT_EXISTENT') }
         const deposits = await DepositRepository.prototype.getAll({
-            user: user._id,
+            user,
+            app,
             size,
             offset 
         });
         const withdraws = await WithdrawRepository.prototype.getAll({
-            user: user._id,
+            user: user,
+            app,
             size,
             offset 
         });
@@ -238,7 +236,7 @@ const progressActions = {
             user,
             creation_timestamp: new Date(),
             address: sendTo, // Deposit Address
-            currency,
+            currency_ticker: ticker,
             amount,
             nonce,
             withdrawNotification,

@@ -21,7 +21,7 @@ Withdraw.init({
   address: {
     type: DataTypes.STRING
   },
-  currency: {
+  currency_ticker: {
     type: DataTypes.STRING
   },
   transactionHash: {
