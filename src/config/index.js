@@ -38,8 +38,6 @@ export const SENDINBLUE_API_KEY = process.env.SENDINBLUE_API_KEY;
 
 export const SENDINBLUE_EMAIL_TO = process.env.SENDINBLUE_EMAIL_TO;
 
-export const MONGO_CONNECTION_STRING = process.env.MONGO_CONNECTION_STRING;
-
 export const TRUSTOLOGY_PRIVATE_KEY_BTC = process.env.TRUSTOLOGY_PRIVATE_KEY_BTC;
 
 export const TRUSTOLOGY_PRIVATE_KEY_ETH = process.env.TRUSTOLOGY_PRIVATE_KEY_ETH;
@@ -49,6 +47,8 @@ export const TRUSTOLOGY_API_KEY = process.env.TRUSTOLOGY_API_KEY;
 export const TRUSTOLOGY_URL = process.env.TRUSTOLOGY_URL;
 
 export const TRUSTOLOGY_WALLETID_BTC = process.env.TRUSTOLOGY_WALLETID_BTC;
+
+export const TRUSTOLOGY_WALLETID_ETH = process.env.TRUSTOLOGY_WALLETID_ETH;
 
 export const TRUSTOLOGY_WEBHOOK_KEY_ETH = process.env.TRUSTOLOGY_WEBHOOK_KEY_ETH;
 
@@ -67,21 +67,6 @@ export const ENV = process.env.ENV;
 /* Variables */
 
 var ETH_NETWORK = config.eth;
-
-/**
- * @function SET_ENV
- */
-
-
-var DB_MONGO = {
-    "connection_string" : process.env.MONGO_URL,
-    "dbs" : {
-        "main" : process.env.MONGO_MAIN,
-        "ecosystem" : process.env.MONGO_ECOSYSTEM,
-        "redis" : process.env.MONGO_REDIS
-    }
-};
-
 
 if(ETH_RPC_URL){
     ETH_NETWORK = changeAllStringsInObjectRecursive(ETH_NETWORK, 'APP_MGMT_PRIVATE_KEY', APP_MGMT_PRIVATE_KEY);

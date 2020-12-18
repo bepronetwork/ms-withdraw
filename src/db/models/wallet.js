@@ -17,8 +17,14 @@ Wallet.init({
   currency: {
     type: DataTypes.STRING
   },
-  subWalletID: {
+  subWalletId: {
     type: DataTypes.STRING
+  },
+  ticker: {
+    type: DataTypes.STRING
+  },
+  erc20: {
+    type: DataTypes.BOOLEAN
   }
 }, {
   db,

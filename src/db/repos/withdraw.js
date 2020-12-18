@@ -1,4 +1,4 @@
-import { Withdraw as WithdrawModel } from "../models/withdraw";
+import { Withdraw as WithdrawModel } from "../models";
 class Withdraw {
     save(data){
         return new Promise((resolve, reject)=>{
