@@ -3,7 +3,7 @@ import { ErrorManager } from '../controllers/Errors';
 import LogicComponent from './logicComponent';
 import Numbers from './services/numbers';
 
-import {WalletRepository, WithdrawRepository } from '../db/repos';
+import {DepositRepository, WalletRepository, WithdrawRepository } from '../db/repos';
 import { Deposit, Withdraw, Address } from '../models';
 import { throwError } from '../controllers/Errors/ErrorManager';
 import Mailer from './services/mailer';
@@ -68,13 +68,13 @@ const processActions = {
     __getTransactions: async (params) => {
         let { user, size, app, offset } = params;
 
-        const deposits = await DepositRepository.prototype.getAll({
+        const deposits = await DepositRepository.getAll({
             user,
             app,
             size,
             offset 
         });
-        const withdraws = await WithdrawRepository.prototype.getAll({
+        const withdraws = await WithdrawRepository.getAll({
             user: user,
             app,
             size,
@@ -103,7 +103,7 @@ const processActions = {
 
 const progressActions = {
     __finalizeWithdraw: async (params) => {
-        let { sendTo, isAutoWithdraw, ticker, isAffiliate, currency, app, user, amount, nonce, withdrawNotification, fee } = params;
+        let { sendTo, isAutoWithdraw, ticker, isAffiliate, app, user, amount, nonce, withdrawNotification, fee } = params;
         let transaction = null;
         let tx = null;
         let autoWithdraw = null;
@@ -228,7 +228,7 @@ const progressActions = {
 
         for(let withdraw of withdraws){
             if(!withdraw.transactionHash){
-                let ticker = (withdraw.currency.ticker.toUpperCase()) == "BTC" ? "BTC" : "ETH";
+                let ticker = (withdraw.currency_ticker.toUpperCase()) == "BTC" ? "BTC" : "ETH";
                 const getTransaction =  (await TrustologySingleton.method(ticker).getTransaction(withdraw.request_id)).data.getRequest;
                 const tx = getTransaction.transactionHash
                 let status = 'Canceled';
@@ -237,25 +237,27 @@ const progressActions = {
                     status = tx ? 'Processed' : 'Queue';
                     note = (status == 'Processed') ? "Successful withdrawal" : "Withdrawal waiting"
                 } 
-                if(getTransaction.status == 'USER_CANCELLED' && withdraw.status.toUpperCase() != 'CANCELED'){
-                    const app_wallet = app.wallet.find(w => new String(w.currency._id).toString() == new String(withdraw.currency._id).toString());
-                    const user_wallet = user.wallet.find(w => new String(w.currency._id).toString() == new String(withdraw.currency._id).toString());
-                    await WalletsRepository.prototype.updatePlayBalance(app_wallet._id, -(parseFloat(withdraw.fee)));
-                    await WalletsRepository.prototype.updatePlayBalance(user_wallet._id, parseFloat(withdraw.amount));
-                }
-                const link_url = setLinkUrl({ ticker: withdraw.currency.ticker, address: tx, isTransactionHash: true })
-                await WithdrawRepository.prototype.findByIdAndUpdateTX({
+                // if(getTransaction.status == 'USER_CANCELLED' && withdraw.status.toUpperCase() != 'CANCELED'){
+                //     const app_wallet = app.wallet.find(w => new String(w.currency._id).toString() == new String(withdraw.currency._id).toString());
+                //     const user_wallet = user.wallet.find(w => new String(w.currency._id).toString() == new String(withdraw.currency._id).toString());
+                //     await WalletsRepository.prototype.updatePlayBalance(app_wallet._id, -(parseFloat(withdraw.fee)));
+                //     await WalletsRepository.prototype.updatePlayBalance(user_wallet._id, parseFloat(withdraw.amount));
+                // }
+                const link_url = setLinkUrl({ ticker: withdraw.currency_ticker, address: tx, isTransactionHash: true })
+                await WithdrawRepository.findByIdAndUpdateTX({
                     _id: withdraw._id,
                     tx,
                     link_url,
                     status: status,
-                    note: note
+                    note: note,
+                    last_update_timestamp: new Date()
                 });
             }
         }
 
-        const withdraws_updated = await WithdrawRepository.prototype.getAll({
-            user: user._id,
+        const withdraws_updated = await WithdrawRepository.getAll({
+            user,
+            app,
             size,
             offset 
         });

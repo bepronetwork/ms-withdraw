@@ -31,8 +31,33 @@ class Withdraw {
             });
         });
     }
+
+    findByIdAndUpdateTX({_id, tx, link_url, status, note, last_update_timestamp}){
+        return new Promise((resolve, reject)=>{
+            WithdrawModel.update(
+                {
+                    transactionHash: tx,
+                    link_url: link_url,
+                    status: status,
+                    note: note,
+                    last_update_timestamp: last_update_timestamp
+                },
+                {
+                    where: {
+                        _id: _id
+                    }
+                }
+            )
+            .then((res)=>{
+                resolve(res);
+            })
+            .catch((err)=>{
+                reject(err);
+            });
+        });
+    }
 }
 
-WithdrawRepository = new Withdraw();
+const WithdrawRepository = new Withdraw();
 
 export { WithdrawRepository };
