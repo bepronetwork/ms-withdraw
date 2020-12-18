@@ -1,4 +1,4 @@
-import { globals } from "../../Globals";
+import { globals } from "../../../Globals";
 import Axios from "axios";
 import EtherscanSingleton from "../etherscan/etherscan";
 import Numbers from "./numbers";

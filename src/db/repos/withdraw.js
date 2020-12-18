@@ -13,6 +13,6 @@ class Withdraw {
     }
 }
 
-WithdrawRepository = new Withdraw();
+const WithdrawRepository = new Withdraw();
 
 export { WithdrawRepository };

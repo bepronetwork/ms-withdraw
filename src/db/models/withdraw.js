@@ -1,10 +1,13 @@
 import { globals } from "../../../Globals";
-let db = globals.DB;
-const { DataTypes, Model } = require('sequelize');
+const db = globals.DB;
+const { DataTypes } = require('sequelize');
 
-export class Withdraw extends Model {}
-
-Withdraw.init({
+const Withdraw = db.define('Withdraw', {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
+  },
   user: {
     type: DataTypes.STRING,
     // allowNull: false
@@ -78,7 +81,6 @@ Withdraw.init({
   fee: {
     type: DataTypes.NUMBER
   },
-}, {
-  db,
-  modelName: 'Withdraw'
 });
+
+export {Withdraw};

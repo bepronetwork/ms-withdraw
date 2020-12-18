@@ -7,7 +7,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
 // Scheduler   
-import { globals } from './Globals';
+import { globals } from '../Globals';
 import { Logger } from './helpers/logger';
 import { PORT } from './config';
 import { rateLimiterUsingThirdParty } from './controllers/middlewares';
@@ -31,7 +31,6 @@ SwaggerExpress.create(config, async (err, swaggerExpress) => {
     // set the ENV variables if Production
 	// install middleware
 	swaggerExpress.register(app);
-    globals.verify();
 	app.listen(PORT, () => {
         Logger.success("MicroService Withdraw Running", PORT);
         globals.connect();

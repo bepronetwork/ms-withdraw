@@ -403,7 +403,7 @@ const progressActions = {
         await WalletRepository.save({
             user        : params.id,
             app         : params.app,
-            address     : params.newAddress.address,
+            address     : newAddress.address,
             currency    : params.currency,
             subWalletId : newAddress.subWalletId,
             ticker      : params.ticker,
