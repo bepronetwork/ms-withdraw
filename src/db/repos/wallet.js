@@ -1,8 +1,32 @@
-import { Wallet } from "../models/wallet";
-class WalletRepository {
+import { Wallet as WalletModel } from "../models";
+class Wallet {
     save(data){
         return new Promise((resolve, reject)=>{
-            Wallet.create(data)
+            WalletModel.create(data)
+            .then((res)=>{
+                resolve(res);
+            })
+            .catch((err)=>{
+                reject(err);
+            });
+        });
+    }
+
+    findWalletBySubWalletId(subWalletId) {
+        return new Promise((resolve, reject)=>{
+            WalletModel.findOne({subWalletId})
+            .then((res)=>{
+                resolve(res);
+            })
+            .catch((err)=>{
+                reject(err);
+            });
+        });
+    }
+
+    findByUserAndTicker(user, ticker) {
+        return new Promise((resolve, reject)=>{
+            WalletModel.findOne({user, ticker})
             .then((res)=>{
                 resolve(res);
             })
@@ -13,6 +37,6 @@ class WalletRepository {
     }
 }
 
-WalletRepository = new WithdrawSchema();
+const WalletRepository = new Wallet();
 
 export { WalletRepository };

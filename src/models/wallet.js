@@ -1,7 +1,6 @@
 import {WalletLogic} from '../logic';
 import {WalletsRepository} from '../db/repos';
 import ModelComponent from './modelComponent';
-import { UpdateMaxWithdrawSingleton, UpdateMinWithdrawSingleton , UpdateAffiliateMinWithdrawSingleton} from "../controllers/Mapper";
 
 class Wallet extends ModelComponent{
 
@@ -9,16 +8,12 @@ class Wallet extends ModelComponent{
 
         let db = new WalletsRepository();
 
-        super(
-            {
+        super({
                 name : 'Wallet', 
                 logic : new WalletLogic({db : db}), 
-                db : db,
-                self : null, 
-                params : params,
-                children : []
-            }
-            );
+                self : null,
+                params : params
+        });
     }
 
     async register(){

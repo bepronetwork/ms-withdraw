@@ -43,13 +43,10 @@ async function webhookDeposit(req, res) {
         console.log("1 ", params);
         console.log("2 ",params.data);
         console.log("3 ",params.data.subWalletIdString);
-        let walletReal = await WalletsRepository.prototype.findWalletBySubWalletId(params.data.subWalletIdString);
-        console.log("4 ",walletReal);
-        let userTemp   = await UsersRepository.prototype.findByWallet(walletReal._id);
         for(let transaction of listTransactions) {
             if(transaction.data.transactionType=="RECEIVED"){
                 try {
-                    let user = new User({...transaction, id: userTemp._id});
+                    let user = new User({...transaction});
                     data.push((await user.updateWallet()));
                 } catch(error) {
                     console.log("error ", error);

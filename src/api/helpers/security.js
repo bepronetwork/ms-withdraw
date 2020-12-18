@@ -1,7 +1,7 @@
 import { AdminsRepository, PermissionRepository } from "../../db/repos";
 import * as crypto from "crypto";
 const axios = require('axios');
-import {MS_MASTER_URL} from "../../config";
+import {MS_MASTER_URL, PRIVATE_KEY} from "../../config";
 
 class Security{
 
