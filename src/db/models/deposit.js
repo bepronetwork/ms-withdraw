@@ -1,12 +1,15 @@
 import { globals } from "../../../Globals";
-let db = globals.DB;
-const { DataTypes, Model } = require('sequelize');
+const db = globals.DB;
+const { DataTypes } = require('sequelize');
 
-export class Deposit extends Model {}
-
-Deposit.init({
+const Deposit = db.define('Deposit', {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
+  },
   user: {
-    type: DataTypes.STRING
+    type: DataTypes.STRING,
   },
   app: {
     type: DataTypes.STRING
@@ -16,8 +19,7 @@ Deposit.init({
   },
   amount: {
     type: DataTypes.NUMBER
-  },
-}, {
-  db,
-  modelName: 'Deposit'
+  }
 });
+
+export {Deposit};

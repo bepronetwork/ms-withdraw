@@ -3,7 +3,7 @@ import { ErrorManager } from '../controllers/Errors';
 import LogicComponent from './logicComponent';
 import Numbers from './services/numbers';
 
-import {DepositRepository, WalletRepository, WithdrawRepository } from '../db/repos';
+import { DepositRepository, WalletRepository, WithdrawRepository } from '../db/repos';
 import { Deposit, Withdraw, Address } from '../models';
 import { throwError } from '../controllers/Errors/ErrorManager';
 import Mailer from './services/mailer';
@@ -46,7 +46,7 @@ const processActions = {
     __updateWallet: async (params) => {
         try {
             let wallet = await WalletRepository.findWalletBySubWalletId(params.data.subWalletIdString);
-            return {...params, id: wallet.user, currency: wallet.currency};
+            return { ...params, id: wallet.user, currency: wallet.currency };
         } catch (err) {
             throw err;
         }
@@ -72,13 +72,13 @@ const processActions = {
             user,
             app,
             size,
-            offset 
+            offset
         });
         const withdraws = await WithdrawRepository.getAll({
             user: user,
             app,
             size,
-            offset 
+            offset
         });
         return {
             deposits: deposits,
@@ -108,7 +108,7 @@ const progressActions = {
         let tx = null;
         let autoWithdraw = null;
         let trustTicker = (ticker.toUpperCase()) == "BTC" ? "BTC" : "ETH";
-        
+
         if (isAutoWithdraw) {
             transaction = await TrustologySingleton.method(trustTicker).autoSendTransaction(
                 sendTo,
@@ -125,7 +125,7 @@ const progressActions = {
             );
             autoWithdraw = false;
         }
-        
+
         let link_url = setLinkUrl({ ticker: ticker.toUpperCase(), address: tx, isTransactionHash: true })
 
         /* Add Withdraw to user */
@@ -150,10 +150,10 @@ const progressActions = {
         }
 
         const withdrawSaveObject = await WithdrawRepository.save(withdraw)
-        console.log("withdrawSaveObject:: ",withdrawSaveObject);
+        console.log("withdrawSaveObject:: ", withdrawSaveObject);
 
-        return{
-            withdraw_id: withdrawSaveObject._id,
+        return {
+            withdraw_id: withdrawSaveObject.id,
             tx: tx,
             autoWithdraw
         };
@@ -167,13 +167,13 @@ const progressActions = {
             var data = JSON.stringify(params);
 
             var config = {
-            method: 'post',
-            url: `${MS_MASTER_URL}/api/user/credit`,
-            headers: {
-                'x-sha2-signature': computedHashSignature,
-                'Content-Type': 'application/json'
-            },
-            data : data
+                method: 'post',
+                url: `${MS_MASTER_URL}/api/user/credit`,
+                headers: {
+                    'x-sha2-signature': computedHashSignature,
+                    'Content-Type': 'application/json'
+                },
+                data: data
             };
 
             await axios(config);
@@ -184,10 +184,10 @@ const progressActions = {
         }
     },
     __getDepositAddress: async (params) => {
-        if(params.wallet){
+        if (params.wallet) {
             return {
                 address: params.wallet.address,
-                ticker : params.ticker
+                ticker: params.ticker
             }
         }
         let newAddress = {};
@@ -197,7 +197,7 @@ const progressActions = {
                 await TrustologySingleton
                     .method(ticker)
                     .createSubWallet(
-                        ticker=="eth" ? TRUSTOLOGY_WALLETID_ETH.split("/")[0] : TRUSTOLOGY_WALLETID_BTC.split("/")[0],
+                        ticker == "eth" ? TRUSTOLOGY_WALLETID_ETH.split("/")[0] : TRUSTOLOGY_WALLETID_BTC.split("/")[0],
                         params.id
                     )
             ).data.createSubWallet.subWalletId;
@@ -208,13 +208,13 @@ const progressActions = {
         }
 
         await WalletRepository.save({
-            user        : params.id,
-            app         : params.app,
-            address     : newAddress.address,
-            currency    : params.currency,
-            subWalletId : newAddress.subWalletId,
-            ticker      : params.ticker,
-            erc20       : params.erc20
+            user: params.id,
+            app: params.app,
+            address: newAddress.address,
+            currency: params.currency,
+            subWalletId: newAddress.subWalletId,
+            ticker: params.ticker,
+            erc20: params.erc20
         });
 
         return {
@@ -224,47 +224,48 @@ const progressActions = {
 
     },
     __getTransactions: async (params) => {
-        let{ withdraws, app, user, size, offset, deposits } = params;
-
-        for(let withdraw of withdraws){
-            if(!withdraw.transactionHash){
-                let ticker = (withdraw.currency_ticker.toUpperCase()) == "BTC" ? "BTC" : "ETH";
-                const getTransaction =  (await TrustologySingleton.method(ticker).getTransaction(withdraw.request_id)).data.getRequest;
-                const tx = getTransaction.transactionHash
-                let status = 'Canceled';
-                let note = "The withdrawal was canceled by the administrator, the money has already returned to your account."
-                if(withdraw.status.toUpperCase() != 'CANCELED'){
-                    status = tx ? 'Processed' : 'Queue';
-                    note = (status == 'Processed') ? "Successful withdrawal" : "Withdrawal waiting"
-                } 
-                // if(getTransaction.status == 'USER_CANCELLED' && withdraw.status.toUpperCase() != 'CANCELED'){
-                //     const app_wallet = app.wallet.find(w => new String(w.currency._id).toString() == new String(withdraw.currency._id).toString());
-                //     const user_wallet = user.wallet.find(w => new String(w.currency._id).toString() == new String(withdraw.currency._id).toString());
-                //     await WalletsRepository.prototype.updatePlayBalance(app_wallet._id, -(parseFloat(withdraw.fee)));
-                //     await WalletsRepository.prototype.updatePlayBalance(user_wallet._id, parseFloat(withdraw.amount));
-                // }
-                const link_url = setLinkUrl({ ticker: withdraw.currency_ticker, address: tx, isTransactionHash: true })
-                await WithdrawRepository.findByIdAndUpdateTX({
-                    _id: withdraw._id,
-                    tx,
-                    link_url,
-                    status: status,
-                    note: note,
-                    last_update_timestamp: new Date()
-                });
+        let { withdraws, app, user, size, offset, deposits } = params;
+        let withdraws_updated = withdraws;
+        if (withdraws.length != 0) {
+            for (let withdraw of withdraws) {
+                if (!withdraw.transactionHash) {
+                    let ticker = (withdraw.currency_ticker.toUpperCase()) == "BTC" ? "BTC" : "ETH";
+                    const getTransaction = (await TrustologySingleton.method(ticker).getTransaction(withdraw.request_id)).data.getRequest;
+                    const tx = getTransaction.transactionHash
+                    let status = 'Canceled';
+                    let note = "The withdrawal was canceled by the administrator, the money has already returned to your account."
+                    if (withdraw.status.toUpperCase() != 'CANCELED') {
+                        status = tx ? 'Processed' : 'Queue';
+                        note = (status == 'Processed') ? "Successful withdrawal" : "Withdrawal waiting"
+                    }
+                    // if(getTransaction.status == 'USER_CANCELLED' && withdraw.status.toUpperCase() != 'CANCELED'){
+                    //     const app_wallet = app.wallet.find(w => new String(w.currency._id).toString() == new String(withdraw.currency._id).toString());
+                    //     const user_wallet = user.wallet.find(w => new String(w.currency._id).toString() == new String(withdraw.currency._id).toString());
+                    //     await WalletsRepository.prototype.updatePlayBalance(app_wallet._id, -(parseFloat(withdraw.fee)));
+                    //     await WalletsRepository.prototype.updatePlayBalance(user_wallet._id, parseFloat(withdraw.amount));
+                    // }
+                    const link_url = setLinkUrl({ ticker: withdraw.currency_ticker, address: tx, isTransactionHash: true })
+                    await WithdrawRepository.findByIdAndUpdateTX({
+                        id: withdraw.id,
+                        tx,
+                        link_url,
+                        status: status,
+                        note: note,
+                        last_update_timestamp: new Date()
+                    });
+                }
             }
+            withdraws_updated = await WithdrawRepository.getAll({
+                user,
+                app,
+                size,
+                offset
+            });
         }
-
-        const withdraws_updated = await WithdrawRepository.getAll({
-            user,
-            app,
-            size,
-            offset 
-        });
 
         return {
             deposits,
-            withdraws : withdraws_updated
+            withdraws: withdraws_updated
         };
     },
 }

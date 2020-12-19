@@ -32,7 +32,7 @@ class Withdraw {
         });
     }
 
-    findByIdAndUpdateTX({_id, tx, link_url, status, note, last_update_timestamp}){
+    findByIdAndUpdateTX({id, tx, link_url, status, note, last_update_timestamp}){
         return new Promise((resolve, reject)=>{
             WithdrawModel.update(
                 {
@@ -44,7 +44,7 @@ class Withdraw {
                 },
                 {
                     where: {
-                        _id: _id
+                        id: id
                     }
                 }
             )
