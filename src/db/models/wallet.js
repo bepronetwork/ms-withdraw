@@ -1,10 +1,14 @@
 import { globals } from "../../../Globals";
 let db = globals.DB;
-const { DataTypes, Model } = require('sequelize');
+const { DataTypes } = require('sequelize');
 
-export class Wallet extends Model {}
 
-Wallet.init({
+const Wallet = db.define('Wallet', {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
+  },
   user: {
     type: DataTypes.STRING
   },
@@ -26,7 +30,6 @@ Wallet.init({
   erc20: {
     type: DataTypes.BOOLEAN
   }
-}, {
-  db,
-  modelName: 'Wallet'
 });
+
+export {Wallet};

@@ -1,23 +1,15 @@
 import {UserLogic} from '../logic';
 import ModelComponent from './modelComponent';
 import {UsersRepository} from '../db/repos';
-
 class User extends ModelComponent{
 
     constructor(params){
-
-        let db = new UsersRepository();
-
         super(
             {
                 name : 'User', 
-                logic : new UserLogic({db : db}), 
-                db : db,
+                logic : new UserLogic({}),
                 self : null, 
-                params : params,
-                children : [
-
-                ]
+                params : params
             }
             );
     }
@@ -57,20 +49,20 @@ class User extends ModelComponent{
     
     async getDepositAddress() {
         // Output = Null
-        const { id } = this.self.params;
+        // const { id } = this.self.params;
         try{
             /* Close Mutex */
-            await UsersRepository.prototype.changeWithdrawPositionGetAddress(id, true);
+            // await UsersRepository.prototype.changeWithdrawPositionGetAddress(id, true);
             let res = await this.process('GetDepositAddress');
             /* Open Mutex */
-            await UsersRepository.prototype.changeWithdrawPositionGetAddress(id, false);
+            // await UsersRepository.prototype.changeWithdrawPositionGetAddress(id, false);
             return res;
         }catch(err){
-            if(parseInt(err.code) != 14){
-                /* If not withdrawing atm */
-                /* Open Mutex */
-                await UsersRepository.prototype.changeWithdrawPositionGetAddress(id, false);
-            }
+            // if(parseInt(err.code) != 14){
+            //     /* If not withdrawing atm */
+            //     /* Open Mutex */
+            //     await UsersRepository.prototype.changeWithdrawPositionGetAddress(id, false);
+            // }
             throw err;
         }
     }
