@@ -171,6 +171,14 @@ const processActions = {
     __updateWallet: async (params) => {
         try {
             let wallet = await WalletRepository.findWalletBySubWalletId(params.data.subWalletIdString);
+
+            const tx   = ;
+
+            if(){
+                
+            }
+
+
             return {...params, id: wallet.user, currency: wallet.currency};
         } catch (err) {
             throw err;

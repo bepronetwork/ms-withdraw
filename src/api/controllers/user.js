@@ -33,7 +33,7 @@ async function cancelWithdraw (req, res) {
 async function webhookDeposit(req, res) {
     try {
         const params = convertDataSingleton.getDataWebHook(req);
-        // SecuritySingleton.checkWebhook(req, params.type=="BTC" ? TRUSTOLOGY_WEBHOOK_KEY_BTC : TRUSTOLOGY_WEBHOOK_KEY_ETH);
+        SecuritySingleton.checkWebhook(req, params.type=="BTC" ? TRUSTOLOGY_WEBHOOK_KEY_BTC : TRUSTOLOGY_WEBHOOK_KEY_ETH);
         let data = [];
         let listTransactions = params.isToken ? params.data.tokensData.map((item)=> {
             return {
