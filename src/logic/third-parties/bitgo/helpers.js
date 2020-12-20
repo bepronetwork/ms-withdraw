@@ -3,7 +3,6 @@ import CurrencyRepository from '../../../db/repos/currency';
 const web3 = new Web3(new Web3.providers.HttpProvider("https://mainnet.infura.io/v3/811fe4fa5c4b41cb9b92f9656aaeaa3b"));
 
 export const getCurrencyAmountToBitGo = async ({ticker, amount}) => {
-    
     switch(new String(ticker).toLowerCase().trim()){
         case 'eth' : {
             // to wei
@@ -14,9 +13,8 @@ export const getCurrencyAmountToBitGo = async ({ticker, amount}) => {
             return parseInt(parseFloat(amount)*100000000);
         }
     };
-            
     const dataTicker = await CurrencyRepository.prototype.findByTicker(ticker);
-    return parseInt(parseFloat(amount)*(10 ** dataTicker.decimals));
+    return BigInt(parseFloat(amount)*(10 ** dataTicker.decimals)).toString().split("n")[0];
 }
 
 export const getCurrencyAmountFromBitGo = async ({ticker, amount}) => {
