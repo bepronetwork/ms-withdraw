@@ -5,6 +5,5 @@ import { DepositRepository } from "./deposit";
 export {
     DepositRepository,
     WithdrawRepository,
-    WalletRepository,
-    DepositRepository
+    WalletRepository
 }

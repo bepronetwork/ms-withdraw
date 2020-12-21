@@ -22,10 +22,6 @@ export const DB_STRING = process.env.DB_STRING;
 
 export const ETH_RPC_URL = process.env.ETH_RPC_URL;
 
-export const TRUSTOLOGY_MANUAL_WALLETID_BTC = process.env.TRUSTOLOGY_MANUAL_WALLETID_BTC;
-
-export const TRUSTOLOGY_MANUAL_WALLETID_ETH = process.env.TRUSTOLOGY_MANUAL_WALLETID_ETH;
-
 export const PUBLIC_KEY = process.env.PUBLIC_KEY;
 
 export const PRIVATE_KEY = process.env.PRIVATE_KEY;
@@ -42,6 +38,14 @@ export const SENDINBLUE_API_KEY = process.env.SENDINBLUE_API_KEY;
 
 export const SENDINBLUE_EMAIL_TO = process.env.SENDINBLUE_EMAIL_TO;
 
+export const PUSHER_APP_ID = process.env.PUSHER_APP_ID;
+
+export const PUSHER_APP_KEY = process.env.PUSHER_APP_KEY;
+
+export const PUSHER_APP_SECRET = process.env.PUSHER_APP_SECRET;
+
+
+
 export const TRUSTOLOGY_PRIVATE_KEY_BTC = process.env.TRUSTOLOGY_PRIVATE_KEY_BTC;
 
 export const TRUSTOLOGY_PRIVATE_KEY_ETH = process.env.TRUSTOLOGY_PRIVATE_KEY_ETH;
@@ -50,25 +54,21 @@ export const TRUSTOLOGY_API_KEY = process.env.TRUSTOLOGY_API_KEY;
 
 export const TRUSTOLOGY_URL = process.env.TRUSTOLOGY_URL;
 
-export const TRUSTOLOGY_AUTO_WALLETID_BTC = process.env.TRUSTOLOGY_AUTO_WALLETID_BTC;
-
-export const TRUSTOLOGY_WALLETID_ETH = process.env.TRUSTOLOGY_WALLETID_ETH;
-
 export const TRUSTOLOGY_WEBHOOK_KEY_ETH = process.env.TRUSTOLOGY_WEBHOOK_KEY_ETH;
 
 export const TRUSTOLOGY_WEBHOOK_KEY_BTC = process.env.TRUSTOLOGY_WEBHOOK_KEY_BTC;
 
-export const PUSHER_APP_ID = process.env.PUSHER_APP_ID;
+export const TRUSTOLOGY_AUTO_WALLETID_BTC = process.env.TRUSTOLOGY_AUTO_WALLETID_BTC;
 
-export const PUSHER_APP_KEY = process.env.PUSHER_APP_KEY;
-
-export const PUSHER_APP_SECRET = process.env.PUSHER_APP_SECRET;
-
-export const ETHEREUM_AUTO_ADDRESS = process.env.ETHEREUM_AUTO_ADDRESS;
+export const TRUSTOLOGY_AUTO_ADDRESS_ETH = process.env.TRUSTOLOGY_AUTO_ADDRESS_ETH;
 
 export const TRUSTOLOGY_MANUAL_WALLETID_BTC = process.env.TRUSTOLOGY_MANUAL_WALLETID_BTC;
 
 export const TRUSTOLOGY_MANUAL_ADDRESS_ETH = process.env.TRUSTOLOGY_MANUAL_ADDRESS_ETH;
+
+export const TRUSTOLOGY_MANUAL_WALLETID_ETH = process.env.TRUSTOLOGY_MANUAL_WALLETID_ETH;
+
+
 
 export const ENV = process.env.ENV;
 

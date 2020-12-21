@@ -1,5 +1,5 @@
 import { Prototype } from "./prototype";
-import { ETHEREUM_AUTO_ADDRESS, TRUSTOLOGY_MANUAL_ADDRESS_ETH, TRUSTOLOGY_PRIVATE_KEY_ETH } from "../../../config";
+import { TRUSTOLOGY_AUTO_ADDRESS_ETH, TRUSTOLOGY_MANUAL_ADDRESS_ETH, TRUSTOLOGY_PRIVATE_KEY_ETH } from "../../../config";
 const { ec: EC } = require("elliptic");
 const axios = require('axios');
 const keyPair = new EC("p256").keyFromPrivate(TRUSTOLOGY_PRIVATE_KEY_ETH);
@@ -115,7 +115,7 @@ export class ETH extends Prototype {
                 console.log("publicKeySignaturePair: ", publicKeySignaturePair);
                 return publicKeySignaturePair;
             };
-            return await this.getSettings().sendEthereum(ETHEREUM_AUTO_ADDRESS, toAddress, amount, asset, "MEDIUM", "GBP", sign);
+            return await this.getSettings().sendEthereum(TRUSTOLOGY_AUTO_ADDRESS_ETH, toAddress, amount, asset, "MEDIUM", "GBP", sign);
         } catch (error) {
             console.log(error)
         }

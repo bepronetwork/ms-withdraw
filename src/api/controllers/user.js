@@ -10,7 +10,9 @@ import { UsersRepository, WalletsRepository } from '../../db/repos';
 
 async function finalizeWithdraw (req, res) {
     try{
-        SecuritySingleton.verifyServeToServe(req.headers, req.body);
+        console.log(1)
+        SecuritySingleton.verifyServeToServe(req);
+        console.log(2)
         let params = req.body;
         let user = new User(params);
         let data = await user.finalizeWithdraw();
