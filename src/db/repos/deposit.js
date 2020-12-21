@@ -11,6 +11,23 @@ class Deposit {
             });
         });
     }
+
+    findByTX(transactionHash){
+        return new Promise((resolve, reject)=>{
+            DepositModel.findOne({
+                where:{
+                    transactionHash
+                }
+            })
+            .then((res)=>{
+                resolve(res);
+            })
+            .catch((err)=>{
+                reject(err);
+            });
+        });
+    }
+
 }
 
 const DepositRepository = new Deposit();

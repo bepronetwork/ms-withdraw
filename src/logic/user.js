@@ -2,7 +2,7 @@ const _ = require('lodash');
 import { ErrorManager } from '../controllers/Errors';
 import LogicComponent from './logicComponent';
 
-import {WalletRepository } from '../db/repos';
+import {DepositRepository, WalletRepository } from '../db/repos';
 import { Deposit, Withdraw, Address } from '../models';
 import { throwError } from '../controllers/Errors/ErrorManager';
 import Mailer from './services/mailer';
@@ -171,13 +171,11 @@ const processActions = {
     __updateWallet: async (params) => {
         try {
             let wallet = await WalletRepository.findWalletBySubWalletId(params.data.subWalletIdString);
+            const tx   = await DepositRepository.findByTX(params.data.tx);
 
-            const tx   = ;
-
-            if(){
-                
+            if(tx==null){
+                throwError("ALREADY_EXISTING_DEPOSIT_TRANSACTION");
             }
-
 
             return {...params, id: wallet.user, currency: wallet.currency};
         } catch (err) {
@@ -365,7 +363,9 @@ const progressActions = {
             data : data
             };
 
-            await axios(config);
+            let res = await axios(config);
+
+            await DepositRepository.findByTX(res.data);
 
             return params;
         } catch (err) {
