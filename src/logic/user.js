@@ -10,7 +10,7 @@ import Mailer from './services/mailer';
 import { setLinkUrl } from '../helpers/linkUrl';
 import { PusherSingleton, TrustologySingleton } from './third-parties';
 import { getVirtualAmountFromRealCurrency } from '../helpers/virtualWallet';
-import { PRIVATE_KEY, TRUSTOLOGY_WALLETID_BTC, TRUSTOLOGY_WALLETID_ETH } from '../config';
+import { PRIVATE_KEY, TRUSTOLOGY_MANUAL_WALLETID_BTC, TRUSTOLOGY_MANUAL_WALLETID_ETH, MS_MASTER_URL } from '../config';
 import * as crypto from "crypto";
 const axios = require('axios');
 let error = new ErrorManager();
@@ -46,7 +46,13 @@ const processActions = {
     __updateWallet: async (params) => {
         try {
             let wallet = await WalletRepository.findWalletBySubWalletId(params.data.subWalletIdString);
-            return { ...params, id: wallet.user, currency: wallet.currency };
+            const tx   = await DepositRepository.findByTX(params.data.tx);
+
+            if(tx==null){
+                throwError("ALREADY_EXISTING_DEPOSIT_TRANSACTION");
+            }
+
+            return {...params, id: wallet.user, currency: wallet.currency};
         } catch (err) {
             throw err;
         }
@@ -54,7 +60,8 @@ const processActions = {
     __getDepositAddress: async (params) => {
         var { currency, id, app, ticker, erc20 } = params;
         // if (!user.email_confirmed) { throwError('UNCONFIRMED_EMAIL') }
-        const wallet = await WalletRepository.findByUserAndTicker(app, ticker);
+        const wallet = await WalletRepository.findByUserAndTicker(id, ticker);
+        console.log(wallet);
         return {
             currency,
             id,
@@ -176,7 +183,9 @@ const progressActions = {
                 data: data
             };
 
-            await axios(config);
+            let res = await axios(config);
+
+            await DepositRepository.findByTX(res.data);
 
             return params;
         } catch (err) {
@@ -197,7 +206,7 @@ const progressActions = {
                 await TrustologySingleton
                     .method(ticker)
                     .createSubWallet(
-                        ticker == "eth" ? TRUSTOLOGY_WALLETID_ETH.split("/")[0] : TRUSTOLOGY_WALLETID_BTC.split("/")[0],
+                        ticker=="eth" ? TRUSTOLOGY_MANUAL_WALLETID_ETH.split("/")[0] : TRUSTOLOGY_MANUAL_WALLETID_BTC.split("/")[0],
                         params.id
                     )
             ).data.createSubWallet.subWalletId;

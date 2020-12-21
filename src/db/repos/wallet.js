@@ -14,7 +14,7 @@ class Wallet {
 
     findWalletBySubWalletId(subWalletId) {
         return new Promise((resolve, reject)=>{
-            WalletModel.findOne({subWalletId})
+            WalletModel.findOne({where: {subWalletId}})
             .then((res)=>{
                 resolve(res);
             })
@@ -26,7 +26,7 @@ class Wallet {
 
     findByUserAndTicker(user, ticker) {
         return new Promise((resolve, reject)=>{
-            WalletModel.findOne({user, ticker})
+            WalletModel.findOne({where: {user, ticker}})
             .then((res)=>{
                 resolve(res);
             })

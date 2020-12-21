@@ -22,6 +22,10 @@ export const DB_STRING = process.env.DB_STRING;
 
 export const ETH_RPC_URL = process.env.ETH_RPC_URL;
 
+export const TRUSTOLOGY_MANUAL_WALLETID_BTC = process.env.TRUSTOLOGY_MANUAL_WALLETID_BTC;
+
+export const TRUSTOLOGY_MANUAL_WALLETID_ETH = process.env.TRUSTOLOGY_MANUAL_WALLETID_ETH;
+
 export const PUBLIC_KEY = process.env.PUBLIC_KEY;
 
 export const PRIVATE_KEY = process.env.PRIVATE_KEY;
