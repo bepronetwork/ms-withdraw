@@ -1,6 +1,5 @@
 import { UserLogic } from '../logic';
 import ModelComponent from './modelComponent';
-import { UsersRepository } from '../db/repos';
 class User extends ModelComponent {
 
     constructor(params) {
