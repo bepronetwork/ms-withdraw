@@ -333,6 +333,8 @@ definitions:
       - app
       - currency
       - id
+      - ticker
+      - erc20
     properties:
       app :
         type : string
@@ -352,6 +354,18 @@ definitions:
         example : "5cuedgq7e6t334t34" 
         description: |
           User ID
+      ticker :
+        type : string
+        format : name
+        example : "ETH" 
+        description: |
+          Ticker currency
+      erc20 :
+        type : string
+        format : name
+        example : "ETH" 
+        description: |
+          Ticker currency
   GeneralResponse : 
     type: object
     required:
