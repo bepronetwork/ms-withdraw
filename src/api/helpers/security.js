@@ -70,7 +70,7 @@ class Security{
             method: 'post',
             url: `${MS_MASTER_URL}/api/users/auth`,
             headers: {
-                'Authorization': header.Authorization,
+                'Authorization': header.authorization,
                 'payload': header.payload,
                 'Content-Type': 'application/json'
             },
