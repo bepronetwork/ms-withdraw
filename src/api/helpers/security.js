@@ -79,7 +79,12 @@ class Security{
 
             axios(config)
             .then(function (response) {
-                console.log("response.data :: ", response.data);
+                if(response.data.data.status!=200){
+                    reject({
+                        code : 304,
+                        messsage : 'Forbidden Access'
+                    });
+                }
                 resolve(response);
             })
             .catch(function (error) {
