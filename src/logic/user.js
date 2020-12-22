@@ -46,13 +46,11 @@ const processActions = {
     __updateWallet: async (params) => {
         try {
             let wallet = await WalletRepository.findWalletBySubWalletId(params.data.subWalletIdString);
-            const tx = await DepositRepository.findByTX(params.data.tx);
-
-            if (tx == null) {
+            const tx   = await DepositRepository.findByTX(params.data.tx);
+            if(tx!=null){
                 throwError("ALREADY_EXISTING_DEPOSIT_TRANSACTION");
             }
-
-            return { ...params, id: wallet.user, currency: wallet.currency };
+            return {...params, id: wallet.user, currency: wallet.currency};
         } catch (err) {
             throw err;
         }
@@ -188,8 +186,7 @@ const progressActions = {
             };
 
             let res = await axios(config);
-
-            await DepositRepository.findByTX(res.data);
+            await DepositRepository.save(res.data.data.message);
 
             return params;
         } catch (err) {

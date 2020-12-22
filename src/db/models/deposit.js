@@ -31,22 +31,22 @@ const Deposit = db.define('Deposit', {
     type: DataTypes.STRING
   },
   amount:{
-    type: DataTypes.NUMBER
+    type: DataTypes.FLOAT
   },
   deposit_external_id:{
     type: DataTypes.STRING
   },
   usd_amount:{
-    type: DataTypes.NUMBER
+    type: DataTypes.FLOAT
   },
   callback_URL:{
     type: DataTypes.STRING
   },
   confirmations:{
-    type: DataTypes.NUMBER
+    type: DataTypes.FLOAT
   },
   maxConfirmations:{
-    type: DataTypes.NUMBER
+    type: DataTypes.FLOAT
   },
   confirmed:{
     type: DataTypes.BOOLEAN
@@ -58,16 +58,16 @@ const Deposit = db.define('Deposit', {
     type: DataTypes.BOOLEAN
   },
   purchaseAmount:{
-    type: DataTypes.NUMBER
+    type: DataTypes.FLOAT
   },
   fee:{
-    type: DataTypes.NUMBER
+    type: DataTypes.FLOAT
   },
   hasBonus:{
     type: DataTypes.BOOLEAN
   },
   bonusAmount:{
-    type: DataTypes.NUMBER
+    type: DataTypes.FLOAT
   }
 });
 
