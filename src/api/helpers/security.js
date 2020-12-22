@@ -83,11 +83,10 @@ class Security{
                 resolve(response);
             })
             .catch(function (error) {
-                console.log("error:: ", error);
-                throw {
+                reject({
                     code : 304,
                     messsage : 'Forbidden Access'
-                }
+                });
             });
         });
     }
