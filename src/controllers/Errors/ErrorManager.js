@@ -1,6 +1,5 @@
 import {ErrorHandler} from './codes';
 import _ from 'lodash';
-import { MIN_WITHDRAW } from '../../config';
 
 // Private Use
 let libraries;
