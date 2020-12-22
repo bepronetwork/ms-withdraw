@@ -79,7 +79,7 @@ class Security{
 
             axios(config)
             .then(function (response) {
-                console.log(response);
+                console.log(response.data);
                 resolve(response);
             })
             .catch(function (error) {
