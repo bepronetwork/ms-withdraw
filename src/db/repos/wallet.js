@@ -2,11 +2,15 @@ import { Wallet as WalletModel } from "../models";
 class Wallet {
     save(data){
         return new Promise((resolve, reject)=>{
-            WalletModel.create(data)
-            .then((res)=>{
-                resolve(res);
-            })
-            .catch((err)=>{
+            WalletModel.sync().then(()=>{
+                WalletModel.create(data)
+                .then((res)=>{
+                    resolve(res);
+                })
+                .catch((err)=>{
+                    reject(err);
+                });
+            }).catch((err)=>{
                 reject(err);
             });
         });
