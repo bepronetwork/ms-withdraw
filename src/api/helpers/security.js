@@ -79,11 +79,11 @@ class Security{
 
             axios(config)
             .then(function (response) {
-                console.log(response.data);
+                console.log("response.data :: ", response.data);
                 resolve(response);
             })
             .catch(function (error) {
-                console.log(error);
+                console.log("error:: ", error);
                 throw {
                     code : 304,
                     messsage : 'Forbidden Access'
