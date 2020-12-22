@@ -35,7 +35,7 @@ class Deposit {
                     user: user,
                     app: app
                 },
-                order: ['creation_timestamp', 'DESC'],
+                // order: ['creation_timestamp', 'DESC'],
                 limit: (!size || size > 10) ? 10 : size,
                 offset: !offset ? 0 : offset
             })

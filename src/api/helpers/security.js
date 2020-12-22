@@ -39,8 +39,6 @@ class Security{
             const hmac = crypto.createHmac("SHA256", key);
             const computedHashSignature = hmac.update(JSON.stringify(request.body)).digest("hex");
             const expectedHashSignature = request.headers["x-sha2-signature"];
-            console.log("computedHashSignature:: ", computedHashSignature)
-            console.log("expectedHashSignature:: ", expectedHashSignature)
             if (computedHashSignature !== expectedHashSignature) {
                 throw new Error("Webhook hash signature mismatch");
             }

@@ -19,7 +19,7 @@ class Withdraw {
                     user: user,
                     app: app
                 },
-                order: ['last_update_timestamp', 'DESC'],
+                // order: ['createdAt', 'DESC'],
                 limit: (!size || size > 10) ? 10 : size,
                 offset: !offset ? 0 : offset
             })
