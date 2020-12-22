@@ -157,10 +157,10 @@ const progressActions = {
         }
 
         const withdrawSaveObject = await WithdrawRepository.save(withdraw)
-        console.log("withdrawSaveObject:: ", withdrawSaveObject);
+        console.log("withdrawSaveObject:: ", withdrawSaveObject.dataValues);
 
         return {
-            withdraw_id: withdrawSaveObject.id,
+            request_id: withdrawSaveObject.dataValues.request_id,
             tx: tx,
             autoWithdraw
         };
