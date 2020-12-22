@@ -31,10 +31,10 @@ const Withdraw = db.define('Withdraw', {
     type: DataTypes.STRING
   },
   amount: {
-    type: DataTypes.NUMBER
+    type: DataTypes.FLOAT
   },
   nonce: {
-    type: DataTypes.NUMBER
+    type: DataTypes.INTEGER
   },
   request_id: {
     type: DataTypes.STRING
@@ -61,7 +61,7 @@ const Withdraw = db.define('Withdraw', {
     type: DataTypes.STRING
   },
   fee: {
-    type: DataTypes.NUMBER
+    type: DataTypes.FLOAT
   },
 });
 
