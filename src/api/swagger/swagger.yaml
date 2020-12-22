@@ -361,12 +361,12 @@ definitions:
         description: |
           Ticker currency
       erc20 :
-        type : string
+        type : boolean
         format : name
-        example : "ETH" 
+        example : true
         description: |
-          Ticker currency
-  GeneralResponse : 
+          ERC20
+  GeneralResponse :
     type: object
     required:
       - data
