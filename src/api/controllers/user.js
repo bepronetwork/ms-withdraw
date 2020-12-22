@@ -8,23 +8,12 @@ import { convertDataSingleton } from '../helpers/convertData';
 import { UsersRepository, WalletsRepository } from '../../db/repos';
 
 
-async function requestWithdraw (req, res) {
+async function finalizeWithdraw (req, res) {
     try{
-        SecuritySingleton.verify({type : 'user', req});
+        SecuritySingleton.verifyServeToServe(req);
         let params = req.body;
         let user = new User(params);
-        let data = await user.requestWithdraw();
-        MiddlewareSingleton.respond(res, req, data);
-	}catch(err){
-        MiddlewareSingleton.respondError(res, err);
-	}
-}
-async function cancelWithdraw (req, res) {
-    try{
-        SecuritySingleton.verify({type : 'admin', req, permissions: ["super_admin"]});
-        let params = req.body;
-		let user = new User(params);
-        let data = await user.cancelWithdraw();
+        let data = await user.finalizeWithdraw();
         MiddlewareSingleton.respond(res, req, data);
 	}catch(err){
         MiddlewareSingleton.respondError(res, err);
@@ -54,13 +43,10 @@ async function webhookDeposit(req, res) {
         console.log("1 ", params);
         console.log("2 ",params.data);
         console.log("3 ",params.data.subWalletIdString);
-        let walletReal = await WalletsRepository.prototype.findWalletBySubWalletId(params.data.subWalletIdString);
-        console.log("4 ",walletReal);
-        let userTemp   = await UsersRepository.prototype.findByWallet(walletReal._id);
         for(let transaction of listTransactions) {
             if(transaction.data.transactionType=="RECEIVED"){
                 try {
-                    let user = new User({...transaction, id: userTemp._id});
+                    let user = new User({...transaction});
                     data.push((await user.updateWallet()));
                 } catch(error) {
                     console.log("error ", error);
@@ -76,6 +62,8 @@ async function webhookDeposit(req, res) {
 }
 async function getDepositAddress(req, res) {
     try {
+        req.body.user = req.body.id;
+        await SecuritySingleton.verify(req);
         let params = req.body;
         let user = new User(params);
         let data = await user.getDepositAddress();
@@ -99,7 +87,6 @@ async function getTransactions(req, res) {
 export {
     getTransactions,
     getDepositAddress,
-    requestWithdraw,
-    cancelWithdraw,
+    finalizeWithdraw,
     webhookDeposit
 }

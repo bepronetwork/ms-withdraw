@@ -7,7 +7,7 @@ import { ErrorManager } from '../controllers/Errors';
 import LogicComponent from './logicComponent';
 import { UsersRepository, AppRepository, WalletsRepository, DepositRepository, WithdrawRepository, AffiliateLinkRepository, AffiliateRepository } from '../db/repos';
 import Numbers from './services/numbers';
-import { verifytransactionHashDepositUser, verifytransactionHashWithdrawUser } from './services/services';
+import { verifytransactionHashWithdrawUser } from './services/services';
 import { Deposit, AffiliateLink } from '../models';
 import CasinoContract from './eth/CasinoContract';
 import { globals } from '../Globals';
@@ -109,50 +109,6 @@ const processActions = {
 			...res
 		}
 		return normalized;
-    },
-    __updateWallet : async (params) => {
-        try{
-            if(params.amount <= 0){throwError('INVALID_AMOUNT')}
-            /* Get User Id */
-            let user = await UsersRepository.prototype.findUserById(params.user);
-            let app = await AppRepository.prototype.findAppById(params.app);
-            if(!app){throwError('APP_NOT_EXISTENT')}
-            if(!user){throwError('USER_NOT_EXISTENT')}
-
-            /* Verify if the transactionHash was created */
-            let { isValid, from } = await verifytransactionHashDepositUser(
-                app.blockchain, params.transactionHash, params.amount, 
-                app.platformAddress , app.decimals)
-                
-            /* Verify if this transactionHashs was already added */
-            let deposit = await DepositRepository.prototype.getDepositByTransactionHash(params.transactionHash);
-            let wasAlreadyAdded = deposit ? true : false;
-
-            /* Verify if User Address is Valid */
-            let isValidAddress = (new String(user.address).toLowerCase() == new String(from).toLowerCase());
-
-            /* Verify if User is in App */
-            let user_in_app = (app.users.findIndex(x => (x._id.toString() == user._id.toString())) > -1);
-
-            let res = {
-                isValidAddress,
-                app,
-                user_in_app,
-                wasAlreadyAdded,
-                user_id             : user._id,
-                wallet              : user.wallet._id,
-                creationDate        : new Date(),
-                transactionHash     : params.transactionHash,
-                from                : from,
-                currencyTicker      : app.currencyTicker,
-                amount              : Numbers.toFloat(params.amount),
-                isValid
-            }
-
-            return res;
-        }catch(err){
-            throw err;
-        }
     },
     __finalizeWithdraw : async (params) => {
         try{

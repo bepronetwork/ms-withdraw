@@ -32,12 +32,9 @@ const processActions = {
         app = await AppRepository.prototype.findAppByIdAddCurrencyWallet(app);
         if(!app){throwError('APP_NOT_EXISTENT')}
         let currency = await CurrencyRepository.prototype.findById(currency_id);
-        const walletExtern = (await TrustologySingleton.method(currency.erc20 ? "ETH" : currency.ticker).getAccountIndex(0));
         return  {
             currency,
-            app : app,
-            address : walletExtern.address,
-            subWalletId : `${walletExtern.subWalletId.id}/${walletExtern.subWalletId.type}/${walletExtern.subWalletId.index}`
+            app : app
         }
     }
 }
@@ -77,16 +74,12 @@ const progressActions = {
                 /* Save Wallet on DB */
                 wallet = (await (new Wallet({
                     currency : currency._id,
-                    virtual : false,
-                    bank_address : wallet_eth.bank_address,
-                    subWalletId  : wallet_eth.subWalletId
+                    virtual : false
                 })).register())._doc;
             }else{
                 wallet = (await (new Wallet({
                     currency : currency._id,
-                    virtual : false,
-                    bank_address : address,
-                    subWalletId
+                    virtual : false
                 })).register())._doc;
             }
             let virtualWallet = app.wallet.find( w => w.currency.virtual == true);
@@ -135,8 +128,7 @@ const progressActions = {
         
 
         return {
-            currency_id : currency._id,
-            bank_address : address
+            currency_id : currency._id
         }
     }
 }

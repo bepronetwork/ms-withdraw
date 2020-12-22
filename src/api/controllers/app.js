@@ -23,7 +23,7 @@ import MiddlewareSingleton from '../helpers/middleware';
 
 async function addCurrencyWallet(req, res) {
     try {
-        await SecuritySingleton.verify({ type: 'admin', req, permissions: ["super_admin", "financials"] });
+        await SecuritySingleton.verify(req.headers, req.body);
         let params = req.body;
         let app = new App(params);
         let data = await app.addCurrencyWallet();

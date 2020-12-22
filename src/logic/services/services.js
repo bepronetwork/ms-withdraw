@@ -1,4 +1,4 @@
-import { globals } from "../../Globals";
+import { globals } from "../../../Globals";
 import Axios from "axios";
 import EtherscanSingleton from "../etherscan/etherscan";
 import Numbers from "./numbers";
@@ -63,43 +63,7 @@ function fromExponential(x) {
       }
     }
     return x;
-  }
-
-
-async function verifytransactionHashDepositUser(blockchain, transactionHash, amount, platformAddress, decimals){
-    try{
-
-        /* Get Information of this transactionHash */
-        let res_transaction = await globals.web3.eth.getTransaction(transactionHash);
-        let res_transaction_recipt = await globals.web3.eth.getTransactionReceipt(transactionHash);
-        let res_transaction_decoded = EtherscanSingleton.getTransactionDataCasino(res_transaction, res_transaction_recipt);
-        
-        /* Verify if receiver of Transaction is platformAddress */
-        if(new String(res_transaction_decoded.tokensTransferedTo).toLowerCase() != new String(platformAddress).toLowerCase()){
-            throw false;
-        }
-
-        /* Verify if the Token Amount is the same */
-        if(
-            Numbers.fromExponential(new Number(res_transaction_decoded.tokenAmount)) 
-            != Numbers.toSmartContractDecimals(new Number(amount), decimals)){
-            throw false;
-        }
-
-        /* Verify if Transaction was Succeded */
-        // TO DO 
-
-        return {
-            isValid : true,
-            from :  res_transaction.from 
-        };
-
-    }catch(err){
-        return {
-            isValid : false
-        };
-    }
-};
+}
 
 async function verifytransactionHashWithdrawUser({currency, transactionHash, platformAddress, amount}){
     try{
@@ -270,7 +234,6 @@ async function verifytransactionHashDepositApp(blockchain, transactionHash, amou
 
 export {
     services,
-    verifytransactionHashDepositUser,
     getServices,
     verifytransactionHashDepositApp,
     fromDecimals,

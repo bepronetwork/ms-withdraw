@@ -4,22 +4,14 @@ class ModelComponent{
         this.self = {
             name : scope.name,
             logic : scope.logic,
-            db : scope.db,
             self : scope.self,
-            params : scope.params,
-            children : scope.children || []
+            params : scope.params
         };
     }
 
 
     process = async (processAction) => {
         try{
-            if(this.self.children.length > 0){
-                /** There are dependencies */
-                for( var i = 0; i < this.self.children.length ; i++){
-                    await this.processChild(this.self.children[i], processAction);
-                }
-            }
             /* Normalize Object */
             this.self.normalizedSelf = await this.self.logic.objectNormalize(this.self.params, processAction);
             /* Test Parameteres */
@@ -30,16 +22,6 @@ class ModelComponent{
             return model;
         }catch(err){
             throw err
-        }
-    }
-
-    processChild = async (child, processAction) => {
-        let object = await child.process(processAction);
-        if(object){
-            this.self.params = {
-                ...this.self.params, 
-                [object.type] : object._doc._id
-            }
         }
     }
 }

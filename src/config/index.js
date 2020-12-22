@@ -16,7 +16,9 @@ export const ETH_TEST_NET = process.env.ETH_NET;
 
 export const INFURA_KEY = process.env.INFURA_KEY; 
 
-export const ETH_NET_NAME = process.env.ETH_NET_NAME; 
+export const ETH_NET_NAME = process.env.ETH_NET_NAME;
+
+export const DB_STRING = process.env.DB_STRING;
 
 export const ETH_RPC_URL = process.env.ETH_RPC_URL;
 
@@ -28,10 +30,6 @@ export const MIN_WITHDRAW = parseFloat(process.env.MIN_WITHDRAW);
 
 export const MS_MASTER_URL = process.env.MS_MASTER_URL;
 
-export const BITGO_ACCESS_TOKEN = process.env.BITGO_KEY;
-
-export const BITGO_ENTERPRISE_ID = process.env.BITGO_ENTERPRISE_ID;
-
 export const QUOTA_GUARD_URL = process.env.QUOTA_GUARD_URL;
 
 export const IS_DEVELOPMENT = process.env.ENV == 'development';
@@ -40,7 +38,13 @@ export const SENDINBLUE_API_KEY = process.env.SENDINBLUE_API_KEY;
 
 export const SENDINBLUE_EMAIL_TO = process.env.SENDINBLUE_EMAIL_TO;
 
-export const MONGO_CONNECTION_STRING = process.env.MONGO_CONNECTION_STRING;
+export const PUSHER_APP_ID = process.env.PUSHER_APP_ID;
+
+export const PUSHER_APP_KEY = process.env.PUSHER_APP_KEY;
+
+export const PUSHER_APP_SECRET = process.env.PUSHER_APP_SECRET;
+
+
 
 export const TRUSTOLOGY_PRIVATE_KEY_BTC = process.env.TRUSTOLOGY_PRIVATE_KEY_BTC;
 
@@ -50,40 +54,27 @@ export const TRUSTOLOGY_API_KEY = process.env.TRUSTOLOGY_API_KEY;
 
 export const TRUSTOLOGY_URL = process.env.TRUSTOLOGY_URL;
 
-export const TRUSTOLOGY_WALLETID_BTC = process.env.TRUSTOLOGY_WALLETID_BTC;
-
 export const TRUSTOLOGY_WEBHOOK_KEY_ETH = process.env.TRUSTOLOGY_WEBHOOK_KEY_ETH;
 
 export const TRUSTOLOGY_WEBHOOK_KEY_BTC = process.env.TRUSTOLOGY_WEBHOOK_KEY_BTC;
 
-export const PUSHER_APP_ID = process.env.PUSHER_APP_ID;
+export const TRUSTOLOGY_AUTO_WALLETID_BTC = process.env.TRUSTOLOGY_AUTO_WALLETID_BTC;
 
-export const PUSHER_APP_KEY = process.env.PUSHER_APP_KEY;
+export const TRUSTOLOGY_AUTO_ADDRESS_ETH = process.env.TRUSTOLOGY_AUTO_ADDRESS_ETH;
 
-export const PUSHER_APP_SECRET = process.env.PUSHER_APP_SECRET;
+export const TRUSTOLOGY_MANUAL_WALLETID_BTC = process.env.TRUSTOLOGY_MANUAL_WALLETID_BTC;
 
-export const ETHEREUM_ADDRESS_ENV = process.env.ETHEREUM_ADDRESS_ENV;
+export const TRUSTOLOGY_MANUAL_ADDRESS_ETH = process.env.TRUSTOLOGY_MANUAL_ADDRESS_ETH;
+
+export const TRUSTOLOGY_MANUAL_WALLETID_ETH = process.env.TRUSTOLOGY_MANUAL_WALLETID_ETH;
+
+
 
 export const ENV = process.env.ENV;
 
 /* Variables */
 
 var ETH_NETWORK = config.eth;
-
-/**
- * @function SET_ENV
- */
-
-
-var DB_MONGO = {
-    "connection_string" : process.env.MONGO_URL,
-    "dbs" : {
-        "main" : process.env.MONGO_MAIN,
-        "ecosystem" : process.env.MONGO_ECOSYSTEM,
-        "redis" : process.env.MONGO_REDIS
-    }
-};
-
 
 if(ETH_RPC_URL){
     ETH_NETWORK = changeAllStringsInObjectRecursive(ETH_NETWORK, 'APP_MGMT_PRIVATE_KEY', APP_MGMT_PRIVATE_KEY);

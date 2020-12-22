@@ -48,15 +48,6 @@ export async function finalizeUserWithdraw(params, bearerToken, payload) {
         .then(res => detectServerError(res))
 };
 
-export async function cancelUserWithdraw(params, bearerToken, payload) {
-    return request(global.app)
-        .post('/api/users/cancelWithdraw')
-        .set("authorization", "Bearer " + bearerToken)
-        .set("payload", getPayloadString(payload))
-        .send(params)
-        .then(res => detectServerError(res))
-};
-
 export async function finalizeAppWithdraw(params, bearerToken, payload) {
     return request(global.app)
         .post('/api/app/finalizeWithdraw')

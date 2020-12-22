@@ -1,6 +1,7 @@
-import MiddlewareSingleton from "./middleware";
 import { AdminsRepository, PermissionRepository } from "../../db/repos";
 import * as crypto from "crypto";
+const axios = require('axios');
+import {MS_MASTER_URL, PRIVATE_KEY} from "../../config";
 
 class Security{
 
@@ -33,26 +34,23 @@ class Security{
         }
     }
 
-    verify = ({type, req, permissions=[]}) => {
-        try{
-            let id = req.body[type];
-            if(type=="admin") {
-                this.checkPermission(permissions, id);
+    checkServeToServe = (request, key) => {
+        try {
+            const hmac = crypto.createHmac("SHA256", key);
+            const computedHashSignature = hmac.update(JSON.stringify(request.body)).digest("hex");
+            const expectedHashSignature = request.headers["x-sha2-signature"];
+            if (computedHashSignature !== expectedHashSignature) {
+                throw new Error("Webhook hash signature mismatch");
             }
-            var bearerHeader = req.headers['x-access-token'] || req.headers['authorization']; // Express headers are auto converted to lowercase
-            var payload = JSON.parse(req.headers['payload']); // Payload with Id
-            if(typeof bearerHeader !== 'undefined'){
-                // Split the Space
-                const bearer = bearerHeader.split(' ');
-                // Get Token From Array
-                const bearerToken = bearer[1];
-                let verified = MiddlewareSingleton.verify({token : bearerToken, payload, id});
-                if(!verified){throw new Error()}
-                return verified;
-            } else {
-                throw new Error();
-            }
-        }catch(err){
+        } catch(err) {
+            throw err;
+        }
+    }
+
+    verifyServeToServe = (req) => {
+        try {
+            this.checkServeToServe(req, PRIVATE_KEY);
+        } catch(err) {
             throw {
                 code : 304,
                 messsage : 'Forbidden Access'
@@ -60,6 +58,41 @@ class Security{
         }
     }
 
+    verify = (req) => {
+        let header = req.headers;
+        let body   = req.body;
+        return new Promise((resolve, reject)=>{
+            var data = JSON.stringify(body);
+
+            var config = {
+            method: 'post',
+            url: `${MS_MASTER_URL}/api/users/auth`,
+            headers: {
+                'Authorization': header.authorization,
+                'payload': header.payload,
+                'Content-Type': 'application/json'
+            },
+            data : data
+            };
+
+            axios(config)
+            .then(function (response) {
+                if(response.data.data.status!=200){
+                    reject({
+                        code : 304,
+                        messsage : 'Forbidden Access'
+                    });
+                }
+                resolve(response);
+            })
+            .catch(function (error) {
+                reject({
+                    code : 304,
+                    messsage : 'Forbidden Access'
+                });
+            });
+        });
+    }
 }
 
 let SecuritySingleton = new Security();

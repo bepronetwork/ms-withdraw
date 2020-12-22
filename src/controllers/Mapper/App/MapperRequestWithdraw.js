@@ -73,7 +73,6 @@ let outputs = {
                         "currency": withdraw.currency,
                         "amount": withdraw.amount,
                         "nonce": withdraw.nonce,
-                        "bitgo_id": withdraw.bitgo_id,
                         "last_update_timestamp": withdraw.last_update_timestamp,
                         "logId": withdraw.logId,
                         "transactionHash": withdraw.transactionHash,

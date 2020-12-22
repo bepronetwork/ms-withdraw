@@ -1,4 +1,4 @@
-import { globals } from "../../Globals";
+import { globals } from "../../../Globals";
 import Numbers from "../services/numbers";
 
 export function detectCurrencyAmountToSmartContractAmount({currency, amount}){
