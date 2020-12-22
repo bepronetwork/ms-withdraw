@@ -60,7 +60,9 @@ class Security{
         }
     }
 
-    verify = (header, body) => {
+    verify = (req) => {
+        let header = req.headers;
+        let body   = req.body;
         return new Promise((resolve, reject)=>{
             var data = JSON.stringify(body);
 
@@ -82,7 +84,10 @@ class Security{
             })
             .catch(function (error) {
                 console.log(error);
-                reject(error);
+                throw {
+                    code : 304,
+                    messsage : 'Forbidden Access'
+                }
             });
         });
     }

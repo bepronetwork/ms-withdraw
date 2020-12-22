@@ -64,6 +64,7 @@ async function webhookDeposit(req, res) {
 }
 async function getDepositAddress(req, res) {
     try {
+        await SecuritySingleton.verify(req);
         let params = req.body;
         let user = new User(params);
         let data = await user.getDepositAddress();
