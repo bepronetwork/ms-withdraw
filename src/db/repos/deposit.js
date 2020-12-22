@@ -2,9 +2,14 @@ import { Deposit as DepositModel } from "../models";
 class Deposit {
     save(data){
         return new Promise((resolve, reject)=>{
-            DepositModel.create(data)
-            .then((res)=>{
-                resolve(res);
+            DepositModel.sync().then(()=>{
+                DepositModel.create(data)
+                .then((res)=>{
+                    resolve(res);
+                })
+                .catch((err)=>{
+                    reject(err);
+                });
             })
             .catch((err)=>{
                 reject(err);
@@ -14,13 +19,18 @@ class Deposit {
 
     findByTX(transactionHash){
         return new Promise((resolve, reject)=>{
-            DepositModel.findOne({
-                where:{
-                    transactionHash
-                }
-            })
-            .then((res)=>{
-                resolve(res);
+            DepositModel.sync().then(()=>{
+                DepositModel.findOne({
+                    where:{
+                        transactionHash
+                    }
+                })
+                .then((res)=>{
+                    resolve(res);
+                })
+                .catch((err)=>{
+                    reject(err);
+                });
             })
             .catch((err)=>{
                 reject(err);

@@ -58,7 +58,9 @@ class Security{
         }
     }
 
-    verify = (header, body) => {
+    verify = (req) => {
+        let header = req.headers;
+        let body   = req.body;
         return new Promise((resolve, reject)=>{
             var data = JSON.stringify(body);
 
@@ -66,7 +68,7 @@ class Security{
             method: 'post',
             url: `${MS_MASTER_URL}/api/users/auth`,
             headers: {
-                'Authorization': header.Authorization,
+                'Authorization': header.authorization,
                 'payload': header.payload,
                 'Content-Type': 'application/json'
             },
@@ -75,12 +77,19 @@ class Security{
 
             axios(config)
             .then(function (response) {
-                console.log(response);
+                if(response.data.data.status!=200){
+                    reject({
+                        code : 304,
+                        messsage : 'Forbidden Access'
+                    });
+                }
                 resolve(response);
             })
             .catch(function (error) {
-                console.log(error);
-                reject(error);
+                reject({
+                    code : 304,
+                    messsage : 'Forbidden Access'
+                });
             });
         });
     }

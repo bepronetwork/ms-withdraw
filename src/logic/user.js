@@ -217,7 +217,8 @@ const progressActions = {
             newAddress = (await TrustologySingleton.method(ticker).getAddress(subWalletId)).data.user.subWallet;
             newAddress["subWalletId"] = newAddress.id;
         } else {
-            newAddress = { address: params.wallet.address, subWalletId: params.wallet.subWalletId };
+            const walletRealETH = await WalletRepository.findByUserAndTicker(params.id, "ETH");
+            newAddress = { address: walletRealETH.address, subWalletId: walletRealETH.subWalletId };
         }
 
         await WalletRepository.save({

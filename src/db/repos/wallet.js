@@ -2,11 +2,15 @@ import { Wallet as WalletModel } from "../models";
 class Wallet {
     save(data){
         return new Promise((resolve, reject)=>{
-            WalletModel.create(data)
-            .then((res)=>{
-                resolve(res);
-            })
-            .catch((err)=>{
+            WalletModel.sync().then(()=>{
+                WalletModel.create(data)
+                .then((res)=>{
+                    resolve(res);
+                })
+                .catch((err)=>{
+                    reject(err);
+                });
+            }).catch((err)=>{
                 reject(err);
             });
         });
@@ -14,11 +18,15 @@ class Wallet {
 
     findWalletBySubWalletId(subWalletId) {
         return new Promise((resolve, reject)=>{
-            WalletModel.findOne({where: {subWalletId}})
-            .then((res)=>{
-                resolve(res);
-            })
-            .catch((err)=>{
+            WalletModel.sync().then(()=>{
+                WalletModel.findOne({where: {subWalletId}})
+                .then((res)=>{
+                    resolve(res);
+                })
+                .catch((err)=>{
+                    reject(err);
+                });
+            }).catch((err)=>{
                 reject(err);
             });
         });
@@ -26,9 +34,14 @@ class Wallet {
 
     findByUserAndTicker(user, ticker) {
         return new Promise((resolve, reject)=>{
-            WalletModel.findOne({where: {user, ticker}})
-            .then((res)=>{
-                resolve(res);
+            WalletModel.sync().then(()=>{
+                WalletModel.findOne({where: {user, ticker}})
+                .then((res)=>{
+                    resolve(res);
+                })
+                .catch((err)=>{
+                    reject(err);
+                });
             })
             .catch((err)=>{
                 reject(err);
