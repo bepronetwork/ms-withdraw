@@ -19,22 +19,17 @@ class Withdraw {
 
     getAll({user, app, size, offset}){
         return new Promise((resolve, reject)=>{
-            WithdrawModel.sync().then(()=>{
-                WithdrawModel.findAll({
-                    where: { 
-                        user: user,
-                        app: app
-                    },
-                    order: ['last_update_timestamp', 'DESC'],
-                    limit: (!size || size > 10) ? 10 : size,
-                    offset: !offset ? 0 : offset
-                })
-                .then((res)=>{
-                    resolve(res);
-                })
-                .catch((err)=>{
-                    reject(err);
-                });
+            WithdrawModel.findAll({
+                where: { 
+                    user: user,
+                    app: app
+                },
+                // order: ['createdAt', 'DESC'],
+                limit: (!size || size > 10) ? 10 : size,
+                offset: !offset ? 0 : offset
+            })
+            .then((res)=>{
+                resolve(res);
             })
             .catch((err)=>{
                 reject(err);
