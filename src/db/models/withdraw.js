@@ -33,9 +33,6 @@ const Withdraw = db.define('Withdraw', {
   amount: {
     type: DataTypes.FLOAT
   },
-  nonce: {
-    type: DataTypes.INTEGER
-  },
   request_id: {
     type: DataTypes.STRING
   },
