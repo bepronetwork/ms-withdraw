@@ -45,12 +45,12 @@ const processActions = {
     },
     __updateWallet: async (params) => {
         try {
-            let wallet = await WalletRepository.findWalletBySubWalletId(String((params.isToken) ? params.data.symbol: params.type).toUpperCase(), params.data.subWalletIdString);
-            const tx   = await DepositRepository.findByTX(params.data.tx);
-            if(tx!=null){
+            let wallet = await WalletRepository.findWalletBySubWalletId(String((params.isToken) ? params.data.symbol : params.type).toUpperCase(), params.data.subWalletIdString);
+            const tx = await DepositRepository.findByTX(params.data.tx);
+            if (tx != null) {
                 throwError("ALREADY_EXISTING_DEPOSIT_TRANSACTION");
             }
-            return {...params, id: wallet.user, currency: wallet.currency};
+            return { ...params, id: wallet.user, currency: wallet.currency };
         } catch (err) {
             throw err;
         }
@@ -237,49 +237,51 @@ const progressActions = {
             let withdraws_updated = withdraws;
             if (withdraws.length != 0) {
                 for (let withdraw of withdraws) {
-                    console.log("withdraw:: ", withdraw)
                     if (!withdraw.transactionHash) {
                         let ticker = (withdraw.currency_ticker.toUpperCase()) == "BTC" ? "BTC" : "ETH";
                         const getTransaction = (await TrustologySingleton.method(ticker).getTransaction(withdraw.request_id)).data.getRequest;
                         const tx = getTransaction.transactionHash
                         let status = 'Canceled';
                         let note = "The withdrawal was canceled by the administrator, the money has already returned to your account."
-                        if (withdraw.status.toUpperCase() != 'CANCELED') {
+                        if (getTransaction.status.toUpperCase() != 'USER_CANCELLED' && withdraw.status.toUpperCase() != 'CANCELED') {
                             status = tx ? 'Processed' : 'Queue';
                             note = (status == 'Processed') ? "Successful withdrawal" : "Withdrawal waiting"
                         }
-                        if(getTransaction.status == 'USER_CANCELLED' && withdraw.status.toUpperCase() != 'CANCELED'){
+                        if (getTransaction.status.toUpperCase() == 'USER_CANCELLED' && withdraw.status.toUpperCase() != 'CANCELED') {
                             const body = {
                                 app,
                                 user,
                                 amount: withdraw.amount,
                                 fee: withdraw.fee,
-                                ticker: withdraw.currency_ticker
+                                ticker: withdraw.currency_ticker,
+                                isAffiliate: withdraw.isAffiliate
                             }
                             const hmac = crypto.createHmac("SHA256", PRIVATE_KEY);
                             const hash = hmac.update(JSON.stringify(body)).digest("hex");
                             var data = JSON.stringify(body);
                             var config = {
-                            method: 'post',
-                            url: `${MS_MASTER_URL}/api/user/withdraw/canceled`,
-                            headers: {
-                                'x-sha2-signature': hash,
-                                'Content-Type': 'application/json'
-                            },
-                            data : data
+                                method: 'post',
+                                url: `${MS_MASTER_URL}/api/user/withdraw/canceled`,
+                                headers: {
+                                    'x-sha2-signature': hash,
+                                    'Content-Type': 'application/json'
+                                },
+                                data: data
                             };
-                    
-                            await axios(config);
+
+                            const res = (await axios(config)).data;
+                            console.log("res:: ", res)
+
+                            const link_url = setLinkUrl({ ticker: withdraw.currency_ticker, address: tx, isTransactionHash: true })
+                            await WithdrawRepository.findByIdAndUpdateTX({
+                                id: withdraw.id,
+                                tx,
+                                link_url,
+                                status: status,
+                                note: note,
+                                last_update_timestamp: new Date()
+                            });
                         }
-                        const link_url = setLinkUrl({ ticker: withdraw.currency_ticker, address: tx, isTransactionHash: true })
-                        await WithdrawRepository.findByIdAndUpdateTX({
-                            id: withdraw.id,
-                            tx,
-                            link_url,
-                            status: status,
-                            note: note,
-                            last_update_timestamp: new Date()
-                        });
                     }
                 }
                 withdraws_updated = await WithdrawRepository.getAll({
