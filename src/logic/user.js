@@ -144,7 +144,7 @@ const progressActions = {
             creation_timestamp: new Date(),
             address: sendTo, // Deposit Address
             currency_ticker: ticker,
-            amount,
+            amount: parseFloat(amount),
             withdrawNotification,
             fee,
             isAffiliate,
