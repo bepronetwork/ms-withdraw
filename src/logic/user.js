@@ -123,7 +123,7 @@ const progressActions = {
         if (isAutoWithdraw) {
             transaction = await TrustologySingleton.method(trustTicker).autoSendTransaction(
                 sendTo,
-                (parseFloat(amount) * (Math.pow(10, ((trustTicker == "BTC") ? 8 : 18)))).toString(),
+                (parseFloat(amount) * (Math.pow(10, ((trustTicker == "BTC") ? 8 : 18)))).toFixed(0).toString(),
                 ((trustTicker == "BTC") ? null : ticker.toUpperCase()),
             );
             tx = (await TrustologySingleton.method(trustTicker).getTransaction(transaction)).data.getRequest.transactionHash;
@@ -131,7 +131,7 @@ const progressActions = {
         } else {
             transaction = await TrustologySingleton.method(trustTicker).sendTransaction(
                 sendTo,
-                (parseFloat(amount) * (Math.pow(10, ((trustTicker == "BTC") ? 8 : 18)))).toString(),
+                (parseFloat(amount) * (Math.pow(10, ((trustTicker == "BTC") ? 8 : 18)))).toFixed(0).toString(),
                 ((trustTicker == "BTC") ? null : ticker.toUpperCase()),
             );
             autoWithdraw = false;
@@ -147,7 +147,6 @@ const progressActions = {
             address: sendTo, // Deposit Address
             currency_ticker: ticker,
             amount,
-            nonce,
             withdrawNotification,
             fee,
             isAffiliate,
