@@ -24,7 +24,8 @@ class Withdraw {
                     user: user
                 },
                 limit: (!size || size > 10) ? 10 : size,
-                offset: !offset ? 0 : offset
+                offset: !offset ? 0 : offset,
+                raw: true
             })
             .then((res)=>{
                 resolve(res);
