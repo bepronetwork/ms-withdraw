@@ -17,14 +17,12 @@ class Withdraw {
         });
     }
 
-    getAll({user, app, size, offset}){
+    getAll({user, size, offset}){
         return new Promise((resolve, reject)=>{
             WithdrawModel.findAll({
                 where: { 
-                    user: user,
-                    app: app
+                    user: user
                 },
-                // order: ['createdAt', 'DESC'],
                 limit: (!size || size > 10) ? 10 : size,
                 offset: !offset ? 0 : offset
             })

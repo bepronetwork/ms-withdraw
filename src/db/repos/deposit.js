@@ -34,14 +34,12 @@ class Deposit {
         });
     }
 
-    getAll({user, app, size, offset}){
+    getAll({user, size, offset}){
         return new Promise((resolve, reject)=>{
             DepositModel.findAll({
                 where: { 
-                    user: user,
-                    app: app
+                    user: user
                 },
-                // order: ['creation_timestamp', 'DESC'],
                 limit: (!size || size > 10) ? 10 : size,
                 offset: !offset ? 0 : offset
             })

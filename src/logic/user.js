@@ -76,13 +76,11 @@ const processActions = {
 
             const deposits = await DepositRepository.getAll({
                 user,
-                app,
                 size,
                 offset
             });
             const withdraws = await WithdrawRepository.getAll({
                 user: user,
-                app,
                 size,
                 offset
             });
@@ -239,6 +237,7 @@ const progressActions = {
             let withdraws_updated = withdraws;
             if (withdraws.length != 0) {
                 for (let withdraw of withdraws) {
+                    console.log("withdraw:: ", withdraw)
                     if (!withdraw.transactionHash) {
                         let ticker = (withdraw.currency_ticker.toUpperCase()) == "BTC" ? "BTC" : "ETH";
                         const getTransaction = (await TrustologySingleton.method(ticker).getTransaction(withdraw.request_id)).data.getRequest;
