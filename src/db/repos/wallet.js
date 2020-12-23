@@ -16,10 +16,13 @@ class Wallet {
         });
     }
 
-    findWalletBySubWalletId(subWalletId) {
+    findWalletBySubWalletId(ticker, subWalletId) {
         return new Promise((resolve, reject)=>{
             WalletModel.sync().then(()=>{
-                WalletModel.findOne({where: {subWalletId}})
+                WalletModel.findOne({where: {
+                    ticker,
+                    subWalletId
+                }})
                 .then((res)=>{
                     resolve(res);
                 })

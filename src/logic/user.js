@@ -45,7 +45,7 @@ const processActions = {
     },
     __updateWallet: async (params) => {
         try {
-            let wallet = await WalletRepository.findWalletBySubWalletId(params.data.subWalletIdString);
+            let wallet = await WalletRepository.findWalletBySubWalletId(String((params.isToken) ? params.data.symbol: params.type).toUpperCase(), params.data.subWalletIdString);
             const tx   = await DepositRepository.findByTX(params.data.tx);
             if(tx!=null){
                 throwError("ALREADY_EXISTING_DEPOSIT_TRANSACTION");
