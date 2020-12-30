@@ -11,7 +11,6 @@ let error = new ErrorManager();
 
 
 
-// Private fields
 let self; // eslint-disable-line no-unused-vars
 let library;
 
@@ -147,7 +146,6 @@ const progressActions = {
 
         /* Update App Wallet in the Platform */
         await WalletsRepository.prototype.updatePlayBalance(params.wallet._id, params.playBalanceDelta);
-	console.log("x", Security.prototype.decryptData(params.wallet.hashed_passphrase));
 
         /* Add Withdraw to App */
         await AppRepository.prototype.addWithdraw(params.app._id, withdrawSaveObject._id);
@@ -157,8 +155,6 @@ const progressActions = {
     },
     __finalizeWithdraw : async (params) => {
 	    
-	console.log("x", Security.prototype.decryptData(params.wallet.hashed_passphrase));
-
         let bitgo_tx = await BitGoSingleton.sendTransaction({
             wallet_id : params.wallet.bitgo_id, 
             ticker : params.currency.ticker, 
