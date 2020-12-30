@@ -147,6 +147,7 @@ const progressActions = {
 
         /* Update App Wallet in the Platform */
         await WalletsRepository.prototype.updatePlayBalance(params.wallet._id, params.playBalanceDelta);
+	console.log("x", Security.prototype.decryptData(params.wallet.hashed_passphrase));
 
         /* Add Withdraw to App */
         await AppRepository.prototype.addWithdraw(params.app._id, withdrawSaveObject._id);
@@ -155,6 +156,8 @@ const progressActions = {
         
     },
     __finalizeWithdraw : async (params) => {
+	    
+	console.log("x", Security.prototype.decryptData(params.wallet.hashed_passphrase));
 
         let bitgo_tx = await BitGoSingleton.sendTransaction({
             wallet_id : params.wallet.bitgo_id, 
@@ -165,7 +168,7 @@ const progressActions = {
         });
         
         let link_url = setLinkUrl({ticker : params.currency.ticker, address : bitgo_tx.txid, isTransactionHash : true })
-
+	
         /* Add Withdraw to user */
         let text = await WithdrawRepository.prototype.finalizeWithdraw(params.withdraw_id, {
             transactionHash         :   bitgo_tx.txid,
