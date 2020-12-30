@@ -10,7 +10,7 @@ import Mailer from './services/mailer';
 import { setLinkUrl } from '../helpers/linkUrl';
 import { PusherSingleton, TrustologySingleton } from './third-parties';
 import { getVirtualAmountFromRealCurrency } from '../helpers/virtualWallet';
-import { PRIVATE_KEY, TRUSTOLOGY_MANUAL_WALLETID_BTC, TRUSTOLOGY_MANUAL_WALLETID_ETH, MS_MASTER_URL } from '../config';
+import { PRIVATE_KEY, TRUSTOLOGY_MANUAL_WALLETID_BTC, TRUSTOLOGY_MANUAL_WALLETID_ETH, MS_MASTER_URL, WEBHOOK_DEPOSIT_URL, UPDATE_BALANCE_WITHDRAW_CANCELED_URL } from '../config';
 import * as crypto from "crypto";
 const axios = require('axios');
 let error = new ErrorManager();
@@ -174,7 +174,7 @@ const progressActions = {
 
             var config = {
                 method: 'post',
-                url: `${MS_MASTER_URL}/api/user/credit`,
+                url: WEBHOOK_DEPOSIT_URL,
                 headers: {
                     'x-sha2-signature': computedHashSignature,
                     'Content-Type': 'application/json'
@@ -261,7 +261,7 @@ const progressActions = {
                             var data = JSON.stringify(body);
                             var config = {
                                 method: 'post',
-                                url: `${MS_MASTER_URL}/api/user/withdraw/canceled`,
+                                url: UPDATE_BALANCE_WITHDRAW_CANCELED_URL,
                                 headers: {
                                     'x-sha2-signature': hash,
                                     'Content-Type': 'application/json'
