@@ -33,6 +33,18 @@ async function addCurrencyWallet(req, res) {
     }
 }
 
+async function getAllTransactions(req, res) {
+    try {
+        let params = req.body;
+        let app = new App(params);
+        let data = await app.getAllTransactions();
+        MiddlewareSingleton.respond(res, req, data);
+    } catch (err) {
+        MiddlewareSingleton.respondError(res, err, req);
+    }
+}
+
 export {
-    addCurrencyWallet
+    addCurrencyWallet,
+    getAllTransactions
 };

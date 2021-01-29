@@ -136,6 +136,36 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+  /users/transactions/backoffice:
+    x-swagger-router-controller: app
+    post:
+      tags:
+      - app
+      summary: Get Transactions From All Users
+      operationId: getAllTransactions
+      description: Get Data From All Users Transactions 
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: app
+          description: Get Data From All Users Transactions
+          required: true
+          schema:
+            $ref: '#/definitions/GetTransactionsBackofficeRequest'
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/GeneralResponse"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
   /app/wallet/currency/add:
     x-swagger-router-controller: app
     post:
@@ -302,6 +332,37 @@ definitions:
           User Id
       offset :
         type : number
+  GetTransactionsBackofficeRequest : 
+    type: object
+    required:
+      - app
+    properties:
+      app :
+        type : string
+        format : name
+        example : "5cuedgq7e6t334t34" 
+        description: |
+          App ID
+      size :
+        type : number
+      user :
+        type : string
+        format : name
+        example : "5cuedgq7e6t334t34" 
+        description: |
+          User Id
+      offset :
+        type : number
+      begin_at :
+        type : string
+        example: "2002-12-09"
+        description: |
+          Start Date
+      end_at :
+        type : string
+        example: "2002-12-09"
+        description: |
+          End Date
   AppAddCurrencyWallet : 
     type: object
     required:

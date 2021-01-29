@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { ErrorManager } from '../controllers/Errors';
-import { AppRepository,  WalletsRepository,  UsersRepository, CurrencyRepository, GamesRepository, JackpotRepository, PointSystemRepository, AutoWithdrawRepository, TxFeeRepository, BalanceRepository, DepositBonusRepository, FreeCurrencyRepository, AffiliateRepository } from '../db/repos';
+import { AppRepository,  WalletsRepository,  UsersRepository, CurrencyRepository, GamesRepository, JackpotRepository, PointSystemRepository, AutoWithdrawRepository, TxFeeRepository, BalanceRepository, DepositBonusRepository, FreeCurrencyRepository, AffiliateRepository, DepositRepository, WithdrawRepository } from '../db/repos';
 import LogicComponent from './logicComponent';
 import { Wallet } from '../models';
 import { throwError } from '../controllers/Errors/ErrorManager';
@@ -36,7 +36,39 @@ const processActions = {
             currency,
             app : app
         }
-    }
+    },
+    __getAllTransactions: async (params) => {
+        try {
+            let { user, size, app, offset, begin_at, end_at } = params;
+
+            const deposits = await DepositRepository.getAllBackoffice({
+                app,
+                user: !user ? null : user,
+                size,
+                offset,
+                begin_at,
+                end_at
+            });
+            const withdraws = await WithdrawRepository.getAllBackoffice({
+                app,
+                user: !user ? null : user,
+                size,
+                offset,
+                begin_at,
+                end_at
+            });
+            return {
+                deposits: deposits,
+                withdraws: withdraws,
+                app,
+                user,
+                size,
+                offset
+            };
+        } catch (error) {
+            console.log(error)
+        }
+    },
 }
 
 
@@ -130,7 +162,78 @@ const progressActions = {
         return {
             currency_id : currency._id
         }
-    }
+    },
+    __getAllTransactions: async (params) => {
+        try {
+            let { withdraws, app, user, size, offset, deposits } = params;
+            let withdraws_updated = withdraws;
+            if (withdraws.length != 0) {
+                for (let withdraw of withdraws) {
+                    if (!withdraw.transactionHash) {
+                        let ticker = (withdraw.currency_ticker.toUpperCase()) == "BTC" ? "BTC" : "ETH";
+                        const getTransaction = (await TrustologySingleton.method(ticker).getTransaction(withdraw.request_id)).data.getRequest;
+                        const tx = getTransaction.transactionHash
+                        let status = 'Canceled';
+                        let note = "The withdrawal was canceled by the administrator, the money has already returned to your account."
+                        if (getTransaction.status.toUpperCase() != 'USER_CANCELLED' && withdraw.status.toUpperCase() != 'CANCELED') {
+                            status = tx ? 'Processed' : 'Queue';
+                            note = (status == 'Processed') ? "Successful withdrawal" : "Withdrawal waiting"
+                        }
+                        if (getTransaction.status.toUpperCase() == 'USER_CANCELLED' && withdraw.status.toUpperCase() != 'CANCELED') {
+                            const body = {
+                                app,
+                                user,
+                                amount: withdraw.amount,
+                                fee: withdraw.fee,
+                                ticker: withdraw.currency_ticker,
+                                isAffiliate: withdraw.isAffiliate
+                            }
+                            const hmac = crypto.createHmac("SHA256", PRIVATE_KEY);
+                            const hash = hmac.update(JSON.stringify(body)).digest("hex");
+                            var data = JSON.stringify(body);
+                            var config = {
+                                method: 'post',
+                                url: UPDATE_BALANCE_WITHDRAW_CANCELED_URL,
+                                headers: {
+                                    'x-sha2-signature': hash,
+                                    'Content-Type': 'application/json'
+                                },
+                                data: data
+                            };
+
+                            const res = (await axios(config)).data;
+                            console.log("res:: ", res)
+
+                            const link_url = setLinkUrl({ ticker: withdraw.currency_ticker, address: tx, isTransactionHash: true })
+                            await WithdrawRepository.findByIdAndUpdateTX({
+                                id: withdraw.id,
+                                tx,
+                                link_url,
+                                status: status,
+                                note: note,
+                                last_update_timestamp: new Date()
+                            });
+                        }
+                    }
+                }
+                withdraws_updated = WithdrawRepository.getAllBackoffice({
+                    app,
+                    user: !user ? null : user,
+                    size,
+                    offset,
+                    begin_at,
+                    end_at
+                });
+            }
+
+            return {
+                deposits,
+                withdraws: withdraws_updated
+            };
+        } catch (error) {
+            console.log(error);
+        }
+    },
 }
 
 /**
@@ -184,6 +287,9 @@ class AppLogic extends LogicComponent{
                 case 'AddCurrencyWallet' : {
 					return await library.process.__addCurrencyWallet(params);
                 };
+                case 'GetAllTransactions': {
+                    return await library.process.__getAllTransactions(params);
+                };
             }
 		}catch(error){
 			throw error
@@ -211,6 +317,9 @@ class AppLogic extends LogicComponent{
 			switch(progressAction) {
                 case 'AddCurrencyWallet' : {
 					return await library.progress.__addCurrencyWallet(params);
+                };
+                case 'GetAllTransactions': {
+                    return await library.process.__getAllTransactions(params);
                 };
             }
 		}catch(error){

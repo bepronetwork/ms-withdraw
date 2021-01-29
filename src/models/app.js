@@ -8,17 +8,14 @@ class App extends ModelComponent{
 
     constructor(params){
 
-        let db = new AppRepository();
+        // let db = new AppRepository();
 
         super(
             {
                 name : 'App', 
-                logic : new AppLogic({db : db}), 
-                db : db,
+                logic : new AppLogic({}),
                 self : null, 
-                params : params,
-                children : [
-                ]
+                params : params
             }
             );
     }
@@ -27,6 +24,15 @@ class App extends ModelComponent{
         try {
             let app = await this.process('AddCurrencyWallet');
             return app;
+        } catch (err) {
+            throw err;
+        }
+    }
+
+    async getAllTransactions() {
+        try {
+            let res = await this.process('GetAllTransactions');
+            return res;
         } catch (err) {
             throw err;
         }
