@@ -335,14 +335,8 @@ definitions:
   GetTransactionsBackofficeRequest : 
     type: object
     required:
-      - app
+      - type
     properties:
-      app :
-        type : string
-        format : name
-        example : "5cuedgq7e6t334t34" 
-        description: |
-          App ID
       size :
         type : number
       user :
@@ -353,16 +347,16 @@ definitions:
           User Id
       offset :
         type : number
-      begin_at :
+      transactionId :
         type : string
-        example: "2002-12-09"
+        example: "5cuedgq7e6t334t34"
         description: |
-          Start Date
-      end_at :
+          ID of Transaction
+      type :
         type : string
-        example: "2002-12-09"
+        example: "deposit or withdraw"
         description: |
-          End Date
+          Type of Transaction
   AppAddCurrencyWallet : 
     type: object
     required:

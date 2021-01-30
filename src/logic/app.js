@@ -39,23 +39,21 @@ const processActions = {
     },
     __getAllTransactions: async (params) => {
         try {
-            let { user, size, app, offset, begin_at, end_at } = params;
+            let { user, size, app, offset, transactionId } = params;
 
             const deposits = await DepositRepository.getAllBackoffice({
                 app,
                 user: !user ? null : user,
                 size,
                 offset,
-                begin_at,
-                end_at
+                transactionId
             });
             const withdraws = await WithdrawRepository.getAllBackoffice({
                 app,
                 user: !user ? null : user,
                 size,
                 offset,
-                begin_at,
-                end_at
+                transactionId
             });
             return {
                 deposits: deposits,
@@ -221,8 +219,7 @@ const progressActions = {
                     user: !user ? null : user,
                     size,
                     offset,
-                    begin_at,
-                    end_at
+                    transactionId
                 });
             }
 
