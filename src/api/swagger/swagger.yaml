@@ -76,6 +76,36 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+  /user/transactions/backoffice:
+    x-swagger-router-controller: user
+    post:
+      tags:
+      - user
+      summary: transactions User
+      operationId: getTransactionsBackoffice
+      description: get Transactions
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: user
+          description: User Information
+          required: true
+          schema:
+            $ref: '#/definitions/GetUserTransactions'
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/GeneralResponse"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
   /user/payment/withdraw: 
     x-swagger-router-controller: user
     post:
@@ -217,7 +247,33 @@ definitions:
         example: "24234g234g23g"
         description: |
           APP ID
-  UserWithdrawFinalize : 
+  GetUserTransactions :
+    type: object
+    required:
+      - type
+    properties:
+      type :
+        type : string
+        example: "withdraw"
+        description: |
+          withdraw or deposit
+      size :
+        type : number
+        example: 100
+      offset :
+        type : number
+        example: 1
+      user :
+        type : string
+        example: "sdfsdfsd"
+        description: |
+          user id
+      transactionId :
+        type : string
+        example: "sdfsdfsdfsd"
+        description: |
+          id transaction
+  UserWithdrawFinalize :
     type: object
     required:
       - app
@@ -227,7 +283,7 @@ definitions:
       - ticker
       - isAutoWithdraw
     properties:
-      amount : 
+      amount :
         type : number
         example: 203
         description: |

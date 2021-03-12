@@ -53,6 +53,15 @@ class User extends ModelComponent {
         }
     }
 
+    async getTransactionsBackoffice() {
+        try {
+            let res = await this.process('GetTransactionsBackoffice');
+            return res;
+        } catch (err) {
+            throw err;
+        }
+    }
+
     async getTransactions() {
         try {
             let res = await this.process('GetTransactions');

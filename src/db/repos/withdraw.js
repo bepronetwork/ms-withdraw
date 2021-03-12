@@ -17,6 +17,23 @@ class Withdraw {
         });
     }
 
+    getFilter(data, {size, offset}){
+        return new Promise((resolve, reject)=>{
+            WithdrawModel.findAll({
+                where: data,
+                limit: (!size || size > 10) ? 10 : size,
+                offset: !offset ? 0 : offset,
+                raw: true
+            })
+            .then((res)=>{
+                resolve(res);
+            })
+            .catch((err)=>{
+                reject(err);
+            });
+        });
+    }
+
     getAll({user, size, offset}){
         return new Promise((resolve, reject)=>{
             WithdrawModel.findAll({
