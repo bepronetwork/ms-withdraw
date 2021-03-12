@@ -130,6 +130,8 @@ const progressActions = {
                     offset: params.offset
                 }
             );
+            res["currency"] = res.currency_ticker;
+            res["_id"] = res.id;
         }else{
             res = await DepositRepository.getFilter(data,
                 {
@@ -137,6 +139,7 @@ const progressActions = {
                     offset: params.offset
                 }
             );
+            res["_id"] = res.id;
         }
 
         return res;
