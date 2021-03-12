@@ -117,6 +117,7 @@ const processActions = {
 const progressActions = {
     __getTransactionsBackoffice: async (params) =>{
         let res = {};
+        let data = {};
         if(res.transactionId){
             data["id"]=res.transactionId;
         }
