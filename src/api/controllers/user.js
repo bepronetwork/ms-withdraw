@@ -8,6 +8,16 @@ import { convertDataSingleton } from '../helpers/convertData';
 import { UsersRepository, WalletsRepository } from '../../db/repos';
 
 
+async function getTransactionsBackoffice (req, res) {
+    try{
+        let params = req.body;
+        let user = new User(params);
+        let data = await user.getTransactionsBackoffice();
+        MiddlewareSingleton.respond(res, req, data);
+	}catch(err){
+        MiddlewareSingleton.respondError(res, err);
+	}
+}
 async function finalizeWithdraw (req, res) {
     try{
         SecuritySingleton.verifyServeToServe(req);
@@ -88,5 +98,6 @@ export {
     getTransactions,
     getDepositAddress,
     finalizeWithdraw,
-    webhookDeposit
+    webhookDeposit,
+    getTransactionsBackoffice
 }

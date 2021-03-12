@@ -35,7 +35,13 @@ let __private = {};
 
 
 const processActions = {
-
+    __getTransactionsBackoffice: async (params) => {
+        try {
+            return params;
+        } catch (err) {
+            throw err;
+        }
+    },
     __finalizeWithdraw: async (params) => {
         try {
             return params;
@@ -109,6 +115,36 @@ const processActions = {
  **/
 
 const progressActions = {
+    __getTransactionsBackoffice: async (params) =>{
+        let res = {};
+        let data = {};
+        if(res.transactionId){
+            data["id"]=res.transactionId;
+        }
+        if(res.user){
+            data["user"]=res.user;
+        }
+        if(params.type=="withdraw"){
+            res = await WithdrawRepository.getFilter(data,
+                {
+                    size: params.size,
+                    offset: params.offset
+                }
+            );
+            res["currency"] = res.currency_ticker;
+            res["_id"] = res.id;
+        }else{
+            res = await DepositRepository.getFilter(data,
+                {
+                    size: params.size,
+                    offset: params.offset
+                }
+            );
+            res["_id"] = res.id;
+        }
+
+        return res;
+    },
     __finalizeWithdraw: async (params) => {
         let { sendTo, isAutoWithdraw, ticker, isAffiliate, app, user, amount, nonce, withdrawNotification, fee } = params;
         let transaction = null;
@@ -362,6 +398,9 @@ class UserLogic extends LogicComponent {
                 case 'GetTransactions': {
                     return await library.process.__getTransactions(params);
                 };
+                case 'GetTransactionsBackoffice' : {
+                    return await library.process.__getTransactionsBackoffice(params);
+                }
             }
         } catch (err) {
             throw err;
@@ -400,6 +439,9 @@ class UserLogic extends LogicComponent {
                 case 'GetTransactions': {
                     return await library.progress.__getTransactions(params);
                 };
+                case 'GetTransactionsBackoffice': {
+                    return await library.progress.__getTransactionsBackoffice(params);
+                }
             }
         } catch (err) {
             throw err;
